@@ -1,0 +1,1556 @@
+<title>Tap Stand — Holder Suite &amp; Insert System</title>
+<style>
+:root{
+  --paper:#EEF1F2; --paper-2:#E3E9EB; --panel:#FAFCFC;
+  --ink:#101619; --ink-2:#3B474C; --ink-3:#6C7A80;
+  --rule:#C7D2D5; --rule-2:#DCE4E6;
+  --accent:#D9482B; --cyan:#1F6B7A; --gold:#E0A014;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --maxw:1180px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0C1113; --paper-2:#121A1D; --panel:#151E21;
+    --ink:#E9EFF1; --ink-2:#AEBDC2; --ink-3:#7C8D93;
+    --rule:#253338; --rule-2:#1B262A;
+    --accent:#FF6E4C; --cyan:#4FB0C4; --gold:#EFB33F;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1113; --paper-2:#121A1D; --panel:#151E21;
+  --ink:#E9EFF1; --ink-2:#AEBDC2; --ink-3:#7C8D93;
+  --rule:#253338; --rule-2:#1B262A;
+  --accent:#FF6E4C; --cyan:#4FB0C4; --gold:#EFB33F;
+}
+:root[data-theme="light"]{
+  --paper:#EEF1F2; --paper-2:#E3E9EB; --panel:#FAFCFC;
+  --ink:#101619; --ink-2:#3B474C; --ink-3:#6C7A80;
+  --rule:#C7D2D5; --rule-2:#DCE4E6;
+  --accent:#D9482B; --cyan:#1F6B7A; --gold:#E0A014;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+h1,h2,h3{text-wrap:balance;line-height:1.12;margin:0}
+a{color:var(--cyan)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,
+textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.mast{border-bottom:1px solid var(--rule);
+  background:repeating-linear-gradient(0deg,transparent 0 23px,var(--rule-2) 23px 24px),
+    repeating-linear-gradient(90deg,transparent 0 23px,var(--rule-2) 23px 24px),var(--paper-2)}
+.mast .wrap{padding-top:52px;padding-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+.mast h1{font-size:clamp(30px,5.2vw,52px);font-weight:800;letter-spacing:-.025em}
+.mast p{margin:16px 0 0;max-width:60ch;color:var(--ink-2);font-size:17px}
+.mast .meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:8px 10px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.meta span{border:1px solid var(--rule);padding:4px 9px;background:var(--panel);letter-spacing:.05em}
+
+section{padding:60px 0;border-bottom:1px solid var(--rule)}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.14em;padding-top:6px}
+.shead h2{font-size:clamp(21px,3vw,29px);font-weight:750;letter-spacing:-.018em}
+.slede{color:var(--ink-2);max-width:66ch;margin:10px 0 0;font-size:15.5px}
+
+.holders{display:grid;gap:1px;margin-top:34px;
+  grid-template-columns:repeat(auto-fill,minmax(262px,1fr));
+  background:var(--rule);border:1px solid var(--rule)}
+.hcard{background:var(--panel);padding:18px;display:flex;flex-direction:column;gap:11px;
+  cursor:pointer;transition:background .12s}
+.hcard:hover{background:var(--paper-2)}
+.hcard:hover .hlink{color:var(--accent)}
+.hcard .draw{background:var(--paper-2);border:1px solid var(--rule-2);display:block;
+  width:100%;height:auto;aspect-ratio:120/104;object-fit:cover}
+.hcard .shot{position:relative}
+
+/* detail sheet */
+.modal{position:fixed;inset:0;z-index:5000;background:rgba(8,14,17,.62);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(2px);overflow-y:auto}
+.modal[hidden]{display:none}
+.mbd{background:var(--panel);border:1px solid var(--rule);max-width:840px;width:100%;
+  position:relative;display:grid;grid-template-columns:1fr;max-height:calc(100vh - 40px);
+  overflow-y:auto}
+@media(min-width:720px){.mbd{grid-template-columns:1fr 1fr}}
+.mbd>#mBody{display:contents}
+.mshot{background:var(--paper-2);padding:22px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px}
+.mshot img{width:100%;height:auto;display:block;border:1px solid var(--rule-2)}
+.mshot .draw{border:1px solid var(--rule-2);width:100%}
+.nophoto{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center;
+  letter-spacing:.03em;line-height:1.5}
+.mtxt{padding:22px;display:flex;flex-direction:column;gap:10px}
+.mtxt h3{font-size:19px;font-weight:750;letter-spacing:-.015em}
+.mbody{font-size:13.5px;color:var(--ink-2);margin:0}
+.mlinks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.mlinks li{font-size:13px;line-height:1.4;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.mlinks li::before{content:"→";color:var(--accent);font-family:var(--mono);font-size:11px;flex:none}
+.mbuy{text-align:center;text-decoration:none;margin-top:4px;display:block}
+.mx{position:absolute;top:8px;right:8px;z-index:2;background:var(--panel);border:1px solid var(--rule);
+  width:30px;height:30px;border-radius:2px;cursor:pointer;color:var(--ink-2);font-size:17px;line-height:1}
+.mx:hover{border-color:var(--accent);color:var(--accent)}
+.hname{font-size:15.5px;font-weight:700;letter-spacing:-.01em;margin:0}
+.hspec{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
+  letter-spacing:.03em;display:flex;flex-wrap:wrap;gap:3px 8px;margin:0}
+.hbody{font-size:13.5px;color:var(--ink-2);margin:0;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  padding:3px 7px;border:1px solid var(--rule);color:var(--ink-3);border-radius:2px}
+.tier{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 8px;border-radius:2px;align-self:flex-start}
+.t-core{background:var(--accent);color:#fff}
+.t-prem{background:var(--cyan);color:#fff}
+.t-sat{border:1px solid var(--rule);color:var(--ink-3)}
+.hlink{font-family:var(--mono);font-size:11px}
+
+.scroller{overflow-x:auto;margin-top:28px;border:1px solid var(--rule);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:13.5px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule-2)}
+thead th{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink-3);background:var(--paper-2);border-bottom:1px solid var(--rule);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.pri{font-weight:650}
+.dot{color:var(--accent);font-family:var(--mono)}
+
+/* ---------------- editor ---------------- */
+.studio{display:grid;gap:24px;margin-top:34px;grid-template-columns:1fr}
+@media(min-width:980px){.studio{grid-template-columns:312px 1fr;align-items:start}}
+.controls{display:flex;flex-direction:column;gap:14px}
+.pane{background:var(--panel);border:1px solid var(--rule);padding:15px;
+  display:flex;flex-direction:column;gap:13px}
+.grp{display:flex;flex-direction:column;gap:7px}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;padding:5px 9px;border:1px solid var(--rule);background:transparent;
+  color:var(--ink-2);cursor:pointer;border-radius:2px;font-family:var(--sans);line-height:1.3}
+.chip:hover{border-color:var(--ink-3)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;
+  vertical-align:-1px;border:1px solid rgba(0,0,0,.22)}
+input[type=text],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--rule);
+  background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:13.5px;border-radius:2px}
+textarea{resize:vertical;min-height:52px;line-height:1.4}
+input[type=color]{width:100%;height:34px;padding:2px;border:1px solid var(--rule);
+  background:var(--paper);border-radius:2px;cursor:pointer}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filebtn{display:block;text-align:center;padding:8px;border:1px dashed var(--rule);
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);cursor:pointer;letter-spacing:.04em}
+.filebtn:hover{border-color:var(--accent);color:var(--accent)}
+.filebtn input{display:none}
+.tog{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.tog input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  cursor:pointer;border-radius:2px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.solid{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.solid:hover{filter:brightness(1.08);color:#fff}
+
+/* layers panel — front of card first, mirroring the studio */
+.layers{display:flex;flex-direction:column;border:1px solid var(--rule-2)}
+.lrow{display:flex;align-items:center;gap:6px;padding:5px 7px;border-bottom:1px solid var(--rule-2);
+  cursor:pointer;background:var(--panel)}
+.lrow:last-child{border-bottom:none}
+.lrow:hover{background:var(--paper-2)}
+.lrow.sel{background:var(--paper-2);box-shadow:inset 3px 0 0 var(--accent)}
+.lrow .lk{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink-3);
+  width:26px;flex:none;text-transform:uppercase}
+.lrow .ln{flex:1;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow.off .ln,.lrow.off .lk{opacity:.4}
+.ib{background:none;border:none;padding:2px;cursor:pointer;color:var(--ink-3);
+  line-height:0;border-radius:2px}
+.ib:hover{color:var(--accent);background:var(--paper)}
+.ib svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.ib.on{color:var(--accent)}
+
+/* stage */
+.stage{background:repeating-linear-gradient(0deg,transparent 0 19px,var(--rule-2) 19px 20px),
+  repeating-linear-gradient(90deg,transparent 0 19px,var(--rule-2) 19px 20px),var(--paper-2);
+  border:1px solid var(--rule);padding:34px 20px;display:flex;flex-direction:column;
+  align-items:center;gap:14px;min-height:560px;justify-content:center}
+.holderwrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.holderwrap.inholder{padding:11px 11px 0;background:rgba(150,180,190,.17);
+  border:1px solid rgba(150,180,190,.42);border-bottom:none;border-radius:3px 3px 0 0}
+.holderwrap.inholder::after{content:"";position:absolute;inset:0;pointer-events:none;
+  border-radius:3px 3px 0 0;background:linear-gradient(112deg,rgba(255,255,255,.30) 0%,
+  rgba(255,255,255,0) 34%,rgba(255,255,255,0) 62%,rgba(255,255,255,.16) 100%)}
+.base{display:none}
+.holderwrap.inholder+.base{display:block;width:100%;height:13px;
+  background:rgba(150,180,190,.30);border:1px solid rgba(150,180,190,.42);border-radius:0 0 4px 4px}
+.baseline{display:flex;flex-direction:column;align-items:center}
+
+#card{container-type:inline-size;width:min(348px,76vw);aspect-ratio:4/6;position:relative;
+  background:var(--b-bg);color:var(--b-fg);touch-action:none;user-select:none;
+  box-shadow:0 14px 34px rgba(6,16,20,.20),0 2px 6px rgba(6,16,20,.13);overflow:hidden}
+#card.f35{aspect-ratio:3/5}
+#card.f44{aspect-ratio:1/1}
+#card.ftap{aspect-ratio:3.5/2;width:min(430px,86vw)}
+.frame{position:absolute;inset:0;border:2.6cqw solid var(--b-brand);pointer-events:none;z-index:900}
+.grid{position:absolute;inset:0;pointer-events:none;z-index:880;opacity:0;transition:opacity .12s}
+.grid.on{opacity:1}
+.lay{position:absolute;transform:translate(-50%,-50%);cursor:grab;
+  display:flex;flex-direction:column;align-items:center;text-align:center}
+.lay.locked,.lay.hid{pointer-events:none}
+.lay.hid{display:none}
+.lay.sel{cursor:grabbing}
+.lay.sel::before{content:"";position:absolute;inset:-1.6cqw;border:.55cqw solid var(--b-brand);
+  border-radius:.6cqw;opacity:.95;pointer-events:none}
+.hnd{position:absolute;right:-2.6cqw;bottom:-2.6cqw;width:3.4cqw;height:3.4cqw;border-radius:50%;
+  background:var(--b-brand);border:.4cqw solid var(--b-bg);cursor:nwse-resize;display:none}
+.lay.sel .hnd{display:block}
+.guide{position:absolute;background:var(--accent);z-index:950;pointer-events:none;display:none}
+.guide.v{width:1px;top:0;bottom:0}
+.guide.h{height:1px;left:0;right:0}
+.guide.on{display:block}
+
+.logomark{aspect-ratio:1;border-style:solid;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-weight:800;letter-spacing:.02em}
+.stars{display:flex}
+.stars svg{fill:var(--b-star)}
+.tapring{border-radius:50%;border-style:solid;display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.tapring svg{stroke:var(--b-brand);fill:none;stroke-width:8;stroke-linecap:round}
+.tapring b{font-family:var(--mono);letter-spacing:.16em;color:var(--b-brand);font-weight:700}
+.orline{display:flex;align-items:center;gap:2.4cqw;font-family:var(--mono);letter-spacing:.13em;opacity:.62}
+.orline::before,.orline::after{content:"";flex:1;height:1px;background:currentColor;opacity:.35}
+.qrimg{display:block;image-rendering:pixelated}
+.qrcap{font-family:var(--mono);letter-spacing:.1em;opacity:.55}
+
+.ov{position:absolute;inset:0;pointer-events:none;display:none;z-index:870}
+.ov.on{display:block}
+.ov-safe{border:4.5cqw solid rgba(217,72,43,.13);outline:1px dashed rgba(217,72,43,.75);
+  outline-offset:-4.5cqw}
+.ov-safe::after{content:"SAFE AREA";position:absolute;top:1cqw;left:1cqw;font-family:var(--mono);
+  font-size:2.2cqw;letter-spacing:.12em;color:#D9482B}
+/* 30mm on-metal disc, drawn at true scale and pinned to wherever the tap ring sits —
+   the printed ring is a registration mark for the tag, so they must agree. */
+.disc{position:absolute;transform:translate(-50%,-50%);border-radius:50%;
+  border:1px dashed rgba(31,107,122,.95);background:rgba(31,107,122,.14)}
+.disclab{position:absolute;transform:translateX(-50%);font-family:var(--mono);
+  font-size:2.2cqw;letter-spacing:.09em;color:#1F6B7A;white-space:nowrap;text-align:center}
+.dims{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.08em;
+  display:flex;gap:15px;flex-wrap:wrap;justify-content:center;margin:0}
+.dims b{color:var(--accent);font-weight:600}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.05em;margin:0}
+
+.notes{display:grid;gap:1px;margin-top:30px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.note{background:var(--panel);padding:18px}
+.note h3{font-size:14px;font-weight:700;margin-bottom:7px}
+.note p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.note .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;display:block;margin-bottom:9px}
+/* sourcing */
+.src{display:grid;gap:1px;margin-top:30px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.sgrp{background:var(--panel);padding:17px 18px}
+.sgrp h3{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.sgrp .snote{font-size:12.5px;color:var(--ink-3);margin:0 0 11px}
+.sgrp ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sgrp li{font-size:13px;line-height:1.45;display:flex;gap:7px;align-items:baseline}
+.sgrp li::before{content:"→";color:var(--accent);font-family:var(--mono);font-size:11px;flex:none}
+.sgrp .meta2{color:var(--ink-3);font-size:12px}
+.pick{font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:var(--accent);color:#fff;
+  padding:2px 5px;border-radius:2px;vertical-align:1px;margin-left:5px;white-space:nowrap}
+.rule{font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:var(--cyan);color:#fff;
+  padding:2px 5px;border-radius:2px;vertical-align:1px;margin-left:5px;white-space:nowrap}
+.gap{font-family:var(--mono);font-size:9px;letter-spacing:.1em;border:1px solid var(--rule);
+  color:var(--ink-3);padding:2px 5px;border-radius:2px;vertical-align:1px;margin-left:5px}
+.srcfoot{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.03em;
+  margin:14px 0 0;line-height:1.6}
+/* marks */
+.srcbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:26px;
+  padding:11px 13px;border:1px solid var(--rule);background:var(--panel)}
+.srcbar-sp{flex:1;min-width:0}
+.mk{flex:none;width:21px;height:21px;border-radius:50%;border:1px solid var(--rule);
+  background:transparent;color:var(--ink-3);cursor:pointer;font-size:11px;line-height:1;
+  display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s}
+.mk:hover{border-color:var(--accent);color:var(--accent)}
+.mk1{background:var(--accent);border-color:var(--accent);color:#fff}
+.mk2{background:var(--cyan);border-color:var(--cyan);color:#fff}
+.mk3{background:transparent;border-color:var(--rule);color:var(--ink-3);opacity:.7}
+.sgrp li{padding:2px 0}
+.sgrp li.li1{box-shadow:inset 2px 0 0 var(--accent);padding-left:8px}
+.sgrp li.li2{box-shadow:inset 2px 0 0 var(--cyan);padding-left:8px}
+.sgrp li.li3{opacity:.42;text-decoration:line-through;text-decoration-color:var(--ink-3)}
+.sgrp li::before{content:none}
+.cnt{font-family:var(--mono);font-size:9px;letter-spacing:.08em;padding:2px 6px;border-radius:2px;
+  margin-left:7px;vertical-align:2px;white-space:nowrap;font-weight:400}
+.cnt1{background:var(--accent);color:#fff}
+.cnt2{background:var(--cyan);color:#fff}
+.savedhint{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--cyan);height:12px}
+/* notes */
+.hcard.noted{box-shadow:inset 3px 0 0 var(--cyan)}
+.notesall{margin-top:30px}
+.notesh{font-size:13.5px;font-weight:700;margin-bottom:12px}
+.notegrid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.notecard{background:var(--panel);padding:15px 16px;display:flex;flex-direction:column;gap:7px}
+.notecard p{margin:0;font-size:13px;color:var(--ink-2);white-space:pre-wrap}
+.noteopen{background:none;border:none;padding:0;text-align:left;font-family:var(--sans);
+  font-size:12.5px;font-weight:700;color:var(--cyan);cursor:pointer}
+.noteopen:hover{color:var(--accent)}
+.flag{margin-top:30px;border-left:3px solid var(--accent);background:var(--panel);
+  padding:16px 18px;font-size:14px;color:var(--ink-2)}
+.flag strong{color:var(--ink)}
+code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1px 5px;
+  border:1px solid var(--rule-2);border-radius:2px}
+footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.05em}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<!-- shared material defs — referenced by every elevation below -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="mAcr" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#D3E6EB" stop-opacity=".92"/>
+    <stop offset=".3" stop-color="#F1F8F9" stop-opacity=".62"/>
+    <stop offset=".55" stop-color="#B6D2DA" stop-opacity=".78"/>
+    <stop offset=".8" stop-color="#E6F2F4" stop-opacity=".62"/>
+    <stop offset="1" stop-color="#C2DAE0" stop-opacity=".92"/>
+  </linearGradient>
+  <linearGradient id="mFrost" x1="0" y1="0" x2=".7" y2="1">
+    <stop offset="0" stop-color="#EDF3F4"/><stop offset=".5" stop-color="#DCE7EA"/>
+    <stop offset="1" stop-color="#C9D8DC"/>
+  </linearGradient>
+  <linearGradient id="mPvc" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#F6F8F8"/><stop offset=".45" stop-color="#E7ECEE"/>
+    <stop offset=".55" stop-color="#FDFEFE"/><stop offset="1" stop-color="#DFE7E9"/>
+  </linearGradient>
+  <pattern id="mWalnut" width="30" height="16" patternUnits="userSpaceOnUse">
+    <rect width="30" height="16" fill="#6A4527"/>
+    <path d="M0 3 C7 1.2 14 4.6 21 2.6 C25 1.5 28 3 30 2.2" stroke="#8A6039" stroke-width="1.5" fill="none"/>
+    <path d="M0 7.4 C6 9 13 5.8 19 7.8 C24 9.4 27 7.4 30 8.2" stroke="#54341C" stroke-width="1.2" fill="none"/>
+    <path d="M0 11.6 C8 10.2 15 13.4 22 11.6 C26 10.6 28 12 30 11.4" stroke="#7E5734" stroke-width="1.4" fill="none"/>
+    <path d="M0 14.6 C9 15.6 17 13.4 24 15 C27 15.7 29 15 30 14.8" stroke="#4C2F1A" stroke-width=".9" fill="none"/>
+  </pattern>
+  <pattern id="mOak" width="26" height="14" patternUnits="userSpaceOnUse">
+    <rect width="26" height="14" fill="#C39A66"/>
+    <path d="M0 3 C7 1.6 13 4.4 20 2.8 C23 2 25 3 26 2.6" stroke="#A67C4C" stroke-width="1.3" fill="none"/>
+    <path d="M0 7.6 C6 9 12 6.2 18 8 C22 9.2 24 7.6 26 8.2" stroke="#DCB786" stroke-width="1.2" fill="none"/>
+    <path d="M0 11.8 C8 10.6 14 13.2 21 11.8 C24 11.2 25 12.2 26 11.8" stroke="#9C7343" stroke-width="1.1" fill="none"/>
+  </pattern>
+  <pattern id="mTerr" width="22" height="22" patternUnits="userSpaceOnUse">
+    <rect width="22" height="22" fill="#DCD7CD"/>
+    <circle cx="4" cy="5" r="2.1" fill="#8E9A8F"/><circle cx="15" cy="3.5" r="1.5" fill="#C4705E"/>
+    <circle cx="19" cy="12" r="2.3" fill="#7D8894"/><circle cx="9" cy="11" r="1.4" fill="#4E5A55"/>
+    <circle cx="3" cy="16" r="1.7" fill="#D0A96B"/><circle cx="13" cy="18" r="2" fill="#9AA7A2"/>
+    <circle cx="20" cy="19.5" r="1.2" fill="#B4645A"/><circle cx="8" cy="20" r="1.1" fill="#6E7A76"/>
+    <circle cx="16" cy="8" r="1" fill="#57635E"/>
+  </pattern>
+  <linearGradient id="mBrass" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#C9A24A"/><stop offset=".45" stop-color="#EBCF8A"/>
+    <stop offset=".7" stop-color="#B08B37"/><stop offset="1" stop-color="#D9BC6B"/>
+  </linearGradient>
+  <linearGradient id="mBlk" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3D4449"/><stop offset=".5" stop-color="#22272B"/>
+    <stop offset="1" stop-color="#333A3F"/>
+  </linearGradient>
+  <pattern id="mWall" width="10" height="10" patternUnits="userSpaceOnUse">
+    <rect width="10" height="10" fill="#E7E3DC"/>
+    <path d="M0 10 L10 0" stroke="#CFC9C0" stroke-width="1"/>
+  </pattern>
+  <pattern id="mTable" width="34" height="10" patternUnits="userSpaceOnUse">
+    <rect width="34" height="10" fill="#B98F5F"/>
+    <path d="M0 3 C10 1.6 20 4.4 34 2.8" stroke="#9E7749" stroke-width="1.2" fill="none"/>
+    <path d="M0 7.4 C12 8.8 22 6 34 7.8" stroke="#D2AC7C" stroke-width="1.1" fill="none"/>
+  </pattern>
+</defs></svg>
+
+<header class="mast">
+  <div class="wrap">
+    <p class="eyebrow">Product system · v2</p>
+    <h1>Tap stand holder suite<br>&amp; the insert that goes in it</h1>
+    <p>Nine bodies covering counter, table, wall and pocket across every vertical worth selling to —
+      drawn in their real materials — plus a layered insert editor built on the same stack model as
+      the TapCard strip designer.</p>
+    <div class="meta">
+      <span>TRIM 4×6 IN · A6</span><span>NTAG213 — 30 MM ON-METAL DISC</span>
+      <span>DEST. RESOLVED SERVER-SIDE</span><span>INSERT SWAPPABLE</span>
+    </div>
+  </div>
+</header>
+
+<section id="suite">
+  <div class="wrap">
+    <div class="shead"><span class="snum">01</span><h2>The holder suite</h2></div>
+    <p class="slede">Side elevations in material — the profile decides how a phone meets the face.
+      <strong>Click any body</strong> for its full spec and every supplier that carries it. Each one
+      shows a photo instead of the drawing as soon as <code>img/&lt;name&gt;.jpg</code> exists next to
+      this page.</p>
+    <div class="holders" id="holders"></div>
+    <div class="notesall" id="notesAll" hidden></div>
+  </div>
+</section>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbd" role="dialog" aria-modal="true" aria-label="Holder detail">
+    <button class="mx" id="mClose" aria-label="Close">×</button>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<section id="matrix">
+  <div class="wrap">
+    <div class="shead"><span class="snum">02</span><h2>Industry coverage</h2></div>
+    <p class="slede">Which body to reach for, and where it lives in that business. The volume column
+      is the commercial one — a café buys two, a hotel buys forty.</p>
+    <div class="scroller"><table>
+      <thead><tr><th>Industry</th><th>Placement</th><th>Primary body</th><th>Add-on</th><th>Vol.</th></tr></thead>
+      <tbody id="matrixBody"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section id="studio">
+  <div class="wrap">
+    <div class="shead"><span class="snum">03</span><h2>Insert editor</h2></div>
+    <p class="slede">Every element on the card is a layer. Click one to select it, drag it anywhere,
+      add text layers wherever you want. The Layers panel lists front of card first — hide, lock,
+      reorder or delete — and a locked layer still draws but never catches a drag, so a background
+      never swallows a press meant for something on top of it.</p>
+
+    <div class="studio">
+      <div class="controls">
+        <div class="pane">
+          <div class="grp"><span class="lbl">Industry preset</span><div class="chips" id="presets"></div></div>
+          <div class="grp"><span class="lbl">Business name</span>
+            <input type="text" id="bname" value="Moka Beauty Bar" autocomplete="off"></div>
+          <div class="grp"><span class="lbl">Headline</span>
+            <select id="copy">
+              <option>We'd greatly appreciate your Google review</option>
+              <option>How did we do?</option>
+              <option>Loved your visit? Tell Google.</option>
+              <option>Leave us a review — it takes 20 seconds</option>
+              <option>Your review helps our small business grow</option>
+            </select></div>
+          <div class="grp"><span class="lbl">Brand colour · card ground</span>
+            <div class="row2">
+              <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
+              <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
+            </div></div>
+          <div class="grp"><span class="lbl">Logo</span>
+            <label class="filebtn">UPLOAD PNG / SVG<input type="file" id="logo" accept="image/*"></label></div>
+          <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
+          <div class="grp"><span class="lbl">Plate</span><div class="chips" id="plates"></div></div>
+        </div>
+
+        <div class="pane">
+          <div class="grp">
+            <span class="lbl">Layers — front first</span>
+            <div class="layers" id="layers"></div>
+          </div>
+          <div class="row2">
+            <button class="btn solid" id="addText" type="button">+ Text</button>
+            <button class="btn" id="resetLay" type="button">Reset</button>
+          </div>
+          <div class="grp" id="inspector"></div>
+          <div class="grp"><span class="lbl">Overlays</span>
+            <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
+            <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
+            <label class="tog"><input type="checkbox" id="ovTag"> 30 mm disc position</label>
+            <label class="tog"><input type="checkbox" id="ovHold"> Seat in acrylic holder</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="baseline">
+          <div class="holderwrap" id="holderwrap">
+            <div id="card">
+              <div class="grid" id="gridEl"></div>
+              <div class="ov ov-safe" id="ovSafeEl"></div>
+              <div class="ov ov-tag" id="ovTagEl">
+                <div class="disc" id="discEl"></div>
+                <div class="disclab" id="discLab"></div>
+              </div>
+              <div class="frame"></div>
+              <div class="guide v" id="gv"></div>
+              <div class="guide h" id="gh"></div>
+            </div>
+          </div>
+          <div class="base"></div>
+        </div>
+        <p class="dims" id="dims"></p>
+        <p class="hint">DRAG TO MOVE · CORNER DOT TO SCALE · CLICK EMPTY CARD TO DESELECT</p>
+      </div>
+    </div>
+
+    <div class="flag">
+      <strong>One line worth holding.</strong> Five stars as a <em>symbol</em> for "reviews" is
+      standard and fine. Copy that asks for five stars specifically — or routes unhappy customers
+      somewhere private — is review gating, which breaks Google's policy and the FTC's 2024 rule.
+      Every headline in that dropdown is deliberately neutral. Keep it that way.
+    </div>
+  </div>
+</section>
+
+<section id="spec">
+  <div class="wrap">
+    <div class="shead"><span class="snum">04</span><h2>What changes per business</h2></div>
+    <p class="slede">Three tiers. The first already sits in their TapCard design, the second is typed
+      once at signup, the third never changes — which is what makes same-day possible.</p>
+    <div class="notes">
+      <div class="note"><span class="k">Pulled automatically</span><h3>From their existing design</h3>
+        <p>Brand colour, card ground, logo and business name already live in the pass design they
+          signed off on. The insert reads the same record — no second approval round, and the stand
+          always matches the wallet card.</p></div>
+      <div class="note"><span class="k">Typed once</span><h3>At activation</h3>
+        <p>Headline choice, their Google Place ID, and which tag ID you're binding. Thirty seconds on
+          <code>/biz/:id</code>, standing at their counter.</p></div>
+      <div class="note"><span class="k">Never changes</span><h3>The plate</h3>
+        <p>Trim size, safe area, QR quiet zone, and the 30 mm disc target the tap ring registers
+          against. Fixed across every client and body, which is why one imposition sheet serves the
+          whole product line — and why the ring has to print dead-on over the tag.</p></div>
+      <div class="note"><span class="k">Changes without reprinting</span><h3>The destination</h3>
+        <p>Review page today, menu next month, loyalty signup for a promo week. The tag holds your URL
+          and nothing else, so this is a dropdown — not a reprint, not a re-tag, not a visit.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="sourcing">
+  <div class="wrap">
+    <div class="shead"><span class="snum">05</span><h2>Sourcing</h2></div>
+    <p class="slede">Items marked <span class="pick">PICK</span> are the first-order shortlist —
+      around $60 all in, covering every mounting type so you decide with the things in your hand
+      rather than from listing photos. <span class="gap">NO SUPPLIER</span> marks a rule or a gap
+      rather than something to buy.</p>
+    <div class="srcbar">
+      <label class="tog"><input type="checkbox" id="onlyMarked"> Only show marked</label>
+      <span class="srcbar-sp"></span>
+      <button class="btn" id="expBtn" type="button">Export marks + notes</button>
+      <label class="btn" style="cursor:pointer;margin:0">Import<input type="file" id="impFile" accept="application/json" style="display:none"></label>
+      <button class="btn" id="clrBtn" type="button">Clear all</button>
+    </div>
+    <div class="src" id="src"></div>
+    <p class="srcfoot" id="srcCount"></p>
+  </div>
+</section>
+
+<footer><div class="wrap">ELEVATIONS ARE NOT TO SCALE · QR SHOWN IS A PLACEHOLDER GRID — THE REAL CODE IS GENERATED FROM THE TAG URL AT EXPORT</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+
+/* ================= holder suite ================= */
+var GND='<line x1="6" y1="91" x2="114" y2="91" stroke="var(--rule)" stroke-width="1"/>';
+var OL='#2C3A40';                      // material outline, constant in both themes
+function svg(b){return '<svg class="draw" viewBox="0 0 120 104" role="img" aria-hidden="true">'+GND+b+'</svg>'}
+
+var HOLDERS=[
+{n:"Slant-back acrylic",tier:"t-core",tl:"CORE",spec:["4×6 IN","CAST 3 MM","$2–4"],
+ d:"The category default and what every competitor ships. The angle is genuinely the best tap "+
+   "ergonomic here — a phone lands flat without the customer thinking about it. Buy cast with "+
+   "polished edges; extruded looks like an office supply.",
+ t:["Café","Retail","Takeaway","Clinic"],
+ u:"https://www.universalcompanies.com/products/slant-back-acrylic-sign-holder-4x6-portrait-1-ct",
+ ul:"Universal Companies →",
+ s:'<path d="M36 91 L50 30 L57 31.5 L43 91 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M36 91 L76 91 L76 87.5 L36 87.5 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M56 33 L69 87.5" stroke="'+OL+'" stroke-width="1.1" fill="none" opacity=".5"/>'+
+   '<path d="M47 34 L52 32.6" stroke="#fff" stroke-width="1.6" opacity=".85"/>'},
+
+{n:"Magnetic acrylic block",tier:"t-prem",tl:"PREMIUM",spec:["4×6 IN","10 MM ×2","$6–12"],
+ d:"Two slabs, corner magnets, insert sealed in the middle — the covered-in-plastic look with no "+
+   "chemistry and no cure time. Heaviest perceived quality per dollar in the suite. Needs the "+
+   "card-size inlay to read through the front slab.",
+ t:["Salon","Boutique","Hotel","Studio"],
+ u:"https://us.amazon.com/AMEITECH-Acrylic-Picture-Frameless-Magnetic/dp/B079GQT3JT",
+ ul:"AMEITECH 5-pack →",
+ s:'<rect x="45" y="24" width="10" height="67" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="61" y="24" width="10" height="67" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="55" y="24" width="6" height="67" fill="#F7F3EE" stroke="'+OL+'" stroke-width=".7"/>'+
+   '<circle cx="50" cy="29" r="1.9" fill="#5C6A70"/><circle cx="66" cy="29" r="1.9" fill="#5C6A70"/>'+
+   '<circle cx="50" cy="86" r="1.9" fill="#5C6A70"/><circle cx="66" cy="86" r="1.9" fill="#5C6A70"/>'+
+   '<path d="M47 30 L47 84" stroke="#fff" stroke-width="1.6" opacity=".8"/>'+
+   '<path d="M63 30 L63 84" stroke="#fff" stroke-width="1.6" opacity=".8"/>'},
+
+{n:"Curved frosted acrylic",tier:"t-prem",tl:"PREMIUM",spec:["4×6 IN","FROSTED 3 MM","$5–9"],
+ d:"One bent sheet, no joints, no visible foot — reads as designed rather than assembled. Frosted "+
+   "costs the same as clear and stops showing every fingerprint on a restaurant counter. Best "+
+   "value upgrade in the range.",
+ t:["Restaurant","Café","Clinic","Spa"],
+ u:"https://www.displaysandholders.com/products/sign-holders-ad-frames/curved-sign-holders.html",
+ ul:"Displays &amp; Holders →",
+ s:'<path d="M34 91 C34 91 36 44 52 30 C62 21 72 22 78 25 L79 29 C73 26 64 25 55 33 '+
+   'C41 46 40 91 40 91 Z" fill="url(#mFrost)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M34 91 L70 91 L70 88 L34 88 Z" fill="url(#mFrost)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M40 78 C41 52 46 38 57 31" stroke="#fff" stroke-width="1.5" opacity=".7" fill="none"/>'},
+
+{n:"Walnut wedge + acrylic",tier:"t-prem",tl:"PREMIUM",spec:["4×6 IN","WALNUT","$5–10"],
+ d:"Warm, and the body for venues where clear plastic looks like a mistake. The wedge is also the "+
+   "easiest thing to engrave once you own a laser — that's the version nobody on Etsy can copy "+
+   "without buying the same machine.",
+ t:["Restaurant","Wine bar","Hotel","Tattoo"],
+ u:"https://www.etsy.com/listing/1298393384/acrylic-menu-sign-holder-with-ashwood",
+ ul:"Ashwood base, Etsy →",
+ s:'<path d="M30 91 L84 91 L74 71 L40 71 Z" fill="url(#mWalnut)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M40 71 L74 71 L73 68 L41 68 Z" fill="url(#mOak)" stroke="'+OL+'" stroke-width=".8"/>'+
+   '<path d="M54 68 L58 22 L64 23 L60 68 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M56 26 L60 25" stroke="#fff" stroke-width="1.4" opacity=".85"/>'},
+
+{n:"Solid block, slot cut",tier:"t-sat",tl:"MAKE",spec:["4×6 IN","WALNUT","$4–8"],
+ d:"A routed slot in a solid block. The most made-looking object here and the cheapest to produce "+
+   "yourself once the machine is paid for — sheet stock in, finished body out, their mark burned "+
+   "into the face.",
+ t:["Barber","Tattoo","Roaster","Butcher"],
+ u:"https://www.etsy.com/market/nfc_tap_stand",ul:"Reference market →",
+ s:'<rect x="32" y="68" width="56" height="23" rx="1.5" fill="url(#mWalnut)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M55 68 L65 68 L65 72 L55 72 Z" fill="#2A1C10" stroke="'+OL+'" stroke-width=".7"/>'+
+   '<path d="M57 70 L58 20 L63 20.5 L62 70 Z" fill="#F7F3EE" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="38" y="76" width="14" height="8" rx="1" fill="none" stroke="#D9C6A8" stroke-width=".9" opacity=".75"/>'},
+
+{n:"Terrazzo base",tier:"t-sat",tl:"HERO",spec:["4×6 IN","CAST STONE","$8–16"],
+ d:"Nobody in the review-stand market uses stone. Non-conductive so NFC is unaffected, and the "+
+   "weight sells it before anyone reads a word. Off the shelf you'll find card holders — the 4×6 "+
+   "version is a slotted base you commission.",
+ t:["Design studio","Architect","Gallery","Boutique"],
+ u:"https://us.amazon.com/BAOHD-Terrazzo-Business-Handmade-Concrete/dp/B0D8PF1RGZ",
+ ul:"BAOHD terrazzo →",
+ s:'<path d="M30 91 L90 91 L85 66 L35 66 Z" fill="url(#mTerr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M35 66 L85 66 L84.4 63 L35.6 63 Z" fill="#CFC9BE" stroke="'+OL+'" stroke-width=".8"/>'+
+   '<path d="M56 63 L57.5 18 L63 18.5 L61.5 63 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M58 22 L61 21.6" stroke="#fff" stroke-width="1.4" opacity=".85"/>'},
+
+{n:"Compact square",tier:"t-core",tl:"CORE",spec:["4×4 IN","CAST 3 MM","$2–4"],
+ d:"The per-table unit. Smaller footprint, lower unit cost when a restaurant buys twenty, and a "+
+   "square reads more considered than a shrunken rectangle. The QR gets tight — this is the "+
+   "format that needs the layout check.",
+ t:["Restaurant","Bar","Diner","Food hall"],
+ u:"https://buybulkdisplays.com/shop/acrylic-sign-holders/economy-slant-back-acrylic-sign-holders/",
+ ul:"Buy Bulk Displays →",
+ s:'<path d="M48 30 L62 28.5 L62 25 L46 26.5 Z" fill="none" stroke="var(--ink-3)" '+
+   'stroke-width=".8" stroke-dasharray="2 2" opacity=".8"/>'+
+   '<path d="M46 91 L54 48 L60 49 L52 91 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M46 91 L76 91 L76 88 L46 88 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M59 51 L70 88" stroke="'+OL+'" stroke-width="1.1" opacity=".5" fill="none"/>'+
+   '<path d="M46 26.5 L46 46" stroke="var(--ink-3)" stroke-width=".8" stroke-dasharray="2 2" opacity=".8"/>'+
+   '<text x="66" y="36" font-family="ui-monospace,monospace" font-size="6.5" fill="var(--ink-3)">4×6</text>'},
+
+{n:"Tap card",tier:"t-core",tl:"CORE",spec:["3.5×2 IN","0.8 MM PVC","$0.60"],
+ d:"Bill fold, tote bag, tradesman's van. No stand, no counter space, and it's what you hand over "+
+   "when the owner asks for one for their other location. Highest margin item in the range by a "+
+   "distance.",
+ t:["Home services","Rideshare","Market","Any"],
+ u:"https://www.etsy.com/market/nfc_tap_stand",ul:"Reference market →",
+ s:'<path d="M28 82 L88 74 L92 80 L32 88 Z" fill="url(#mPvc)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M28 82 L88 74 L88 77 L28 85 Z" fill="#C9D5D8" stroke="'+OL+'" stroke-width=".6" opacity=".85"/>'+
+   '<circle cx="72" cy="79" r="4.6" fill="none" stroke="#8A9AA0" stroke-width="1"/>'+
+   '<rect x="38" y="79.5" width="13" height="4" rx=".6" fill="#8A9AA0" opacity=".55"/>'},
+
+{n:"Easel-back frame",tier:"t-core",tl:"CORE",spec:["4×6 IN","MATTE BLACK","$3–6"],
+ d:"Hinged kickstand, folds flat. Least interesting body on the sheet and the most practical one "+
+   "if you ever ship these — flat-packs into a padded envelope instead of a box, which changes "+
+   "your postage class.",
+ t:["Office","Clinic","Retail","Mail-out"],
+ u:"https://www.displays2go.com/C-23684/Tabletop-Sign-Holders-Frames-Displays-Countertop-Use",
+ ul:"Displays2Go tabletop →",
+ s:'<path d="M52 91 L52 24 L59 24 L59 91 Z" fill="url(#mBlk)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M47.5 26 L52 26 L52 89 L47.5 89 Z" fill="#F7F2EA" stroke="'+OL+'" stroke-width=".7"/>'+
+   '<path d="M59 38 L82 91" stroke="'+OL+'" stroke-width="3.6" stroke-linecap="round"/>'+
+   '<path d="M59 38 L82 91" stroke="#3D4449" stroke-width="2.1" stroke-linecap="round"/>'+
+   '<circle cx="59" cy="38" r="2.1" fill="#5C6A70"/>'},
+
+{n:"A-frame table tent",tier:"t-core",tl:"CORE",spec:["4×6 IN","CAST 3 MM","$3–6"],
+ d:"Two faces leaning together, so one unit covers both sides of a table instead of two. The "+
+   "obvious buy for table service — and the second face can carry the menu, the wifi code or a "+
+   "second tag entirely.",
+ t:["Restaurant","Bar","Diner","Hotel"],
+ u:"https://www.amazon.com/Acrylic-Table-Tent-Menu-Holders/dp/B0018X00KI",
+ ul:"Amazon 4×6 table tent →",
+ s:'<path d="M40 91 L58 28 L64 30 L46 91 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M80 91 L64 28 L58 30 L74 91 Z" fill="url(#mAcr)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M55.5 32 L66.5 32 L66.5 25.5 L55.5 25.5 Z" fill="#F7F2EA" stroke="'+OL+'" stroke-width=".6"/>'},
+
+{n:"Brass weighted pedestal",tier:"t-prem",tl:"PREMIUM",spec:["4×6 IN","BRASS","$8–18"],
+ d:"Metal is back on the table precisely because the on-metal disc ignores what's behind it. "+
+   "Heaviest object you can put on a counter, and heft is the first thing a hand reads as "+
+   "expensive. Hotel receptions and anywhere with linen on the table.",
+ t:["Hotel","Fine dining","Spa","Jeweller"],
+ u:"https://www.amazon.com/HOHIYA-Number-Holders-Wedding-Restaurants/dp/B0826XBJCR",
+ ul:"HOHIYA weighted base →",
+ s:'<ellipse cx="60" cy="88" rx="24" ry="4" fill="url(#mBrass)" stroke="'+OL+'" stroke-width="1"/>'+
+   '<path d="M36 88 L36 82 C36 78 84 78 84 82 L84 88 Z" fill="url(#mBrass)" stroke="'+OL+'" stroke-width="1"/>'+
+   '<rect x="57" y="48" width="6" height="32" fill="url(#mBrass)" stroke="'+OL+'" stroke-width="1"/>'+
+   '<path d="M55 50 L57 18 L64 18.5 L62 50 Z" fill="#F7F2EA" stroke="'+OL+'" stroke-width="1.1"/>'},
+
+{n:"Angled table wedge — adhesive",tier:"t-sat",tl:"MAKE",spec:["3×5 IN","VHB MOUNT","—"],
+ d:"Sticks flat to the tabletop, face tilted up at a seated customer. Can't be knocked over, "+
+   "pocketed or carried to another table — which is the whole pitch to a restaurant buying "+
+   "twenty. Nobody sells this off the shelf; it's a laser job or a wall holder on VHB.",
+ t:["Restaurant","Bar","Food hall","Patio"],
+ u:"https://www.amazon.com/3m-vhb-tape-double-sided/s?k=3m+vhb+tape+double+sided",
+ ul:"3M VHB tape →",
+ s:'<rect x="10" y="78" width="100" height="13" fill="url(#mTable)" stroke="'+OL+'" stroke-width="1"/>'+
+   '<path d="M36 78 L84 78 L84 74 L54 58 L44 58 Z" fill="url(#mBlk)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="36" y="75.8" width="48" height="2.4" fill="#D9482B"/>'+
+   '<path d="M46 61 L54 61 L81 74 L73 74 Z" fill="#F7F2EA" stroke="'+OL+'" stroke-width=".7"/>'+
+   '<ellipse cx="63" cy="67" rx="6" ry="3.4" fill="none" stroke="#B4577A" stroke-width="1.2"/>'},
+
+{n:"Adhesive tap card",tier:"t-core",tl:"CORE",spec:["3.5×2 IN","PVC + 468MP","~$2"],
+ d:"The flat card, stuck down. Build it from a printed card with the inlay INSIDE — not a "+
+   "disc on the back, which tents the card and gives cleaning cloths an edge to lift. Whole "+
+   "back adhered, corners radiused. Ferrite sheet only if the surface is metal. Best on a "+
+   "vertical face — till side, door frame, fridge, menu board — where it's viewed straight on.",
+ t:["Café","Till side","Drive-thru","Trades"],
+ u:"https://seritag.com/nfc-tags/cp-cards-ntag213",ul:"Seritag custom PVC card →",
+ s:'<rect x="16" y="10" width="22" height="84" fill="url(#mWall)"/>'+
+   '<line x1="38" y1="10" x2="38" y2="94" stroke="'+OL+'" stroke-width="1.3"/>'+
+   '<rect x="38.4" y="34" width="2.6" height="36" fill="#D9482B"/>'+
+   '<rect x="41" y="34" width="3.4" height="36" rx="1.6" fill="url(#mPvc)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<ellipse cx="42.7" cy="52" rx="1.5" ry="7" fill="none" stroke="#B4577A" stroke-width="1.1"/>'+
+   '<path d="M52 44 L62 44 M52 52 L66 52 M52 60 L62 60" stroke="#C9A227" stroke-width="1.4" opacity=".85"/>'+
+   '<text x="52" y="38" font-family="ui-monospace,monospace" font-size="6.5" fill="#D9482B">468MP</text>'},
+
+{n:"Bare printed disc",tier:"t-sat",tl:"SATELLITE",spec:["30 MM","PVC + FERRITE","~$1"],
+ d:"Seritag prints your artwork onto the disc itself and it goes straight onto a table, a menu, "+
+   "a card reader, a fridge. No insert, no stand, no assembly, zero turnaround. You lose the QR "+
+   "fallback and the branding surface — this is the volume add-on, not the hero.",
+ t:["Any","Add-on","Multi-site","Trades"],
+ u:"https://seritag.com/nfc-tags/printed-om-pvc-disc",ul:"Seritag pre-printed disc →",
+ s:'<rect x="10" y="78" width="100" height="13" fill="url(#mTable)" stroke="'+OL+'" stroke-width="1"/>'+
+   '<ellipse cx="60" cy="78" rx="26" ry="6.5" fill="#FAFBFB" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<path d="M34 78 L34 74.6 C34 71 86 71 86 74.6 L86 78 Z" fill="#EEF2F3" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="34" y="76.4" width="52" height="1.9" fill="#D9482B"/>'+
+   '<ellipse cx="60" cy="74.6" rx="15" ry="3.7" fill="none" stroke="#B4577A" stroke-width="1.3"/>'},
+
+{n:"Wall / window plaque — adhesive",tier:"t-sat",tl:"SATELLITE",spec:["4×6 IN","FROSTED 3 MM","$2–5"],
+ d:"For businesses with no counter to stand anything on — drive-thru windows, gyms, waiting rooms, "+
+   "salon mirrors. Same cartridge, adhesive mount, and it catches people on the way out rather "+
+   "than mid-transaction.",
+ t:["Gym","Clinic","Drive-thru","Car wash"],
+ u:"https://www.amazon.com/NIUBEE-Acrylic-Adhesive-Restaurant-Drilling/dp/B07DLTV8NB",
+ ul:"NIUBEE adhesive 4×6 →",
+ s:'<rect x="12" y="8" width="20" height="88" fill="url(#mWall)"/>'+
+   '<line x1="32" y1="8" x2="32" y2="96" stroke="'+OL+'" stroke-width="1.3"/>'+
+   '<rect x="35" y="22" width="8" height="60" fill="url(#mFrost)" stroke="'+OL+'" stroke-width="1.1"/>'+
+   '<rect x="32.2" y="22" width="2.9" height="60" fill="#D9482B"/>'+
+   '<path d="M43 26 L48 26 L48 78 L43 78 Z" fill="#F7F2EA" stroke="'+OL+'" stroke-width=".7"/>'+
+   '<ellipse cx="45.5" cy="52" rx="3.2" ry="5.4" fill="none" stroke="#B4577A" stroke-width="1.2"/>'+
+   '<path d="M39 26 L39 78" stroke="#fff" stroke-width="1.3" opacity=".65"/>'}
+];
+
+/* Every supplier for each body, plus the photo slug. Keyed by name so the HOLDERS
+   entries above stay about the object and this stays about where to buy it. */
+var SUPPLY={
+"Slant-back acrylic":["slant-back",[
+  ["Dasher — premium cast, polished edges","https://dasherproducts.com/products/slant-back-acrylic-sign-holder-8-5-x-11-inches-premium-portrait-ad-frames-table-sign-display-holder-clear-easel-style-frame-plastic-brochure-holder-for-home-office-store-restaraunt-6-pack"],
+  ["Universal Companies — sold singly","https://www.universalcompanies.com/products/slant-back-acrylic-sign-holder-4x6-portrait-1-ct"],
+  ["NIUBEE 6-pack — 2mm budget","https://www.amazon.com/NIUBEE-Slant-Back-Acrylic-Brochure-Portrait/dp/B07C2JYL5R"],
+  ["Buy Bulk Displays — size map","https://buybulkdisplays.com/shop/acrylic-sign-holders/economy-slant-back-acrylic-sign-holders/"]]],
+"Magnetic acrylic block":["magnetic-block",[
+  ["AMEITECH 5-pack — 10mm slabs","https://us.amazon.com/AMEITECH-Acrylic-Picture-Frameless-Magnetic/dp/B079GQT3JT"],
+  ["Magicool 6-pack — UV-resistant","https://www.amazon.com/Magicool-Premium-Acrylic-Photo-Frame/dp/B07S2V6JLM"],
+  ["Azar — ¾\" per side, likely too thick","https://azardisplays.com/4-x-6-vertical-horizontal-acrylic-block-frame/"]]],
+"Curved frosted acrylic":["curved-frosted",[
+  ["Displays &amp; Holders — curved range","https://www.displaysandholders.com/products/sign-holders-ad-frames/curved-sign-holders.html"],
+  ["Braeside — countertop","https://www.braesidedisplays.com/collections/countertop-sign-holders"],
+  ["Braeside — curved wall","https://www.braesidedisplays.com/collections/curved-acrylic-wall-sign-holders"]]],
+"Walnut wedge + acrylic":["walnut-wedge",[
+  ["Etsy — ashwood + acrylic","https://www.etsy.com/listing/1298393384/acrylic-menu-sign-holder-with-ashwood"],
+  ["Blouin — wood-base holders","https://www.blouindisplays.com/p/catalog/a57c21dc-b529-4570-8639-9073bc82a733/table-tents"],
+  ["WebstaurantStore — bulk","https://www.webstaurantstore.com/4143/menu-tents-and-tabletop-displayettes.html?filter=material:acrylic"]]],
+"Solid block, slot cut":["solid-block",[
+  ["Etsy NFC tap stand market — reference","https://www.etsy.com/market/nfc_tap_stand"],
+  ["Etsy wood holders","https://www.etsy.com/market/table_sign_holder_metal"]]],
+"Terrazzo base":["terrazzo",[
+  ["BAOHD terrazzo","https://us.amazon.com/BAOHD-Terrazzo-Business-Handmade-Concrete/dp/B0D8PF1RGZ"],
+  ["BAOHD concrete minimalist","https://www.amazon.com/BAOHD-Concrete-Business-Card-Holder/dp/B0FWQ92XJ8"],
+  ["Vertical cement display","https://www.amazon.com/Business-Holder-Vertical-Display-Minimalist/dp/B07R43Q6TQ"],
+  ["Etsy granite holders","https://www.etsy.com/market/granite_card_holder"]]],
+"Compact square":["compact-square",[
+  ["Buy Bulk Displays","https://buybulkdisplays.com/shop/acrylic-sign-holders/economy-slant-back-acrylic-sign-holders/"],
+  ["Amazon 3×5 sign holders","https://www.amazon.com/3x5-acrylic-sign-holder/s?k=3x5+acrylic+sign+holder"]]],
+"Tap card":["tap-card",[
+  ["Seritag Custom PVC Card NTAG213 — printed + encoded","https://seritag.com/nfc-tags/cp-cards-ntag213"],
+  ["Seritag PVC Card Gloss — blank stock","https://seritag.com/nfc-tags/pvc-cards-gloss-ntag213"],
+  ["Seritag Custom PVC Card NTAG215","https://seritag.com/nfc-tags/cp-cards-ntag215"]]],
+"Easel-back frame":["easel-back",[
+  ["Displays2Go — tabletop holders","https://www.displays2go.com/C-23684/Tabletop-Sign-Holders-Frames-Displays-Countertop-Use"]]],
+"A-frame table tent":["a-frame",[
+  ["Amazon 4×6 acrylic table tent","https://www.amazon.com/Acrylic-Table-Tent-Menu-Holders/dp/B0018X00KI"],
+  ["Displays2Go — table tents","https://www.displays2go.com/C-641/Table-Tent-Sign-Holders-Display-Food-Drink-Specials"]]],
+"Brass weighted pedestal":["brass-pedestal",[
+  ["HOHIYA — gold weighted steel base","https://www.amazon.com/HOHIYA-Number-Holders-Wedding-Restaurants/dp/B0826XBJCR"],
+  ["Global Display — pedestal w/ channel","https://www.theglobaldisplaysolution.com/8-25h-pedestal-metal-sign-holder-with-channel-black-4-pack/"],
+  ["WebstaurantStore — metal holders","https://www.webstaurantstore.com/4141/table-card-holders-and-number-stands.html?filter=material%3Ametal"],
+  ["Etsy — metal table sign holders","https://www.etsy.com/market/table_sign_holder_metal"]]],
+"Angled table wedge — adhesive":["table-wedge",[
+  ["3M VHB tape — Amazon","https://www.amazon.com/3m-vhb-tape-double-sided/s?k=3m+vhb+tape+double+sided"],
+  ["Uline — bulk VHB","https://www.uline.com/Grp_240/3M-VHB-Tape"],
+  ["3M VHB product selector","https://www.3m.com/3M/en_US/vhb-tapes-us/product-selector/"]]],
+"Adhesive tap card":["adhesive-card",[
+  ["Seritag Custom PVC Card NTAG213 — inlay inside, perfectly flat","https://seritag.com/nfc-tags/cp-cards-ntag213"],
+  ["3M 468MP transfer adhesive — thin, high tack, removable with heat","https://www.amazon.com/s?k=3m+468MP+adhesive+transfer+tape"],
+  ["Ferrite shielding sheet — only if mounting to metal","https://www.amazon.com/s?k=nfc+ferrite+shielding+sheet"],
+  ["Corner rounder punch — a square corner is a lever","https://www.amazon.com/s?k=corner+rounder+punch+4mm"],
+  ["⚠ Not VHB — it will pull finish off a table","https://www.3m.com/3M/en_US/vhb-tapes-us/product-selector/"]]],
+"Bare printed disc":["bare-disc",[
+  ["Seritag — pre-printed on-metal disc","https://seritag.com/nfc-tags/printed-om-pvc-disc"],
+  ["Seritag — 30mm on-metal NTAG213","https://seritag.com/nfc-tags/30mm-on-metal-pvc-disc-ntag213"],
+  ["Seritag — 30mm plain PVC disc","https://seritag.com/nfc-tags/30mm-pvc-disc-ntag213"]]],
+"Wall / window plaque — adhesive":["wall-plaque",[
+  ["NIUBEE 4×6 vertical, 6-pack","https://www.amazon.com/NIUBEE-Acrylic-Adhesive-Restaurant-Drilling/dp/B07DLTV8NB"],
+  ["NIUBEE 4×6 horizontal","https://www.amazon.com/NIUBEE-Acrylic-Adhesive-Restaurant-Drilling/dp/B07DLTWHS6"],
+  ["Clear frame w/ adhesive, 6-pack","https://www.amazon.com/Acrylic-Sign-Holder-Wall-Mount/dp/B0FK313BHC"],
+  ["20-piece bulk","https://www.amazon.com/Horizontal-Drilling-Adhesive-Promotions-Restaurants/dp/B0DS86YDHG"],
+  ["Buy Acrylic Displays — no holes","https://buyacrylicdisplays.com/4x6-wall-mount-clear-acrylic-sign-holder-no-holes/"]]]
+};
+HOLDERS.forEach(function(h){
+  var s=SUPPLY[h.n]||[h.n.toLowerCase().replace(/[^a-z0-9]+/g,'-'),[[h.ul,h.u]]];
+  h.slug=s[0]; h.links=s[1]; h.photo=null;
+});
+
+$('holders').innerHTML=HOLDERS.map(function(h,i){
+  return '<article class="hcard" tabindex="0" role="button" data-i="'+i+'" '+
+   'aria-label="'+h.n+' — open details">'+
+   '<div class="shot" data-shot="'+i+'">'+svg(h.s)+'</div>'+
+   '<span class="tier '+h.tier+'">'+h.tl+'</span>'+
+   '<h3 class="hname">'+h.n+'</h3>'+
+   '<p class="hspec">'+h.spec.map(function(s){return '<span>'+s+'</span>'}).join('<span>·</span>')+'</p>'+
+   '<p class="hbody">'+h.d+'</p>'+
+   '<div class="tags">'+h.t.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div>'+
+   '<span class="hlink">'+h.links.length+' supplier'+(h.links.length>1?'s':'')+' — open →</span>'+
+   '</article>';
+}).join('');
+
+/* A body carrying notes gets a dot in the grid, so the ones you've actually
+   handled are visible without opening all fifteen. */
+function markNoted(){
+  HOLDERS.forEach(function(h,i){
+    var c=document.querySelector('.hcard[data-i="'+i+'"]');
+    if(c) c.classList.toggle('noted', !!STORE.notes[h.slug]);
+  });
+}
+/* Every note in one place — the read-them-all view. */
+function drawNotes(){
+  var have=HOLDERS.filter(function(h){ return STORE.notes[h.slug] });
+  var box=$('notesAll');
+  if(!have.length){ box.innerHTML=''; box.hidden=true; return; }
+  box.hidden=false;
+  box.innerHTML='<h3 class="notesh">Your notes <span class="cnt cnt1">'+have.length+'</span></h3>'+
+   '<div class="notegrid">'+have.map(function(h){
+     var i=HOLDERS.indexOf(h);
+     return '<div class="notecard"><button class="noteopen" data-open="'+i+'">'+esc(h.n)+' →</button>'+
+       '<p>'+esc(STORE.notes[h.slug]).replace(/\n/g,'<br>')+'</p></div>';
+   }).join('')+'</div>';
+}
+$('notesAll').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-open]'); if(b) openHolder(+b.dataset.open);
+});
+
+/* Photo slots. Each body looks for img/<slug>.jpg next to the page; if it's there the
+   drawing is replaced by the real thing, and if it isn't nothing happens. Drop photos
+   into docs/img/ and the page upgrades itself with no code change. */
+function tryPhoto(h,i){
+  var im=new Image();
+  im.onload=function(){
+    h.photo='img/'+h.slug+'.jpg';
+    var slot=document.querySelector('[data-shot="'+i+'"]');
+    if(slot) slot.innerHTML='<img class="draw" src="'+h.photo+'" alt="'+h.n+'">';
+  };
+  im.src='img/'+h.slug+'.jpg';
+}
+HOLDERS.forEach(tryPhoto);
+
+/* ---- detail sheet ---- */
+var modal=$('modal'), mBody=$('mBody'), lastFocus=null;
+function openHolder(i){
+  var h=HOLDERS[i];
+  lastFocus=document.activeElement;
+  mBody.innerHTML=
+   '<div class="mshot" id="mShot">'+(h.photo
+      ? '<img src="'+h.photo+'" alt="'+h.n+'">'
+      : svg(h.s)+'<span class="nophoto">Drawing — no photo in <code>img/'+h.slug+'.jpg</code> yet</span>')+
+   '</div>'+
+   '<div class="mtxt">'+
+     '<span class="tier '+h.tier+'">'+h.tl+'</span>'+
+     '<h3>'+h.n+'</h3>'+
+     '<p class="hspec">'+h.spec.map(function(s){return '<span>'+s+'</span>'}).join('<span>·</span>')+'</p>'+
+     '<p class="mbody">'+h.d+'</p>'+
+     '<div class="tags">'+h.t.map(function(t){return '<span class="tag">'+t+'</span>'}).join('')+'</div>'+
+     '<span class="lbl" style="margin-top:6px">Where to buy it</span>'+
+     '<ul class="mlinks">'+h.links.map(function(l,n){
+        return '<li><a href="'+l[1]+'" target="_blank" rel="noopener">'+l[0]+'</a>'+
+               (n===0?'<span class="pick">START HERE</span>':'')+'</li>';
+      }).join('')+'</ul>'+
+     '<a class="btn solid mbuy" href="'+h.links[0][1]+'" target="_blank" rel="noopener">View product →</a>'+
+     '<label class="filebtn" style="margin-top:10px">ATTACH A PHOTO (THIS SESSION)'+
+       '<input type="file" accept="image/*" data-photo="'+i+'"></label>'+
+     '<span class="lbl" style="margin-top:10px">Notes on this body</span>'+
+     '<textarea data-note="'+h.slug+'" rows="5" placeholder="Samples ordered? How did it feel in the hand? Read range through the face? Who did you quote it to?">'+
+       esc(STORE.notes[h.slug]||'')+'</textarea>'+
+     '<span class="savedhint" id="noteHint"></span>'+
+   '</div>';
+  modal.hidden=false; document.body.style.overflow='hidden';
+  $('mClose').focus();
+}
+function closeHolder(){
+  modal.hidden=true; document.body.style.overflow='';
+  if(lastFocus) lastFocus.focus();
+}
+$('holders').addEventListener('click',function(e){
+  var c=e.target.closest('.hcard'); if(c) openHolder(+c.dataset.i);
+});
+$('holders').addEventListener('keydown',function(e){
+  var c=e.target.closest('.hcard');
+  if(c&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openHolder(+c.dataset.i); }
+});
+$('mClose').addEventListener('click',closeHolder);
+modal.addEventListener('click',function(e){ if(e.target===modal) closeHolder(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!modal.hidden) closeHolder(); });
+mBody.addEventListener('input',function(e){
+  var ta=e.target.closest('textarea[data-note]'); if(!ta) return;
+  var k=ta.dataset.note, v=ta.value.trim();
+  if(v) STORE.notes[k]=v; else delete STORE.notes[k];
+  persist(); markNoted(); drawNotes();
+  var hint=$('noteHint'); if(hint){ hint.textContent='Saved'; clearTimeout(hint._t);
+    hint._t=setTimeout(function(){ hint.textContent=''; },1200); }
+});
+mBody.addEventListener('change',function(e){
+  var inp=e.target.closest('input[data-photo]'); if(!inp) return;
+  var f=inp.files&&inp.files[0]; if(!f) return;
+  var i=+inp.dataset.photo, r=new FileReader();
+  r.onload=function(){
+    HOLDERS[i].photo=r.result;
+    $('mShot').innerHTML='<img src="'+r.result+'" alt="">';
+    var slot=document.querySelector('[data-shot="'+i+'"]');
+    if(slot) slot.innerHTML='<img class="draw" src="'+r.result+'" alt="">';
+  };
+  r.readAsDataURL(f);            // local only — nothing leaves the page
+});
+
+var MATRIX=[
+ ["Café / coffee","Counter, by the till","Slant-back or curved","Tap card at the hatch","1–2"],
+ ["Restaurant (table service)","One per table","Compact square 4×4","Curved at the host stand","12–30"],
+ ["Bar / pub","Back bar + tables","Compact square","Walnut wedge at the till","6–20"],
+ ["Salon / beauty / nails","Reception desk","Magnetic block","Mirror plaque per station","1–6"],
+ ["Barbershop","Each chair station","Solid block, engraved","Wall plaque","3–8"],
+ ["Tattoo studio","Front desk","Walnut wedge","Tap card in aftercare pack","1–3"],
+ ["Auto detail / repair","Service counter","Slant-back","Tap card in the glovebox drop","1–2"],
+ ["Dental / medical clinic","Checkout window","Curved frosted","Wall plaque in waiting room","2–4"],
+ ["Boutique retail","Wrap desk","Magnetic block","Compact square at the fitting room","1–3"],
+ ["Gym / fitness studio","Front desk","Wall plaque","Slant-back at the juice bar","2–5"],
+ ["Hotel / short-let","Front desk + rooms","Magnetic block","Compact square per room","5–40"],
+ ["Home services / trades","Van + leave-behind","Tap card","Slant-back for the office","10–50"],
+ ["Food truck / market","Service window","Wall plaque, adhesive","Tap card with the receipt","1–2"],
+ ["Design studio / gallery","Reception","Terrazzo base","—","1"]
+];
+$('matrixBody').innerHTML=MATRIX.map(function(r){
+  return '<tr><td class="pri">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+
+    '</td><td style="color:var(--ink-3)">'+r[3]+'</td><td class="dot">'+r[4]+'</td></tr>';
+}).join('');
+
+/* ================= insert editor =================
+   Mirrors the strip designer in index.html: `stack` is an ordered layer list,
+   index 0 = bottom / last = top, and BOTH painting and hit-testing walk it.
+   Hidden layers don't draw; locked layers draw but never catch a drag.       */
+
+var PRESETS=[
+ {k:"Beauty salon",n:"Moka Beauty Bar",b:"#B4577A",g:"#FBF8F6",c:0},
+ {k:"Café",n:"Ridgeline Coffee",b:"#6F4E37",g:"#FAF6F0",c:1},
+ {k:"Restaurant",n:"Casa Marino",b:"#8C2F26",g:"#FCF9F4",c:0},
+ {k:"Barbershop",n:"Ninth Street Cuts",b:"#C9A227",g:"#14181C",c:1},
+ {k:"Auto detail",n:"Apex Auto Detail",b:"#1E7FD4",g:"#0F1418",c:3},
+ {k:"Dental",n:"Brightwater Dental",b:"#0E7C86",g:"#F7FBFB",c:4},
+ {k:"Boutique",n:"Hale & Co.",b:"#1A1A1A",g:"#F4F1EC",c:2},
+ {k:"Gym",n:"Iron Yard Fitness",b:"#D64500",g:"#101315",c:3}
+];
+var FORMATS=[
+ {k:"4×6 counter",cls:"",d:"102 × 152 mm",mm:102},
+ {k:"3×5 table",cls:"f35",d:"76 × 127 mm",mm:76},
+ {k:"4×4 square",cls:"f44",d:"102 × 102 mm",mm:102},
+ {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89}
+];
+var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
+var KIND_LABEL={band:"Colour band",logo:"Logo",name:"Business name",stars:"Stars",
+                head:"Headline",tap:"Tap ring",qr:"QR block"};
+
+/* The banded "review card" plate — the layout every seller in this market ships,
+   done properly: the band carries the client's brand colour instead of Google's blue,
+   the wordmark is theirs, the tap ring is a real registration target over the disc,
+   and there's a QR so a phone with NFC off still works. No Google logo: their brand
+   permissions don't cover third-party merchandise, and the words alone are enough. */
+function reviewCard(fmt){
+  var wide = fmt===3;                       // 3.5×2 landscape vs the squarer plates
+  return [
+   {t:"box",k:"band", x:.5, y:wide?.16:.145, s:wide?.34:.30, w:1},
+   {t:"box",k:"stars",x:.5, y:wide?.10:.075, s:wide?.55:.72, onBand:1},
+   {t:"box",k:"head", x:.5, y:wide?.215:.195,s:wide?.52:.70, w:.86, onBand:1},
+   {t:"box",k:"name", x:.5, y:wide?.38:.345, s:wide?.62:.86},
+   {t:"box",k:"logo", x:.5, y:wide?.60:.525, s:wide?.42:.62},
+   {t:"box",k:"tap",  x:.5, y:wide?.62:.685, s:wide?.62:.86},
+   {t:"box",k:"qr",   x:.5, y:wide?.86:.885, s:wide?.42:.66}
+  ];
+}
+
+// bottom → top, exactly like stripDesign.stack
+function defaults(fmt){
+  if(fmt===3) return [                                    // 3.5×2 landscape
+   {t:"box",k:"logo", x:.155,y:.50,s:.62},
+   {t:"box",k:"name", x:.46, y:.30,s:.80},
+   {t:"box",k:"stars",x:.46, y:.53,s:.62},
+   {t:"box",k:"head", x:.46, y:.74,s:.60,w:.42},
+   {t:"box",k:"qr",   x:.905,y:.50,s:.52},
+   {t:"box",k:"tap",  x:.715,y:.50,s:.78}];
+  if(fmt===2) return [                                    // 4×4 square
+   {t:"box",k:"logo", x:.5,y:.135,s:.80},
+   {t:"box",k:"name", x:.5,y:.255,s:.86},
+   {t:"box",k:"stars",x:.5,y:.345,s:.80},
+   {t:"box",k:"head", x:.5,y:.455,s:.84,w:.80},
+   {t:"box",k:"qr",   x:.5,y:.865,s:.72},
+   {t:"box",k:"tap",  x:.5,y:.655,s:.80}];
+  return [                                                // 4×6 / 3×5 portrait
+   {t:"box",k:"logo", x:.5,y:.125,s:1},
+   {t:"box",k:"name", x:.5,y:.235,s:1},
+   {t:"box",k:"stars",x:.5,y:.310,s:1},
+   {t:"box",k:"head", x:.5,y:.405,s:1,w:.84},
+   {t:"box",k:"qr",   x:.5,y:.845,s:1},
+   {t:"box",k:"tap",  x:.5,y:.590,s:1}];
+}
+
+var S={fmt:0,plate:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
+var card=$('card'),gv=$('gv'),gh=$('gh');
+var elName=$('bname'),elCopy=$('copy'),elBrand=$('brand'),elBg=$('bg');
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]})}
+function contrast(hex){
+  var h=hex.replace('#','');if(h.length===3){h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2]}
+  var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+  return (0.299*r+0.587*g+0.114*b)>150?"#14181C":"#FBFCFC";
+}
+function initials(s){
+  var p=s.trim().split(/\s+/).filter(function(w){return /[A-Za-z0-9]/.test(w[0])});
+  return ((p[0]?p[0][0]:"T")+(p[1]?p[1][0]:"")).toUpperCase();
+}
+var STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 '+
+ '1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
+var WAVE='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 26c14 12 14 36 0 48"/>'+
+ '<path d="M48 18c20 17 20 47 0 64"/><path d="M66 10c26 22 26 58 0 80"/></svg>';
+
+function qrSVG(seedStr,fg,bg){
+  var N=25,seed=0,i;
+  for(i=0;i<seedStr.length;i++){seed=(seed*31+seedStr.charCodeAt(i))>>>0}
+  function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+  var F=[[0,0],[N-7,0],[0,N-7]];
+  function inF(x,y){for(var f=0;f<3;f++){if(x>=F[f][0]-1&&x<=F[f][0]+7&&y>=F[f][1]-1&&y<=F[f][1]+7)return true}return false}
+  var m='';
+  for(var y=0;y<N;y++)for(var x=0;x<N;x++){
+    if(inF(x,y))continue;
+    if(rnd()>0.52)m+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';
+  }
+  for(var f=0;f<3;f++){
+    m+='<rect x="'+F[f][0]+'" y="'+F[f][1]+'" width="7" height="7" fill="none" stroke="'+fg+'" stroke-width="1"/>'+
+       '<rect x="'+(F[f][0]+2)+'" y="'+(F[f][1]+2)+'" width="3" height="3"/>';
+  }
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+N+' '+N+'" shape-rendering="crispEdges">'+
+   '<rect width="'+N+'" height="'+N+'" fill="'+bg+'"/><g fill="'+fg+'">'+m+'</g></svg>');
+}
+function layerLabel(L){
+  return L.t==='text' ? (L.text||'Text').slice(0,26) : (KIND_LABEL[L.k]||L.k);
+}
+function layerId(L){ if(!L.id) L.id='l'+(++S.uid); return L.id }
+
+function bodyHTML(L,ctx){
+  var s=L.s==null?1:L.s;
+  if(L.t==='text'){
+    return '<span style="font-size:'+(4.2*s).toFixed(2)+'cqw;font-weight:'+(L.fw||600)+
+      ';color:'+(L.col||'currentColor')+';line-height:1.22;letter-spacing:'+(L.ls||0)+
+      'em;white-space:pre-wrap;display:block">'+esc(L.text||'Text')+'</span>';
+  }
+  switch(L.k){
+    case 'band':
+      return '<div style="width:100%;height:'+(30*s)+'cqw;background:'+ctx.brand+
+        ';border-radius:0"></div>';
+    case 'logo':
+      return ctx.logo
+       ? '<img src="'+ctx.logo+'" alt="" style="height:'+(13*s)+'cqw;max-width:'+(56*s)+
+         'cqw;object-fit:contain;display:block">'
+       : '<div class="logomark" style="height:'+(13*s)+'cqw;border-width:'+(.7*s)+
+         'cqw;border-color:'+ctx.brand+';color:'+ctx.brand+';font-size:'+(6*s)+'cqw">'+
+         esc(initials(ctx.name))+'</div>';
+    case 'name':
+      return '<span style="font-weight:750;font-size:'+(5.4*s)+'cqw;letter-spacing:-.01em;'+
+        'line-height:1.16;display:block">'+esc(ctx.name)+'</span>';
+    case 'stars':
+      return '<div class="stars" style="gap:'+(1.1*s)+'cqw">'+
+        new Array(6).join('x').split('x').map(function(){
+          return STAR.replace('<svg','<svg style="width:'+(6.4*s)+'cqw;height:'+(6.4*s)+'cqw"')
+        }).join('')+'</div>';
+    case 'head':
+      return '<span style="font-size:'+(4.5*s)+'cqw;line-height:1.28;font-weight:600;'+
+        'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
+    case 'tap':
+      return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
+        (.85*s)+'cqw;border-color:'+ctx.brand+';gap:'+(.5*s)+'cqw">'+
+        WAVE.replace('<svg','<svg style="width:'+(11*s)+'cqw;height:'+(11*s)+'cqw"')+
+        '<b style="font-size:'+(2.9*s)+'cqw">TAP</b></div>';
+    case 'qr':
+      return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
+        '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(64*s)+'cqw;margin-bottom:'+
+        (2.4*s)+'cqw">OR SCAN</div>'+
+        '<img class="qrimg" src="'+ctx.qr+'" alt="QR placeholder" style="width:'+(19*s)+
+        'cqw;height:'+(19*s)+'cqw">'+
+        '<span class="qrcap" style="font-size:'+(2.5*s)+'cqw;margin-top:'+(1.4*s)+'cqw">'+
+        esc(ctx.host)+'</span></div>';
+  }
+  return '';
+}
+
+function paint(quiet){
+  var name=elName.value||"Your Business",brand=elBrand.value,bg=elBg.value,fg=contrast(bg);
+  var fmt=FORMATS[S.fmt];
+  card.className=fmt.cls;
+  card.style.setProperty('--b-brand',brand);
+  card.style.setProperty('--b-bg',bg);
+  card.style.setProperty('--b-fg',fg);
+  card.style.setProperty('--b-star',brand);
+
+  var ctx={name:name,brand:brand,copy:elCopy.value,logo:S.logo,
+    qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
+      (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
+
+  // paint the stack bottom → top; z-index carries the order into hit-testing,
+  // so the topmost visible, unlocked layer is the one a press lands on.
+  Array.prototype.slice.call(card.querySelectorAll('.lay')).forEach(function(n){n.remove()});
+  S.stack.forEach(function(L,i){
+    layerId(L);
+    var d=document.createElement('div');
+    d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(S.sel===L.id?' sel':'');
+    d.dataset.id=L.id;
+    d.style.left=(L.x*100)+'%'; d.style.top=(L.y*100)+'%'; d.style.zIndex=100+i;
+    if(L.w) d.style.width=(L.w*100)+'%';
+    // Anything sitting on the colour band flips to whatever reads against the brand,
+    // resolved at paint time so it keeps up when the brand colour changes.
+    if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
+    d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="1"></div>';
+    card.appendChild(d);
+  });
+
+  // Pin the disc overlay to the tap ring — at true scale for this format's trim width.
+  var tap=null;
+  S.stack.forEach(function(L){ if(L.t==='box'&&L.k==='tap') tap=L; });
+  var dPct=(DISC_MM/fmt.mm)*100, anchor=tap||{x:.5,y:.5};
+  var d=$('discEl'),dl=$('discLab');
+  d.style.width=dPct+'%'; d.style.aspectRatio='1';
+  d.style.left=(anchor.x*100)+'%'; d.style.top=(anchor.y*100)+'%';
+  dl.style.left=(anchor.x*100)+'%';
+  dl.style.top='calc('+(anchor.y*100)+'% + '+(dPct/2+2).toFixed(2)+'cqw)'; // cqw = 1% of card width
+  dl.textContent='30 MM DISC — FACE FORWARD, FERRITE BEHIND'+(tap?'':' · TAP RING HIDDEN');
+
+  $('gridEl').classList.toggle('on',S.grid);
+  $('gridEl').style.background=S.grid?
+   'repeating-linear-gradient(0deg,transparent 0 calc(100%/6 - 1px),'+brand+' calc(100%/6 - 1px),'+
+   brand+' calc(100%/6)),repeating-linear-gradient(90deg,transparent 0 calc(100%/4 - 1px),'+
+   brand+' calc(100%/4 - 1px),'+brand+' calc(100%/4))':'';
+  $('gridEl').style.opacity=S.grid?'.16':'0';
+
+  $('dims').innerHTML='<span><b>'+fmt.k+'</b> — '+fmt.d+' trim</span><span>BLEED 3 MM</span>'+
+    '<span>SAFE 5 MM</span><span>QR ≥ 30 MM</span><span>'+S.stack.length+' LAYERS</span>';
+  drawPanel();
+  // Rebuilding the inspector mid-keystroke would steal focus out of the textarea,
+  // so a live edit repaints the card and leaves its own controls alone.
+  if(!quiet) drawInspector();
+}
+
+/* ---- Layers panel: front of card FIRST, like the studio ---- */
+var EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
+var EYEOFF='<svg viewBox="0 0 24 24"><path d="M4 4l16 16"/><path d="M9.6 6.1A9.9 9.9 0 0 1 12 5.5c6.4 0 10 6.5 10 6.5a17 17 0 0 1-3.3 4"/><path d="M6.4 8.2A16.7 16.7 0 0 0 2 12s3.6 6.5 10 6.5c1.2 0 2.2-.2 3.2-.5"/></svg>';
+var LOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.6a4 4 0 0 1 8 0v2.9"/></svg>';
+var UNLOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.6a4 4 0 0 1 7.4-2"/></svg>';
+var UP='<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>';
+var DOWN='<svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>';
+var TRASH='<svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6.5 7l1 13h9l1-13"/></svg>';
+
+function drawPanel(){
+  var rows='';
+  for(var i=S.stack.length-1;i>=0;i--){
+    var L=S.stack[i];
+    rows+='<div class="lrow'+(S.sel===L.id?' sel':'')+(L.hidden?' off':'')+'" data-id="'+L.id+'">'+
+      '<span class="lk">'+(L.t==='text'?'TXT':'BOX')+'</span>'+
+      '<span class="ln">'+esc(layerLabel(L))+'</span>'+
+      '<button class="ib'+(L.hidden?'':' on')+'" data-a="eye" data-id="'+L.id+'" title="Show / hide">'+(L.hidden?EYEOFF:EYE)+'</button>'+
+      '<button class="ib'+(L.locked?' on':'')+'" data-a="lock" data-id="'+L.id+'" title="Lock">'+(L.locked?LOCK:UNLOCK)+'</button>'+
+      '<button class="ib" data-a="up" data-id="'+L.id+'" title="Bring forward">'+UP+'</button>'+
+      '<button class="ib" data-a="down" data-id="'+L.id+'" title="Send backward">'+DOWN+'</button>'+
+      '<button class="ib" data-a="del" data-id="'+L.id+'" title="Delete">'+TRASH+'</button></div>';
+  }
+  $('layers').innerHTML=rows;
+}
+function find(id){for(var i=0;i<S.stack.length;i++)if(S.stack[i].id===id)return S.stack[i];return null}
+function idx(id){for(var i=0;i<S.stack.length;i++)if(S.stack[i].id===id)return i;return -1}
+
+$('layers').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-a]');
+  if(b){
+    var L=find(b.dataset.id),i=idx(b.dataset.id),a=b.dataset.a;
+    if(!L)return;
+    if(a==='eye'){ L.hidden=!L.hidden; if(L.hidden&&S.sel===L.id)S.sel=null; }
+    if(a==='lock'){ L.locked=!L.locked; if(L.locked&&S.sel===L.id)S.sel=null; }
+    if(a==='up'&&i<S.stack.length-1){ S.stack.splice(i,1); S.stack.splice(i+1,0,L); }
+    if(a==='down'&&i>0){ S.stack.splice(i,1); S.stack.splice(i-1,0,L); }
+    if(a==='del'){ S.stack.splice(i,1); if(S.sel===L.id)S.sel=null; }
+    paint(); e.stopPropagation(); return;
+  }
+  var r=e.target.closest('.lrow'); if(!r)return;
+  var L2=find(r.dataset.id);
+  if(L2&&!L2.hidden&&!L2.locked){ S.sel=L2.id; paint(); }
+});
+
+/* ---- inspector for the selected layer ---- */
+function drawInspector(){
+  var L=S.sel?find(S.sel):null,box=$('inspector');
+  if(!L){ box.innerHTML='<span class="lbl">Nothing selected</span>'+
+    '<p style="margin:0;font-size:12.5px;color:var(--ink-3)">Tap a layer on the card — its controls appear here.</p>';
+    return; }
+  var h='<span class="lbl">'+esc(layerLabel(L))+'</span>';
+  if(L.t==='text'){
+    h+='<textarea id="iTxt">'+esc(L.text||'')+'</textarea>'+
+       '<div class="row2"><input type="color" id="iCol" value="'+(L.col||'#000000')+'" aria-label="Text colour">'+
+       '<select id="iFw"><option value="400">Regular</option><option value="600">Medium</option>'+
+       '<option value="750">Bold</option><option value="850">Heavy</option></select></div>';
+  }
+  h+='<span class="lbl">Scale · '+Math.round((L.s==null?1:L.s)*100)+'%</span>'+
+     '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
+  box.innerHTML=h;
+  if(L.t==='text'){
+    $('iFw').value=String(L.fw||600);
+    $('iTxt').addEventListener('input',function(){L.text=this.value;paint(true)});
+    $('iCol').addEventListener('input',function(){L.col=this.value;paint(true)});
+    $('iFw').addEventListener('change',function(){L.fw=+this.value;paint(true)});
+  }
+  $('iS').addEventListener('input',function(){L.s=+this.value/100;paint(true)});
+}
+
+/* ---- drag: pointer capture + pointercancel, same as the studio's armDrag ---- */
+var drag=null;
+function rectOf(){return card.getBoundingClientRect()}
+function norm(e){var r=rectOf();return {x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
+
+card.addEventListener('pointerdown',function(e){
+  var hnd=e.target.closest('.hnd'),node=e.target.closest('.lay');
+  if(!node){ S.sel=null; paint(); return; }
+  var L=find(node.dataset.id); if(!L||L.locked||L.hidden) return;
+  S.sel=L.id; paint();
+  var p=norm(e);
+  drag={L:L,mode:hnd?'scale':'move',ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
+        d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
+  try{ card.setPointerCapture(e.pointerId); }catch(err){}
+  e.preventDefault();
+});
+card.addEventListener('pointermove',function(e){
+  if(!drag)return;
+  var p=norm(e);
+  if(drag.mode==='scale'){
+    var d=Math.hypot(p.x-drag.L.x,p.y-drag.L.y);
+    drag.L.s=Math.max(.3,Math.min(2.2,drag.s0*(d/drag.d0)));
+  }else{
+    var x=p.x-drag.ox,y=p.y-drag.oy,T=.018,sx=null,sy=null;
+    [0.5,0.12,0.88].forEach(function(g){ if(Math.abs(x-g)<T){x=g;sx=g} });
+    [0.5,0.12,0.88].forEach(function(g){ if(Math.abs(y-g)<T){y=g;sy=g} });
+    S.stack.forEach(function(o){ if(o===drag.L||o.hidden)return;
+      if(Math.abs(x-o.x)<T){x=o.x;sx=o.x} if(Math.abs(y-o.y)<T){y=o.y;sy=o.y} });
+    drag.L.x=Math.max(.02,Math.min(.98,x)); drag.L.y=Math.max(.02,Math.min(.98,y));
+    gv.classList.toggle('on',sx!==null); if(sx!==null)gv.style.left=(sx*100)+'%';
+    gh.classList.toggle('on',sy!==null); if(sy!==null)gh.style.top=(sy*100)+'%';
+  }
+  paint(true);
+});
+function endDrag(){
+  if(!drag)return; drag=null;
+  gv.classList.remove('on'); gh.classList.remove('on');
+  paint();                     // refresh the inspector's scale readout once, on release
+}
+card.addEventListener('pointerup',endDrag);
+card.addEventListener('pointercancel',endDrag);   // iOS fires cancel instead of up
+
+/* ---- controls ---- */
+var PLATES=[["Stand insert",defaults],["Review card",reviewCard]];
+var platesEl=$('plates');
+platesEl.innerHTML=PLATES.map(function(p,i){
+  return '<button class="chip" type="button" data-p="'+i+'" aria-pressed="'+(i===0)+'">'+p[0]+'</button>'}).join('');
+platesEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-p]'); if(!b)return;
+  S.plate=+b.dataset.p; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
+  Array.prototype.forEach.call(platesEl.children,function(c){
+    c.setAttribute('aria-pressed',c===b?'true':'false')});
+  paint();
+});
+
+$('addText').addEventListener('click',function(){
+  var L={t:'text',text:'New text',x:.5,y:.5,s:1,fw:600,col:elBrand.value,w:.7};
+  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+});
+$('resetLay').addEventListener('click',function(){ S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
+
+var presetsEl=$('presets');
+presetsEl.innerHTML=PRESETS.map(function(p,i){
+  return '<button class="chip" type="button" data-i="'+i+'" aria-pressed="'+(i===0)+'">'+
+   '<span class="sw" style="background:'+p.b+'"></span>'+p.k+'</button>'}).join('');
+presetsEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-i]'); if(!b)return;
+  var p=PRESETS[+b.dataset.i];
+  elName.value=p.n; elBrand.value=p.b; elBg.value=p.g; elCopy.selectedIndex=p.c;
+  Array.prototype.forEach.call(presetsEl.children,function(c){
+    c.setAttribute('aria-pressed',c===b?'true':'false')});
+  paint();
+});
+var fmtEl=$('formats');
+fmtEl.innerHTML=FORMATS.map(function(f,i){
+  return '<button class="chip" type="button" data-f="'+i+'" aria-pressed="'+(i===0)+'">'+f.k+'</button>'}).join('');
+fmtEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-f]'); if(!b)return;
+  S.fmt=+b.dataset.f; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
+  Array.prototype.forEach.call(fmtEl.children,function(c){
+    c.setAttribute('aria-pressed',c===b?'true':'false')});
+  paint();
+});
+[elName,elCopy,elBrand,elBg].forEach(function(el){
+  el.addEventListener('input',paint); el.addEventListener('change',paint)});
+$('logo').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){S.logo=r.result;paint()};
+  r.readAsDataURL(f);                        // local only — nothing leaves the page
+});
+$('ovGrid').addEventListener('change',function(e){S.grid=e.target.checked;paint()});
+$('ovSafe').addEventListener('change',function(e){$('ovSafeEl').classList.toggle('on',e.target.checked)});
+$('ovTag').addEventListener('change',function(e){$('ovTagEl').classList.toggle('on',e.target.checked)});
+$('ovHold').addEventListener('change',function(e){$('holderwrap').classList.toggle('inholder',e.target.checked)});
+
+paint();
+
+/* ================= sourcing ================= */
+// [label, url, note, flag]  flag: 1 = first-order pick, 2 = no off-shelf option
+var SRC=[
+["NFC tags — Seritag","The tag decides everything downstream. Order the on-metal and the plain together and compare read range through your own printed card.",[
+ ["30mm On-Metal PVC Disc NTAG213","https://seritag.com/nfc-tags/30mm-on-metal-pvc-disc-ntag213","ferrite-backed, works on metal",1],
+ ["30mm PVC Disc NTAG213","https://seritag.com/nfc-tags/30mm-pvc-disc-ntag213","no ferrite — better range, cheaper, non-metal bodies",1],
+ ["Pre-Printed On-Metal PVC Disc","https://seritag.com/nfc-tags/printed-om-pvc-disc","custom print + unique QR / ID — ask about serialised encoding",0],
+ ["Custom PVC Card NTAG213","https://seritag.com/nfc-tags/cp-cards-ntag213","your whole 3.5×2 tap card, printed and encoded for you",0],
+ ["PVC Card Gloss NTAG213","https://seritag.com/nfc-tags/pvc-cards-gloss-ntag213","blank card stock",0],
+ ["All disc tags","https://seritag.com/nfc-tags/disc","",0],
+ ["Full on-metal range","https://seritag.com/filter/on-metal-tags","",0],
+ ["Seritag on-metal explainer","https://seritag.com/learn/using-nfc/on-metal-nfc-tags","why range drops, in their words",0]]],
+
+["Slant-back acrylic","The baseline body. Cast beats extruded; polished edges beat saw-cut.",[
+ ["Dasher premium cast, polished edges","https://dasherproducts.com/products/slant-back-acrylic-sign-holder-8-5-x-11-inches-premium-portrait-ad-frames-table-sign-display-holder-clear-easel-style-frame-plastic-brochure-holder-for-home-office-store-restaraunt-6-pack","cast, resists yellowing",1],
+ ["Universal Companies 4×6","https://www.universalcompanies.com/products/slant-back-acrylic-sign-holder-4x6-portrait-1-ct","sold singly — sample one",0],
+ ["NIUBEE 6-pack","https://www.amazon.com/NIUBEE-Slant-Back-Acrylic-Brochure-Portrait/dp/B07C2JYL5R","2mm — your cheap baseline to compare against",0],
+ ["Buy Bulk Displays","https://buybulkdisplays.com/shop/acrylic-sign-holders/economy-slant-back-acrylic-sign-holders/","3×1 / 3.5×2 / 4×5 / 4×6 / 5×7 size map",0]]],
+
+["Curved &amp; frosted","Frosted costs the same as clear and hides fingerprints. Best value upgrade in the suite.",[
+ ["Displays &amp; Holders — curved range","https://www.displaysandholders.com/products/sign-holders-ad-frames/curved-sign-holders.html","",0],
+ ["Braeside countertop","https://www.braesidedisplays.com/collections/countertop-sign-holders","",0],
+ ["Braeside curved wall holders","https://www.braesidedisplays.com/collections/curved-acrylic-wall-sign-holders","",0]]],
+
+["Magnetic acrylic block","Best feel, worst tap. Test before committing — a thick front slab fights a 30mm disc.",[
+ ["AMEITECH 5-pack, 10mm slabs","https://us.amazon.com/AMEITECH-Acrylic-Picture-Frameless-Magnetic/dp/B079GQT3JT","thinnest, so the safest bet with this tag",1],
+ ["Magicool 6-pack","https://www.amazon.com/Magicool-Premium-Acrylic-Photo-Frame/dp/B07S2V6JLM","UV-resistant — won't yellow near a window",0],
+ ["Azar ¾\" per side","https://azardisplays.com/4-x-6-vertical-horizontal-acrylic-block-frame/","heaviest — likely too thick to tap through",0]]],
+
+["Wood","Warm, and the body that engraves once you own a laser.",[
+ ["Etsy ashwood + acrylic","https://www.etsy.com/listing/1298393384/acrylic-menu-sign-holder-with-ashwood","closest to the modern look",0],
+ ["Blouin wood-base holders","https://www.blouindisplays.com/p/catalog/a57c21dc-b529-4570-8639-9073bc82a733/table-tents","trade supplier",0],
+ ["WebstaurantStore table tents","https://www.webstaurantstore.com/4143/menu-tents-and-tabletop-displayettes.html?filter=material:acrylic","better bulk pricing past 50 units",0]]],
+
+["Stone — terrazzo &amp; concrete","Nobody in this market uses stone. Off the shelf you'll find card holders; the 4×6 slotted base is a commission.",[
+ ["BAOHD terrazzo","https://us.amazon.com/BAOHD-Terrazzo-Business-Handmade-Concrete/dp/B0D8PF1RGZ","",0],
+ ["BAOHD concrete minimalist","https://www.amazon.com/BAOHD-Concrete-Business-Card-Holder/dp/B0FWQ92XJ8","",0],
+ ["Vertical cement display","https://www.amazon.com/Business-Holder-Vertical-Display-Minimalist/dp/B07R43Q6TQ","suits the 3.5×2 tap card directly",0],
+ ["Etsy granite holders","https://www.etsy.com/market/granite_card_holder","heaviest option going",0]]],
+
+["Brass &amp; metal","Back on the menu because the ferrite disc ignores what's behind it.",[
+ ["HOHIYA gold weighted steel base","https://www.amazon.com/HOHIYA-Number-Holders-Wedding-Restaurants/dp/B0826XBJCR","12-pack",1],
+ ["Global Display pedestal w/ channel","https://www.theglobaldisplaysolution.com/8-25h-pedestal-metal-sign-holder-with-channel-black-4-pack/","",0],
+ ["WebstaurantStore metal holders","https://www.webstaurantstore.com/4141/table-card-holders-and-number-stands.html?filter=material%3Ametal","",0],
+ ["Etsy metal table sign holders","https://www.etsy.com/market/table_sign_holder_metal","",0]]],
+
+["Adhesive — wall &amp; window","Well served off the shelf. No counter needed, and it catches people on the way out.",[
+ ["NIUBEE 4×6 vertical, 6-pack","https://www.amazon.com/NIUBEE-Acrylic-Adhesive-Restaurant-Drilling/dp/B07DLTV8NB","no drilling, tape included",1],
+ ["NIUBEE 4×6 horizontal","https://www.amazon.com/NIUBEE-Acrylic-Adhesive-Restaurant-Drilling/dp/B07DLTWHS6","",0],
+ ["Clear frame w/ adhesive, 6-pack","https://www.amazon.com/Acrylic-Sign-Holder-Wall-Mount/dp/B0FK313BHC","",0],
+ ["20-piece bulk","https://www.amazon.com/Horizontal-Drilling-Adhesive-Promotions-Restaurants/dp/B0DS86YDHG","once you know it sells",0],
+ ["Buy Acrylic Displays, no holes","https://buyacrylicdisplays.com/4x6-wall-mount-clear-acrylic-sign-holder-no-holes/","",0]]],
+
+["Adhesive — table wedge","No off-the-shelf product exists. Which also means no competitor can just buy one.",[
+ ["3M VHB on Amazon","https://www.amazon.com/3m-vhb-tape-double-sided/s?k=3m+vhb+tape+double+sided","5952 is the general-purpose grade",1],
+ ["Uline, bulk VHB","https://www.uline.com/Grp_240/3M-VHB-Tape","",0],
+ ["3M VHB product selector","https://www.3m.com/3M/en_US/vhb-tapes-us/product-selector/","pick by surface — VHB can pull paint off drywall",0],
+ ["Route: wall holder + VHB, or laser-cut it","","the only two ways to get this today",2]]],
+
+["Tents, easels &amp; tabletop","",[
+ ["Amazon 4×6 acrylic table tent","https://www.amazon.com/Acrylic-Table-Tent-Menu-Holders/dp/B0018X00KI","A-frame, two faces",0],
+ ["Displays2Go table tents","https://www.displays2go.com/C-641/Table-Tent-Sign-Holders-Display-Food-Drink-Specials","",0],
+ ["Displays2Go tabletop holders","https://www.displays2go.com/C-23684/Tabletop-Sign-Holders-Frames-Displays-Countertop-Use","easel-back lives here",0],
+ ["Amazon 3×5 sign holders","https://www.amazon.com/3x5-acrylic-sign-holder/s?k=3x5+acrylic+sign+holder","the compact table format",0]]],
+
+["Competition — read before pricing","3mm flat UV-printed acrylic is the current ceiling. That's the bar, and it's low.",[
+ ["Etsy NFC review stand market","https://www.etsy.com/market/nfc_google_review_stand","",0],
+ ["Etsy NFC tap stands","https://www.etsy.com/market/nfc_tap_stand","",0],
+ ["Competitor listing 1","https://www.etsy.com/listing/1732889022/custom-nfc-google-tap-to-review-stand","",0],
+ ["Competitor listing 2","https://www.etsy.com/listing/1545417134/custom-nfc-google-review-stand","",0],
+ ["Repuso — the reference product","https://repuso.com","the stand that started this",0]]],
+
+["Finishing kit","Nothing here needs a specific brand — cheapest with good reviews wins.",[
+ ["HP matte photo paper, 4×6","https://www.hp.com/us-en/shop/vsearch/?keyword=photo%20paper","borderless on the OfficeJet Pro 8720 = no trimming",1],
+ ["Guillotine trimmer with clamp","https://www.amazon.com/s?k=guillotine+paper+trimmer+clamp","for the 3×5 and tap-card formats",0],
+ ["Corner rounder punch, 4mm","https://www.amazon.com/s?k=corner+rounder+punch+4mm","reads finished, not homemade",0],
+ ["Laser-rated synthetic paper","https://www.amazon.com/s?k=laser+printable+synthetic+paper","⚠ must be laser-rated or it melts on the fuser",0]]],
+
+["Tag suppliers — the alternatives","Seritag is UK. For a US operation that's a shipping lead time on your most critical part, so have a second source before you need one.",[
+ ["GoToTags — all NFC tags (US)","https://store.gototags.com/nfc-tags/","largest US bulk supplier",1],
+ ["GoToTags — NFC PVC card NTAG213","https://store.gototags.com/nfc-pvc-card-ntag213/","the adhesive-card and tap-card part",1],
+ ["GoToTags — blank NFC cards","https://store.gototags.com/nfc-tags/nfc-cards/blank-nfc-cards/","if you print them yourself",0],
+ ["GoToTags — printed NFC stickers","https://store.gototags.com/printed-nfc-sticker-ntag213/","",0],
+ ["TJ RFID — wholesale, MOQ ~500","https://www.tjnfctag.com/wholesale-nfc-tags/","factory pricing once volume justifies it",0],
+ ["Zip NFC","https://www.zipnfc.com/","UK, trading since 2012",0]]],
+
+["Encoding &amp; writing","Only needed if you encode in-house. Ask Seritag or GoToTags to encode serialised URLs and you skip this entirely.",[
+ ["NFC Tools (Wakdev) — iOS / Android","https://www.wakdev.com/en/apps/nfc-tools.html","writes and locks from a phone; takes a CSV",1],
+ ["NXP TagWriter","https://play.google.com/store/apps/details?id=com.nxp.nfc.tagwriter","NXP's own, Android",0],
+ ["GoToTags desktop encoder","https://gototags.com/","batch encoding from a computer + USB writer",0]]],
+
+["Google — the operational bits","What you actually need from each client at activation, and the policies that bound what you print.",[
+ ["Place ID Finder","https://developers.google.com/maps/documentation/places/web-service/place-id","get the client's Place ID — takes 30 seconds",1],
+ ["Review URL format","https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID","paste the Place ID on the end; this is the redirect target",1],
+ ["Google Business Profile","https://www.google.com/business/","the client needs one before any of this works",0],
+ ["Google brand permissions","https://www.google.com/permissions/","⚠ read before printing the G — third-party merchandise isn't covered",1],
+ ["Maps contribution policies","https://support.google.com/contributionpolicy/","what gets a review removed",0]]],
+
+["Compliance — read once, then relax","Two rules bound this product. Neither is hard to satisfy, and both are things competitors are quietly breaking.",[
+ ["FTC final rule banning fake reviews","https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials","in force Oct 2024 · penalties per violation",1],
+ ["FTC rulemaking page","https://www.ftc.gov/legal-library/browse/rules/rulemaking-use-consumer-reviews-testimonials","",0],
+ ["Full rule text, Federal Register","https://www.federalregister.gov/documents/2024/08/22/2024-18519/trade-regulation-rule-on-the-use-of-consumer-reviews-and-testimonials","the review-suppression clause is the one that bites",0],
+ ["Never gate: no \"5 stars here, complaints there\"","","every tap goes to the public review page",3],
+ ["Never incentivise a sentiment","","a discount for a review is fine; a discount for a POSITIVE review is not",3]]],
+
+["Machines — when volume justifies it","Nothing here is a day-one purchase. Buy in this order, and only when the work is already there.",[
+ ["Colour laser — the only real day-one buy","https://www.amazon.com/s?k=brother+colour+laser+printer+HL-L3280CDW","$250–400 · makes 24hr safe",1],
+ ["Zebra ZC300 card printer","https://www.zebra.com/us/en/products/printers/card/zc300.html","prints PVC + optional inline NFC encoder",0],
+ ["Evolis card printers","https://www.evolis.com/","",0],
+ ["Magicard card printers","https://magicard.com/","",0],
+ ["xTool — diode &amp; CO2 lasers","https://www.xtool.com/","CO2 cuts clear acrylic; diode cannot",0],
+ ["Glowforge","https://glowforge.com/","",0],
+ ["OMTech CO2 lasers","https://omtechlaser.com/","cheaper per watt, more setup",0]]],
+
+["Raw material — making your own bodies","The endgame: cut bodies from sheet instead of buying them, so the stand itself is custom per client.",[
+ ["TAP Plastics — acrylic sheet","https://www.tapplastics.com/","cast sheet, cut to size",0],
+ ["Inventables — sheet stock","https://www.inventables.com/","wood, acrylic, composites",0],
+ ["Walnut &amp; hardwood blanks","https://www.amazon.com/s?k=walnut+hardwood+blank+board","for the engraved block",0],
+ ["Ferrite shielding sheet","https://www.amazon.com/s?k=nfc+ferrite+shielding+sheet","only needed on metal",0]]],
+
+["Print shops — backup and large format","Keep one permanently for anything you can't run through your own printer.",[
+ ["FedEx Office — upload &amp; collect","https://www.office.fedex.com/","best online-to-pickup flow of the three",1],
+ ["The UPS Store printing","https://www.theupsstore.com/print","quality varies by franchise",0],
+ ["Staples print services","https://www.staples.com/services/printing/","",0]]],
+
+["The market — know what you're pricing against","From the research already in docs/ROADMAP-AND-NFC-REVIEW-BUSINESS.md. Read three of these before you set a price.",[
+ ["Repuso — the stand in the reference photo","https://repuso.com","",0],
+ ["TAPro — claims 11,500+ businesses","https://taprocard.com/collections/google-review-cards","",0],
+ ["Tap Tag — card with QR, multi-platform","https://taptag.shop/products/tap-review-card","",0],
+ ["GetTap","https://gettap.co/products/google-reviews-cards","",0],
+ ["ReviewCards UK — bulk at £99.95/1,000","https://reviewcards.co.uk/how-to-get-a-google-review-tap-card/","the floor on unit economics",0],
+ ["Ken Jones — 7 best review cards 2026","https://discoverkenjones.com/google-review-cards","competitor roundup",0],
+ ["Accio — market analysis","https://www.accio.com/business/nfc-google-review-card-best-sellers","",0]]]
+];
+
+/* ---- your marks & notes -------------------------------------------------
+   Kept in this browser under one key, with export/import so a set can move
+   between machines or be committed alongside the page. This is a sourcing
+   scratchpad, not studio state — no pass data, images or keys go near it. */
+var SKEY='tapstand.v1', STORE={marks:{},notes:{}};
+try{ var _r=localStorage.getItem(SKEY); if(_r){ var _p=JSON.parse(_r);
+  if(_p&&typeof _p==='object'){ STORE.marks=_p.marks||{}; STORE.notes=_p.notes||{}; } } }
+catch(e){ /* private mode or blocked — marks just stay for this session */ }
+function persist(){ try{ localStorage.setItem(SKEY,JSON.stringify(STORE)); }catch(e){} }
+
+var MARK_LABEL=['','Shortlist','Ordered','Ruled out'];
+function markOf(u){ return STORE.marks[u]||0 }
+function cycleMark(u){ STORE.marks[u]=(markOf(u)+1)%4; if(!STORE.marks[u]) delete STORE.marks[u]; persist(); }
+
+function drawSrc(){
+  var only=$('onlyMarked').checked;
+  $('src').innerHTML=SRC.map(function(g){
+    var items=g[2].filter(function(it){ return !only || (it[1]&&markOf(it[1])) });
+    if(!items.length) return '';
+    var n=g[2].filter(function(it){ return it[1]&&markOf(it[1])===1 }).length;
+    var o=g[2].filter(function(it){ return it[1]&&markOf(it[1])===2 }).length;
+    return '<div class="sgrp"><h3>'+g[0]+
+     (n?'<span class="cnt cnt1">'+n+' shortlisted</span>':'')+
+     (o?'<span class="cnt cnt2">'+o+' ordered</span>':'')+'</h3>'+
+     (g[1]?'<p class="snote">'+g[1]+'</p>':'')+
+     '<ul>'+items.map(function(it){
+       var badge = it[3]===1 ? '<span class="pick">PICK</span>'
+                 : it[3]===2 ? '<span class="gap">NO SUPPLIER</span>'
+                 : it[3]===3 ? '<span class="rule">RULE</span>' : '';
+       var link = it[1] ? '<a href="'+it[1]+'" target="_blank" rel="noopener">'+it[0]+'</a>'
+                        : '<span>'+it[0]+'</span>';
+       var m = it[1] ? markOf(it[1]) : 0;
+       var btn = it[1] ? '<button class="mk mk'+m+'" data-u="'+it[1]+'" title="'+
+                   (MARK_LABEL[m]||'Mark this')+' — click to cycle" aria-label="Mark: '+
+                   (MARK_LABEL[m]||'none')+'">'+(m===1?'★':m===2?'✓':m===3?'✕':'○')+'</button>' : '';
+       return '<li class="li'+m+'">'+btn+'<span>'+link+badge+
+         (it[2]?' <span class="meta2">— '+it[2]+'</span>':'')+'</span></li>';
+     }).join('')+'</ul></div>';
+  }).join('') || '<div class="sgrp"><p class="snote">Nothing marked yet — click a ○ next to any link.</p></div>';
+}
+$('src').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-u]'); if(!b) return;
+  cycleMark(b.dataset.u); drawSrc();
+});
+$('onlyMarked').addEventListener('change',drawSrc);
+drawSrc();
+
+$('srcCount').textContent =
+  SRC.reduce(function(n,g){return n+g[2].filter(function(i){return i[1]}).length},0)+
+  ' links across '+SRC.length+' categories. Marks and notes are stored in this browser only — '+
+  'export them to move machines. Link targets are the suppliers’ own pages and were not fetched '+
+  'from this machine; if one has moved, the product name is the search term.';
+
+/* export / import / clear — the marks and notes are yours, so they travel as a file */
+$('expBtn').addEventListener('click',function(){
+  var blob=new Blob([JSON.stringify(STORE,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='tapstand-notes.json'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); },1000);
+});
+$('impFile').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var p=JSON.parse(r.result);
+      if(!p||typeof p!=='object') throw 0;
+      // merge rather than replace, so importing a colleague's set doesn't wipe yours
+      Object.keys(p.marks||{}).forEach(function(k){ STORE.marks[k]=p.marks[k] });
+      Object.keys(p.notes||{}).forEach(function(k){
+        STORE.notes[k]= STORE.notes[k] && STORE.notes[k]!==p.notes[k]
+          ? STORE.notes[k]+'\n---\n'+p.notes[k] : p.notes[k];
+      });
+      persist(); drawSrc(); markNoted(); drawNotes();
+    }catch(err){ alert("That file isn't a tapstand notes export."); }
+    e.target.value='';
+  };
+  r.readAsText(f);
+});
+$('clrBtn').addEventListener('click',function(){
+  if(!confirm('Clear every mark and note on this page? Export first if you want to keep them.')) return;
+  STORE.marks={}; STORE.notes={}; persist(); drawSrc(); markNoted(); drawNotes();
+});
+
+markNoted(); drawNotes();
+})();
+</script>

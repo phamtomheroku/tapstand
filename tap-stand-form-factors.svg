@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 900" width="1120" height="900" font-family="Helvetica, Arial, sans-serif">
+<defs>
+  <linearGradient id="acr" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#D3E6EB" stop-opacity=".92"/>
+    <stop offset=".3" stop-color="#F1F8F9" stop-opacity=".62"/>
+    <stop offset=".55" stop-color="#B6D2DA" stop-opacity=".8"/>
+    <stop offset=".8" stop-color="#E6F2F4" stop-opacity=".62"/>
+    <stop offset="1" stop-color="#C2DAE0" stop-opacity=".92"/>
+  </linearGradient>
+  <linearGradient id="frost" x1="0" y1="0" x2=".7" y2="1">
+    <stop offset="0" stop-color="#EFF4F5"/><stop offset=".5" stop-color="#DCE7EA"/>
+    <stop offset="1" stop-color="#C7D7DB"/>
+  </linearGradient>
+  <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#C9A24A"/><stop offset=".4" stop-color="#EFD79B"/>
+    <stop offset=".68" stop-color="#AD8833"/><stop offset="1" stop-color="#DCC076"/>
+  </linearGradient>
+  <linearGradient id="blk" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3A4045"/><stop offset=".5" stop-color="#22272B"/>
+    <stop offset="1" stop-color="#31373C"/>
+  </linearGradient>
+  <pattern id="walnut" width="30" height="16" patternUnits="userSpaceOnUse">
+    <rect width="30" height="16" fill="#6A4527"/>
+    <path d="M0 3 C7 1.2 14 4.6 21 2.6 C25 1.5 28 3 30 2.2" stroke="#8A6039" stroke-width="1.5" fill="none"/>
+    <path d="M0 7.4 C6 9 13 5.8 19 7.8 C24 9.4 27 7.4 30 8.2" stroke="#54341C" stroke-width="1.2" fill="none"/>
+    <path d="M0 11.6 C8 10.2 15 13.4 22 11.6 C26 10.6 28 12 30 11.4" stroke="#7E5734" stroke-width="1.4" fill="none"/>
+    <path d="M0 14.6 C9 15.6 17 13.4 24 15 C27 15.7 29 15 30 14.8" stroke="#4C2F1A" stroke-width=".9" fill="none"/>
+  </pattern>
+  <pattern id="oak" width="26" height="14" patternUnits="userSpaceOnUse">
+    <rect width="26" height="14" fill="#C39A66"/>
+    <path d="M0 3 C7 1.6 13 4.4 20 2.8 C23 2 25 3 26 2.6" stroke="#A67C4C" stroke-width="1.3" fill="none"/>
+    <path d="M0 7.6 C6 9 12 6.2 18 8 C22 9.2 24 7.6 26 8.2" stroke="#DCB786" stroke-width="1.2" fill="none"/>
+    <path d="M0 11.8 C8 10.6 14 13.2 21 11.8 C24 11.2 25 12.2 26 11.8" stroke="#9C7343" stroke-width="1.1" fill="none"/>
+  </pattern>
+  <pattern id="terr" width="22" height="22" patternUnits="userSpaceOnUse">
+    <rect width="22" height="22" fill="#DCD7CD"/>
+    <circle cx="4" cy="5" r="2.1" fill="#8E9A8F"/><circle cx="15" cy="3.5" r="1.5" fill="#C4705E"/>
+    <circle cx="19" cy="12" r="2.3" fill="#7D8894"/><circle cx="9" cy="11" r="1.4" fill="#4E5A55"/>
+    <circle cx="3" cy="16" r="1.7" fill="#D0A96B"/><circle cx="13" cy="18" r="2" fill="#9AA7A2"/>
+    <circle cx="20" cy="19.5" r="1.2" fill="#B4645A"/><circle cx="8" cy="20" r="1.1" fill="#6E7A76"/>
+    <circle cx="16" cy="8" r="1" fill="#57635E"/>
+  </pattern>
+  <pattern id="wall" width="10" height="10" patternUnits="userSpaceOnUse">
+    <rect width="10" height="10" fill="#E7E3DC"/>
+    <path d="M0 10 L10 0" stroke="#CFC9C0" stroke-width="1"/>
+  </pattern>
+  <pattern id="tabletop" width="34" height="10" patternUnits="userSpaceOnUse">
+    <rect width="34" height="10" fill="#B98F5F"/>
+    <path d="M0 3 C10 1.6 20 4.4 34 2.8" stroke="#9E7749" stroke-width="1.2" fill="none"/>
+    <path d="M0 7.4 C12 8.8 22 6 34 7.8" stroke="#D2AC7C" stroke-width="1.1" fill="none"/>
+  </pattern>
+</defs>
+
+<rect width="1120" height="900" fill="#F4F6F7"/>
+
+<text x="24" y="34" font-size="19" font-weight="700" fill="#101619">Tap stand form factors — side elevations, in material</text>
+<text x="24" y="55" font-size="12.5" fill="#5C6A70">Every body takes the same cartridge: printed insert, 30 mm NTAG213 disc face-forward, backing card. Red = adhesive.</text>
+<line x1="24" y1="68" x2="1096" y2="68" stroke="#C7D2D5" stroke-width="1"/>
+
+<!-- ============ ROW 1 : counter standing ============ -->
+<g transform="translate(24,86)">
+  <text x="0" y="10" font-size="10" letter-spacing="1.6" fill="#D9482B" font-weight="700">FREESTANDING — COUNTER</text>
+</g>
+
+<!-- 1 slant-back acrylic -->
+<g transform="translate(24,100)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M74 150 L96 44 L106 46 L84 150 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M100 48 L118 46 L118 40 L100 42 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".7"/>
+  <path d="M74 150 L152 150 L152 145 L74 145 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M104 50 L136 145" stroke="#2C3A40" stroke-width="1.1" fill="none" opacity=".45"/>
+  <path d="M88 50 L98 47" stroke="#fff" stroke-width="2" opacity=".85"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Slant-back acrylic</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Clear cast · the category default · best tap angle</text>
+</g>
+
+<!-- 2 curved frosted -->
+<g transform="translate(296,100)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M72 150 C72 150 74 84 96 60 C110 44 128 44 140 50 L142 58 C132 52 116 52 104 66 C86 86 82 150 82 150 Z"
+        fill="url(#frost)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M72 150 L142 150 L142 145 L72 145 Z" fill="url(#frost)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M84 128 C86 92 94 72 110 60" stroke="#fff" stroke-width="1.8" opacity=".75" fill="none"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Curved frosted acrylic</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">One bent sheet · no joints · hides fingerprints</text>
+</g>
+
+<!-- 3 magnetic block -->
+<g transform="translate(568,100)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <rect x="94" y="42" width="16" height="108" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="126" y="42" width="16" height="108" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="110" y="42" width="16" height="108" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".8"/>
+  <circle cx="102" cy="50" r="2.6" fill="#5C6A70"/><circle cx="134" cy="50" r="2.6" fill="#5C6A70"/>
+  <circle cx="102" cy="142" r="2.6" fill="#5C6A70"/><circle cx="134" cy="142" r="2.6" fill="#5C6A70"/>
+  <path d="M98 52 L98 140" stroke="#fff" stroke-width="2" opacity=".8"/>
+  <path d="M130 52 L130 140" stroke="#fff" stroke-width="2" opacity=".8"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Magnetic acrylic block</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Sealed sandwich · heaviest feel · ⚠ thick = weak tap</text>
+</g>
+
+<!-- 4 easel-back frame -->
+<g transform="translate(840,100)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M104 150 L104 44 L114 44 L114 150 Z" fill="url(#blk)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M100 46 L104 46 L104 148 L100 148 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".7"/>
+  <path d="M114 62 L152 150" stroke="#2C3A40" stroke-width="4" stroke-linecap="round"/>
+  <path d="M114 62 L152 150" stroke="url(#blk)" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="114" cy="62" r="3" fill="#5C6A70"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Easel-back frame</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Hinged kickstand · folds flat · cheapest to ship</text>
+</g>
+
+<!-- ============ ROW 2 ============ -->
+<g transform="translate(24,336)">
+  <text x="0" y="10" font-size="10" letter-spacing="1.6" fill="#D9482B" font-weight="700">FREESTANDING — PREMIUM &amp; TABLE</text>
+</g>
+
+<!-- 5 walnut wedge -->
+<g transform="translate(24,350)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M62 150 L164 150 L146 112 L80 112 Z" fill="url(#walnut)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M80 112 L146 112 L144 106 L82 106 Z" fill="url(#oak)" stroke="#2C3A40" stroke-width=".9"/>
+  <path d="M106 106 L114 34 L126 36 L118 106 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M110 40 L120 38.5" stroke="#fff" stroke-width="1.8" opacity=".85"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Walnut wedge + acrylic</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Warm · engravable once you own a laser</text>
+</g>
+
+<!-- 6 walnut block slot -->
+<g transform="translate(296,350)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <rect x="66" y="106" width="112" height="44" rx="2" fill="url(#walnut)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M114 106 L132 106 L132 116 L114 116 Z" fill="#2A1C10" stroke="#2C3A40" stroke-width=".8"/>
+  <path d="M117 112 L119 32 L129 33 L127 112 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="76" y="122" width="26" height="16" rx="1.5" fill="none" stroke="#D9C6A8" stroke-width="1.2" opacity=".8"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Solid block, slot cut</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Most "made" · you produce these yourself</text>
+</g>
+
+<!-- 7 terrazzo -->
+<g transform="translate(568,350)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M62 150 L176 150 L166 100 L72 100 Z" fill="url(#terr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M72 100 L166 100 L164.6 94 L73.4 94 Z" fill="#CFC9BE" stroke="#2C3A40" stroke-width=".9"/>
+  <path d="M112 94 L116 28 L128 29 L124 94 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M117 34 L123 33" stroke="#fff" stroke-width="1.8" opacity=".85"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Terrazzo cast base</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Heavy · architectural · nobody else uses stone</text>
+</g>
+
+<!-- 8 brass pedestal -->
+<g transform="translate(840,350)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <ellipse cx="120" cy="146" rx="46" ry="7" fill="url(#brass)" stroke="#2C3A40" stroke-width="1.1"/>
+  <path d="M74 146 L74 136 C74 130 166 130 166 136 L166 146 Z" fill="url(#brass)" stroke="#2C3A40" stroke-width="1.1"/>
+  <rect x="115" y="72" width="10" height="60" fill="url(#brass)" stroke="#2C3A40" stroke-width="1.1"/>
+  <path d="M112 74 L116 30 L128 31 L124 74 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width="1.2"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Brass weighted pedestal</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Metal is fine — the ferrite disc ignores it</text>
+</g>
+
+<!-- ============ ROW 3 ============ -->
+<g transform="translate(24,586)">
+  <text x="0" y="10" font-size="10" letter-spacing="1.6" fill="#D9482B" font-weight="700">ADHESIVE — NO FOOTPRINT</text>
+</g>
+
+<!-- 9 A-frame -->
+<g transform="translate(24,600)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <line x1="18" y1="150" x2="238" y2="150" stroke="#C7D2D5"/>
+  <path d="M84 150 L116 52 L124 54 L94 150 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M156 150 L124 52 L116 54 L146 150 Z" fill="url(#acr)" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M112 58 L128 58 L128 50 L112 50 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".7"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">A-frame table tent</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Two faces · works from either side of a table</text>
+</g>
+
+<!-- 10 wall plaque adhesive -->
+<g transform="translate(296,600)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <rect x="30" y="20" width="42" height="140" fill="url(#wall)"/>
+  <line x1="72" y1="20" x2="72" y2="160" stroke="#2C3A40" stroke-width="1.4"/>
+  <rect x="76" y="44" width="9" height="92" fill="url(#frost)" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="72.5" y="44" width="3.5" height="92" fill="#D9482B"/>
+  <path d="M85 50 L92 50 L92 130 L85 130 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".8"/>
+  <circle cx="88.5" cy="90" r="7" fill="none" stroke="#B4577A" stroke-width="1.6"/>
+  <text x="104" y="86" font-size="10.5" fill="#D9482B" font-weight="700">3M VHB</text>
+  <text x="104" y="100" font-size="10.5" fill="#6C7A80">wall mount</text>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Wall plaque — adhesive</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">No counter needed · exits, mirrors, drive-thru</text>
+</g>
+
+<!-- 11 table wedge adhesive -->
+<g transform="translate(568,600)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <rect x="20" y="128" width="216" height="24" fill="url(#tabletop)" stroke="#2C3A40" stroke-width="1.1"/>
+  <path d="M78 128 L166 128 L166 122 L104 96 L86 96 Z" fill="url(#blk)" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="78" y="125" width="88" height="3.5" fill="#D9482B"/>
+  <path d="M90 100 L104 100 L162 122 L148 122 Z" fill="#F7F2EA" stroke="#2C3A40" stroke-width=".8"/>
+  <circle cx="124" cy="111" r="7.5" fill="none" stroke="#B4577A" stroke-width="1.6"/>
+  <text x="176" y="106" font-size="10.5" fill="#D9482B" font-weight="700">3M VHB</text>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Angled table wedge — adhesive</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Can't be knocked over, pocketed or walked off</text>
+</g>
+
+<!-- 12 bare disc -->
+<g transform="translate(840,600)">
+  <rect width="256" height="212" fill="#FFF" stroke="#DCE4E6"/>
+  <rect x="20" y="128" width="216" height="24" fill="url(#tabletop)" stroke="#2C3A40" stroke-width="1.1"/>
+  <ellipse cx="128" cy="128" rx="52" ry="13" fill="#FFF" stroke="#2C3A40" stroke-width="1.2"/>
+  <path d="M76 128 L76 124 C76 117 180 117 180 124 L180 128 Z" fill="#F2F4F5" stroke="#2C3A40" stroke-width="1.2"/>
+  <rect x="76" y="126" width="104" height="3" fill="#D9482B"/>
+  <ellipse cx="128" cy="123" rx="30" ry="7.4" fill="none" stroke="#B4577A" stroke-width="1.6"/>
+  <path d="M118 118 L138 118 M114 123 L142 123" stroke="#C9A227" stroke-width="1.6" opacity=".9"/>
+  <text x="14" y="176" font-size="13.5" font-weight="700" fill="#101619">Bare printed disc</text>
+  <text x="14" y="194" font-size="11" fill="#6C7A80">Seritag prints it · no insert, no assembly, $1 unit</text>
+</g>
+
+<text x="24" y="866" font-size="10.5" fill="#6C7A80">NOT TO SCALE · CREAM = PRINTED INSERT · RED = 3M ADHESIVE LAYER · PINK RING = TAP TARGET, 30 MM DISC SITS DIRECTLY BEHIND IT</text>
+</svg>
