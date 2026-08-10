@@ -107,6 +107,23 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
 .t-sat{border:1px solid var(--rule);color:var(--ink-3)}
 .hlink{font-family:var(--mono);font-size:11px}
 
+/* NFC tags & holders */
+.nfclist{cursor:grab}
+.nfcitem{background:var(--panel);padding:16px;display:flex;gap:14px;align-items:flex-start;
+  cursor:grab;transition:background .1s;user-select:none}
+.nfcitem:hover{background:var(--paper-2)}
+.nfcitem.dragging{opacity:.5}
+.nfcdrag{color:var(--ink-3);font-family:var(--mono);font-size:11px;flex:none;padding-top:2px}
+.nfcbody{flex:1;display:flex;flex-direction:column;gap:8px}
+.nfctitle{font-weight:700;font-size:14px;letter-spacing:-.01em;line-height:1.3}
+.nfcdesc{font-size:12px;color:var(--ink-2);line-height:1.4}
+.nfclinks{display:flex;flex-wrap:wrap;gap:7px}
+.nfclink{font-size:11px;padding:4px 8px;border:1px solid var(--rule);
+  background:var(--paper);color:var(--cyan);text-decoration:none;border-radius:2px;
+  transition:all .1s;font-family:var(--mono);letter-spacing:.03em}
+.nfclink:hover{border-color:var(--cyan);background:var(--panel)}
+.nfcnote{font-size:11px;color:var(--ink-3)}.
+
 .scroller{overflow-x:auto;margin-top:28px;border:1px solid var(--rule);background:var(--panel)}
 table{border-collapse:collapse;width:100%;min-width:660px;font-size:13.5px}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule-2)}
@@ -534,6 +551,16 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
   </div>
 </section>
 
+<section id="nfc">
+  <div class="wrap">
+    <div class="shead"><span class="snum">06</span><h2>NFC Tags & Holders</h2></div>
+    <p class="slede">Drag to reorder by preference. Links open to suppliers; notes stay local.</p>
+    <div class="nfclist" id="nfclist" style="display:grid;gap:1px;margin-top:24px;background:var(--rule);border:1px solid var(--rule)">
+      <!-- NFC items rendered here -->
+    </div>
+  </div>
+</section>
+
 <footer><div class="wrap">ELEVATIONS ARE NOT TO SCALE · QR SHOWN IS A PLACEHOLDER GRID — THE REAL CODE IS GENERATED FROM THE TAG URL AT EXPORT</div></footer>
 
 <script>
@@ -928,6 +955,91 @@ mBody.addEventListener('change',function(e){
   };
   r.readAsDataURL(f);            // local only — nothing leaves the page
 });
+
+/* ================= NFC tags & holders ================= */
+var NFC_ITEMS=[
+  {name:"ST820: 48×78mm White NTAG213",desc:"White PVC cards, 10 units. $5.40",type:"card",holders:[
+    {label:"Etsy — Ashwood + acrylic",url:"https://www.etsy.com/listing/1298393384/acrylic-menu-sign-holder-with-ashwood"},
+    {label:"Amazon — ACFENG oak base 4×6",url:"https://www.amazon.com/ACFENG-Acrylic-Decoration-10PCS-2MM-Thickness/dp/B07YB4TWM2"},
+    {label:"Amazon — newnewshow 5×7 wood base",url:"https://www.amazon.com/Acrylic-Holder-Vertical-Display-Office/dp/B0C2P4YL39"}
+  ]},
+  {name:"ST783: PVC Card Stick Tag (3M) 10-pack",desc:"3M467 adhesive variant. $11.40",type:"card-adhesive",holders:[
+    {label:"For: Mount directly with 3M adhesive (no holder needed)"},
+    {label:"Or: Wood base holder above"}
+  ]},
+  {name:"ST706: 29mm NTAG213 On-Metal Disc",desc:"30mm round disc tag, 10 units. $10.60",type:"small",holders:[
+    {label:"Amazon — UNIQOOO small wood stands 5-pack",url:"https://www.amazon.com/UNIQOOO-Acrylic-Holders-Display-Decoration/dp/B07WPBF43C"},
+    {label:"Amazon — UNIQOOO 10-pack walnut stands",url:"https://www.amazon.com/UNIQOOO-Acrylic-Holders-Numbers-Decoration/dp/B07J9YDF4Z"}
+  ]},
+  {name:"ST704: 38mm Clear NTAG213",desc:"Clear disc tag, 10 units. $5.10",type:"small",holders:[
+    {label:"Amazon — UNIQOOO small wood stands (as above)"},
+    {label:"Desk/shelf display — tap surface"}
+  ]}
+];
+
+var STORE_NFC={rank:NFC_ITEMS.map(function(_,i){return i})};
+function persist_nfc(){localStorage.setItem('nfc',JSON.stringify(STORE_NFC))}
+function load_nfc(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('nfc')||'{}');
+    if(saved.rank&&saved.rank.length===NFC_ITEMS.length) STORE_NFC=saved;
+  }catch(e){}
+}
+
+function draw_nfc(){
+  var html=STORE_NFC.rank.map(function(i){
+    var item=NFC_ITEMS[i];
+    return '<div class="nfcitem" draggable="true" data-idx="'+i+'">'+
+      '<span class="nfcdrag">⋮</span>'+
+      '<div class="nfcbody">'+
+      '<div class="nfctitle">'+esc(item.name)+'</div>'+
+      '<div class="nfcdesc">'+esc(item.desc)+'</div>'+
+      '<div class="nfclinks">'+
+      item.holders.map(function(h){
+        return h.url ? '<a href="'+h.url+'" target="_blank" class="nfclink">'+esc(h.label)+'</a>' :
+               '<span class="nfcnote">'+esc(h.label)+'</span>';
+      }).join('')+
+      '</div></div></div>';
+  }).join('');
+  $('nfclist').innerHTML=html;
+  attach_nfc_drag();
+}
+
+function attach_nfc_drag(){
+  var items=$('nfclist').querySelectorAll('.nfcitem');
+  items.forEach(function(item){
+    item.addEventListener('dragstart',function(e){
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/html',this.innerHTML);
+      this.classList.add('dragging');
+      this.dataset.drag='true';
+    });
+    item.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      var drag=document.querySelector('.nfcitem[data-drag="true"]');
+      if(drag&&drag!==this){
+        var rect=this.getBoundingClientRect();
+        if(e.clientY<rect.top+rect.height/2){
+          this.parentNode.insertBefore(drag,this);
+        }else{
+          this.parentNode.insertBefore(drag,this.nextSibling);
+        }
+      }
+    });
+    item.addEventListener('dragend',function(){
+      this.classList.remove('dragging');
+      delete this.dataset.drag;
+      STORE_NFC.rank=Array.from($('nfclist').querySelectorAll('.nfcitem')).map(function(el){
+        return +el.dataset.idx;
+      });
+      persist_nfc();
+    });
+  });
+}
+
+load_nfc();
+draw_nfc();
 
 var MATRIX=[
  ["Café / coffee","Counter, by the till","Slant-back or curved","Tap card at the hatch","1–2"],
