@@ -122,7 +122,7 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
   background:var(--paper);color:var(--cyan);text-decoration:none;border-radius:2px;
   transition:all .1s;font-family:var(--mono);letter-spacing:.03em}
 .nfclink:hover{border-color:var(--cyan);background:var(--panel)}
-.nfcnote{font-size:11px;color:var(--ink-3)}.
+.nfcnote{font-size:11px;color:var(--ink-3)}
 
 .scroller{overflow-x:auto;margin-top:28px;border:1px solid var(--rule);background:var(--panel)}
 table{border-collapse:collapse;width:100%;min-width:660px;font-size:13.5px}
@@ -1084,8 +1084,8 @@ var FORMATS=[
  {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89}
 ];
 var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
-var KIND_LABEL={band:"Colour band",logo:"Logo",name:"Business name",stars:"Stars",
-                head:"Headline",tap:"Tap ring",qr:"QR block"};
+var KIND_LABEL={band:"Colour band",logo:"Logo",lockup:"Logo lockup",name:"Business name",
+                stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block"};
 
 /* The banded "review card" plate — the layout every seller in this market ships,
    done properly: the band carries the client's brand colour instead of Google's blue,
@@ -1102,6 +1102,22 @@ function reviewCard(fmt){
    {t:"box",k:"logo", x:.5, y:wide?.60:.525, s:wide?.42:.62},
    {t:"box",k:"tap",  x:.5, y:wide?.62:.685, s:wide?.62:.86},
    {t:"box",k:"qr",   x:.5, y:wide?.86:.885, s:wide?.42:.66}
+  ];
+}
+
+/* The co-brand draft: an eyebrow line, the client's logo locked up with the platform
+   word, stars, the message, and a big TAP HERE at the foot. The right half of the
+   lockup is set as TEXT rather than a platform mark — see the Sourcing notes on brand
+   permissions. Swap in your own asset there if you have one you're licensed to use. */
+function draftPlate(fmt){
+  var wide = fmt===3;
+  return [
+   {t:"text",text:"THANKS FOR VISITING",x:.5,y:wide?.13:.078,s:wide?.5:.62,fw:750,ls:.16},
+   {t:"box",k:"lockup",x:.5,y:wide?.32:.205,s:wide?.62:1},
+   {t:"box",k:"stars", x:.5,y:wide?.53:.335,s:wide?.62:1.05},
+   {t:"box",k:"head",  x:.5,y:wide?.74:.475,s:wide?.55:1, w:.86},
+   {t:"box",k:"qr",    x:wide?.93:.845,y:wide?.5:.925,s:wide?.4:.46},
+   {t:"box",k:"tap",   x:wide?.72:.5, y:wide?.5:.715, s:wide?.7:1.12, cap:"TAP HERE"}
   ];
 }
 
@@ -1185,6 +1201,17 @@ function bodyHTML(L,ctx){
     case 'band':
       return '<div style="width:100%;height:'+(30*s)+'cqw;background:'+ctx.brand+
         ';border-radius:0"></div>';
+    case 'lockup':
+      var mark = ctx.logo
+        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(34*s)+
+          'cqw;object-fit:contain;display:block">'
+        : '<div class="logomark" style="height:'+(11*s)+'cqw;border-width:'+(.6*s)+
+          'cqw;border-color:'+ctx.brand+';color:'+ctx.brand+';font-size:'+(5*s)+'cqw">'+
+          esc(initials(ctx.name))+'</div>';
+      return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
+        '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
+        '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
+        esc(L.word||'Google')+'</span></div>';
     case 'logo':
       return ctx.logo
        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(13*s)+'cqw;max-width:'+(56*s)+
@@ -1207,10 +1234,10 @@ function bodyHTML(L,ctx){
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+ctx.brand+';gap:'+(.5*s)+'cqw">'+
         WAVE.replace('<svg','<svg style="width:'+(11*s)+'cqw;height:'+(11*s)+'cqw"')+
-        '<b style="font-size:'+(2.9*s)+'cqw">TAP</b></div>';
+        '<b style="font-size:'+(2.9*s)+'cqw">'+esc(L.cap||'TAP')+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
-        '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(64*s)+'cqw;margin-bottom:'+
+        '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
         (2.4*s)+'cqw">OR SCAN</div>'+
         '<img class="qrimg" src="'+ctx.qr+'" alt="QR placeholder" style="width:'+(19*s)+
         'cqw;height:'+(19*s)+'cqw">'+
@@ -1327,6 +1354,14 @@ function drawInspector(){
     '<p style="margin:0;font-size:12.5px;color:var(--ink-3)">Tap a layer on the card — its controls appear here.</p>';
     return; }
   var h='<span class="lbl">'+esc(layerLabel(L))+'</span>';
+  if(L.k==='lockup'){
+    h+='<span class="lbl">Word beside the logo</span>'+
+       '<input type="text" id="iWord" value="'+esc(L.word||'Google')+'">';
+  }
+  if(L.k==='tap'){
+    h+='<span class="lbl">Ring caption</span>'+
+       '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
+  }
   if(L.t==='text'){
     h+='<textarea id="iTxt">'+esc(L.text||'')+'</textarea>'+
        '<div class="row2"><input type="color" id="iCol" value="'+(L.col||'#000000')+'" aria-label="Text colour">'+
@@ -1336,6 +1371,8 @@ function drawInspector(){
   h+='<span class="lbl">Scale · '+Math.round((L.s==null?1:L.s)*100)+'%</span>'+
      '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
   box.innerHTML=h;
+  if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
+  if(L.k==='tap')    $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
   if(L.t==='text'){
     $('iFw').value=String(L.fw||600);
     $('iTxt').addEventListener('input',function(){L.text=this.value;paint(true)});
@@ -1388,7 +1425,7 @@ card.addEventListener('pointerup',endDrag);
 card.addEventListener('pointercancel',endDrag);   // iOS fires cancel instead of up
 
 /* ---- controls ---- */
-var PLATES=[["Stand insert",defaults],["Review card",reviewCard]];
+var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate]];
 var platesEl=$('plates');
 platesEl.innerHTML=PLATES.map(function(p,i){
   return '<button class="chip" type="button" data-p="'+i+'" aria-pressed="'+(i===0)+'">'+p[0]+'</button>'}).join('');
@@ -1400,8 +1437,11 @@ platesEl.addEventListener('click',function(e){
   paint();
 });
 
+// New text lands at the top of the card — that's where a headline wants to be — and
+// each additional one steps down so they don't stack on the same spot. Drag from there.
 $('addText').addEventListener('click',function(){
-  var L={t:'text',text:'New text',x:.5,y:.5,s:1,fw:600,col:elBrand.value,w:.7};
+  var n=S.stack.filter(function(o){return o.t==='text'}).length;
+  var L={t:'text',text:'New text',x:.5,y:Math.min(.08+n*.07,.9),s:1,fw:700,w:.8};
   layerId(L); S.stack.push(L); S.sel=L.id; paint();
 });
 $('resetLay').addEventListener('click',function(){ S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
