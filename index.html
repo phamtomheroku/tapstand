@@ -256,7 +256,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .grid{position:absolute;inset:0;pointer-events:none;z-index:880;opacity:0;transition:opacity .12s}
 .grid.on{opacity:1}
 .lay{position:absolute;transform:translate(-50%,-50%);cursor:grab;
-  display:flex;flex-direction:column;align-items:center;text-align:center}
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  max-width:92cqw;overflow-wrap:break-word;hyphens:auto}
+.lay>span,.lay>div{max-width:100%}
 .lay.locked,.lay.hid{pointer-events:none}
 .lay.hid{display:none}
 .lay.sel{cursor:grabbing}
@@ -586,6 +588,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           </div>
           <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
           <div class="grp"><span class="lbl">Overlays</span>
+            <label class="tog"><input type="checkbox" id="autoFit" checked> Auto-fit (stop elements colliding)</label>
             <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
             <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
             <label class="tog"><input type="checkbox" id="ovTag"> 30 mm disc position</label>
@@ -1445,7 +1448,8 @@ function draftPlate(fmt){
    template with the colours swapped. All tuned for the 4×6; drag from there. ---- */
 
 // 1. Brand wedge across the top, content stepping down out of it.
-function splitPlate(){return[
+function splitPlate(f){ if(f===3) return wideFor(DIRECTIONS[S.dir||0].g,'pattern');
+ return[
  {t:"box",k:"split", x:.5,y:.275,s:1.05,w:1},
  {t:"text",text:"TAP TO REVIEW",x:.5,y:.07,s:.6,fw:750,ls:.2,onBand:1},
  {t:"box",k:"lockup",x:.5,y:.20,s:.95,onBand:1},
@@ -1455,7 +1459,8 @@ function splitPlate(){return[
  {t:"box",k:"qr",    x:.5,y:.935,s:.42}]}
 
 // 2. Ticket stub — dashed tear line, the ring reads as the punch.
-function ticketPlate(){return[
+function ticketPlate(f){ if(f===3) return wideFor(DIRECTIONS[S.dir||0].g,'fill');
+ return[
  {t:"box",k:"band",  x:.5,y:.075,s:.5,w:1},
  {t:"text",text:"ADMIT ONE REVIEW",x:.5,y:.062,s:.52,fw:750,ls:.24,onBand:1},
  {t:"box",k:"name",  x:.5,y:.185,s:1.05},
@@ -1467,7 +1472,8 @@ function ticketPlate(){return[
  {t:"box",k:"qr",    x:.5,y:.915,s:.5}]}
 
 // 3. Full brand ground, tap knocked out of it. Loudest of the five.
-function discPlate(){return[
+function discPlate(f){ if(f===3) return wideFor(DIRECTIONS[S.dir||0].g,'fill');
+ return[
  {t:"box",k:"fill",  x:.5,y:.5,s:1,w:1},
  {t:"box",k:"lockup",x:.5,y:.13,s:.9,onBand:1},
  {t:"box",k:"stars", x:.5,y:.245,s:1.05,onBand:1},
@@ -1477,7 +1483,8 @@ function discPlate(){return[
  {t:"box",k:"qr",    x:.5,y:.945,s:.34,onBand:1}]}
 
 // 4. Editorial — vertical rail, everything ranged left off it.
-function railPlate(){return[
+function railPlate(f){ if(f===3) return wideFor(DIRECTIONS[S.dir||0].g,'motif');
+ return[
  {t:"box",k:"rail",  x:.085,y:.5,s:1},
  {t:"text",text:"REVIEWS",x:.085,y:.5,s:.62,fw:750,ls:.34,onBand:1,rot:1},
  {t:"box",k:"lockup",x:.28,y:.135,s:.82,al:"left"},
@@ -1488,7 +1495,8 @@ function railPlate(){return[
  {t:"box",k:"qr",    x:.28,y:.925,s:.42,al:"left"}]}
 
 // 5. Oversized outline type behind the ring.
-function typePlate(){return[
+function typePlate(f){ if(f===3) return wideFor(DIRECTIONS[S.dir||0].g,'pattern');
+ return[
  {t:"text",text:"THANK\nYOU",x:.5,y:.375,s:4.2,fw:850,ls:-.03,lh:.86,stroke:.2},
  {t:"box",k:"name",  x:.5,y:.085,s:1},
  {t:"box",k:"stars", x:.5,y:.165,s:.9},
@@ -1500,7 +1508,8 @@ function typePlate(){return[
    The plates all shared one shape: a centred vertical stack. These do not. Each
    is its own geometry — asymmetric, cropped, banded, rotated or radial — because
    composition, not typeface, is what makes two cards read as unrelated. ---- */
-function aFullbleed(f,g){ if(f===2) return[
+function aFullbleed(f,g){ if(f===3) return wideFor(g,'pattern');
+ if(f===2) return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
  {t:"box",k:"fill",   x:.5,y:.795,s:1,w:1,hf:.41},
  {t:"box",k:"logo",   x:.07,y:.685,s:.8,lw:40,lh:13,al:"left",onBand:1},
@@ -1517,7 +1526,8 @@ function aFullbleed(f,g){ if(f===2) return[
  {t:"box",k:"tap",    x:.5,y:.955,s:1,w:1,style:"bar",cap:"TAP TO REVIEW",icon:"phone"},
  {t:"box",k:"qr",     x:.86,y:.825,s:.38,onBand:1}]}
 
-function aSplit(f,g){ if(f===2) return[   // vertical split — the square's natural cut
+function aSplit(f,g){ if(f===3) return wideFor(g,'motif');
+ if(f===2) return[   // vertical split — the square's natural cut
  {t:"box",k:"fill",   x:.22,y:.5,s:1,w:.44,hf:1.1},
  {t:"box",k:"motif",  x:.22,y:.36,s:1.05,g:g.motif,onBand:1},
  {t:"box",k:"stars",  x:.22,y:.63,s:.6,onBand:1},
@@ -1536,7 +1546,8 @@ function aSplit(f,g){ if(f===2) return[   // vertical split — the square's nat
  {t:"box",k:"tap",    x:.5,y:.82,s:1.05,style:"underline",cap:"TAP HERE",icon:"phone"},
  {t:"box",k:"qr",     x:.5,y:.94,s:.42}]}
 
-function aRadial(f,g){ if(f===2) return[   // a square is the right shape for this
+function aRadial(f,g){ if(f===3) return wideFor(g,'fill');
+ if(f===2) return[   // a square is the right shape for this
  {t:"box",k:"hero",   x:.5,y:.5,s:1.25,g:g.hero,op:.45},
  {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.5,fw:750,arc:240,arcR:36},
  {t:"box",k:"logo",   x:.5,y:.115,s:.75,lw:36,lh:12},
@@ -1554,7 +1565,8 @@ function aRadial(f,g){ if(f===2) return[   // a square is the right shape for th
  {t:"box",k:"head",   x:.5,y:.875,s:.8,w:.76},
  {t:"box",k:"qr",     x:.5,y:.955,s:.34}]}
 
-function aEdge(f,g){ if(f===2) return[
+function aEdge(f,g){ if(f===3) return wideFor(g,'motif');
+ if(f===2) return[
  {t:"box",k:"motif",  x:.90,y:.16,s:1.7,g:g.motif,op:.18},
  {t:"box",k:"logo",   x:.09,y:.475,s:.85,lw:42,lh:14,al:"left"},
  {t:"box",k:"name",   x:.09,y:.49,s:1,al:"left"},
@@ -1573,7 +1585,8 @@ function aEdge(f,g){ if(f===2) return[
  {t:"box",k:"tap",    x:.09,y:.925,s:1,style:"bare",cap:"TAP",icon:"phone",al:"left"},
  {t:"box",k:"qr",     x:.88,y:.93,s:.36}]}
 
-function aGrid(f,g){ if(f===2) return[    // four true quadrants
+function aGrid(f,g){ if(f===3) return wideFor(g,'fill');
+ if(f===2) return[    // four true quadrants
  {t:"box",k:"logo",   x:.08,y:.10,s:.72,lw:34,lh:11,al:"left"},
  {t:"box",k:"name",   x:.08,y:.105,s:.78,al:"left"},
  {t:"box",k:"stars",  x:.92,y:.105,s:.5,al:"right"},
@@ -1596,7 +1609,8 @@ function aGrid(f,g){ if(f===2) return[    // four true quadrants
  {t:"box",k:"qr",     x:.92,y:.70,s:.46,al:"right"},
  {t:"text",text:"SCAN OR TAP · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
 
-function aBanded(f,g){ if(f===2) return[
+function aBanded(f,g){ if(f===3) return wideFor(g,'pattern');
+ if(f===2) return[
  {t:"box",k:"fill",   x:.5,y:.115,s:1,w:1,hf:.23},
  {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.26},
  {t:"box",k:"logo",   x:.5,y:.10,s:.72,lw:34,lh:11,onBand:1},
@@ -1617,7 +1631,8 @@ function aBanded(f,g){ if(f===2) return[
  {t:"box",k:"tap",    x:.5,y:.70,s:1.1,cap:"TAP HERE",icon:"phone",onBand:1},
  {t:"box",k:"qr",     x:.5,y:.92,s:.44}]}
 
-function aDiagonal(f,g){ if(f===2) return[
+function aDiagonal(f,g){ if(f===3) return wideFor(g,'pattern');
+ if(f===2) return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
  {t:"box",k:"logo",   x:.46,y:.185,s:.8,lw:40,lh:13,rotd:-7},
  {t:"box",k:"name",   x:.46,y:.20,s:.95,rotd:-7},
@@ -1636,7 +1651,8 @@ function aDiagonal(f,g){ if(f===2) return[
  {t:"box",k:"tap",    x:.44,y:.70,s:1.15,cap:"TAP HERE",icon:"phone",rotd:-7},
  {t:"box",k:"qr",     x:.5,y:.93,s:.42,rotd:-7}]}
 
-function aDepth(f,g){ if(f===2) return[
+function aDepth(f,g){ if(f===3) return wideFor(g,'motif');
+ if(f===2) return[
  {t:"box",k:"fill",   x:.57,y:.40,s:1,w:.74,hf:.30,op:.25},
  {t:"box",k:"fill",   x:.43,y:.355,s:1,w:.74,hf:.30},
  {t:"box",k:"logo",   x:.43,y:.285,s:.75,lw:34,lh:11,onBand:1},
@@ -1657,6 +1673,19 @@ function aDepth(f,g){ if(f===2) return[
  {t:"box",k:"qr",     x:.5,y:.94,s:.42},
  {t:"box",k:"motif",  x:.12,y:.10,s:1.1,g:g.motif,op:.3}]}
 
+function wideFor(g,kind){
+  var L=[
+   {t:"box",k:"logo", x:.055,y:.30,s:.62,lw:30,lh:10,al:"left"},
+   {t:"box",k:"name", x:.055,y:.31,s:.6,w:.44,al:"left"},
+   {t:"box",k:"stars",x:.055,y:.55,s:.44,al:"left"},
+   {t:"box",k:"head", x:.055,y:.76,s:.44,w:.44,al:"left"},
+   {t:"box",k:"tap",  x:.70,y:.5,s:.72,cap:"TAP",icon:"phone"},
+   {t:"box",k:"qr",   x:.895,y:.5,s:.34}];
+  if(kind==='fill')    L.unshift({t:"box",k:"fill",   x:.5,y:.5,s:1,w:1,hf:1.1,op:.14});
+  if(kind==='pattern') L.unshift({t:"box",k:"pattern",x:.5,y:.5,s:.7,w:1,hf:1.1,g:g.pat,op:.22});
+  if(kind==='motif')   L.unshift({t:"box",k:"motif",  x:.965,y:.14,s:.85,g:g.motif,op:.2});
+  return L;
+}
 var ARCHETYPES=[["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth]];
 
@@ -1909,8 +1938,8 @@ function bodyHTML(L,ctx){
         (2.4*s)+'cqw">OR SCAN</div>'+
         '<img class="qrimg" src="'+ctx.qr+'" alt="QR placeholder" style="width:'+QW(s)+
         'cqw;height:'+QW(s)+'cqw">'+
-        '<span class="qrcap" style="font-size:'+(2.5*s)+'cqw;margin-top:'+(1.4*s)+'cqw">'+
-        esc(ctx.host)+'</span></div>';
+        (s<.45?'':'<span class="qrcap" style="font-size:'+(2.5*s)+'cqw;margin-top:'+(1.4*s)+
+        'cqw">'+esc(ctx.host)+'</span>')+'</div>';
   }
   return '';
 }
@@ -1946,7 +1975,7 @@ function paint(quiet){
     layerId(L);
     var d=document.createElement('div');
     d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(S.sel===L.id?' sel':'');
-    d.dataset.id=L.id;
+    d.dataset.id=L.id; d.dataset.k=L.k||L.t;
     d.style.left=(L.x*100)+'%'; d.style.top=(L.y*100)+'%'; d.style.zIndex=100+i;
     if(L.w) d.style.width=(L.w*100)+'%';
     // Anything sitting on the colour band flips to whatever reads against the brand,
@@ -1980,6 +2009,8 @@ function paint(quiet){
   dl.style.top='calc('+(anchor.y*100)+'% + '+(dPct/2+2).toFixed(2)+'cqw)'; // cqw = 1% of card width
   dl.textContent='30 MM DISC — FACE FORWARD, FERRITE BEHIND'+(tap?'':' · TAP RING HIDDEN');
 
+  if(autoFit && !quiet) resolveLayout();
+
   $('gridEl').classList.toggle('on',S.grid);
   $('gridEl').style.background=S.grid?
    'repeating-linear-gradient(0deg,transparent 0 calc(100%/6 - 1px),'+brand+' calc(100%/6 - 1px),'+
@@ -1994,6 +2025,70 @@ function paint(quiet){
   // so a live edit repaints the card and leaves its own controls alone.
   if(!quiet) drawInspector();
 }
+
+/* ---- auto-fit ---------------------------------------------------------------
+   Layer positions are authored as anchor points, which says nothing about how tall
+   the content renders. A long business name wraps to two lines and runs into the
+   stars beneath it; a headline at a bigger scale pushes into the ring. This measures
+   the real boxes after paint and separates anything that collides, then pulls
+   everything back inside the card.
+
+   Backgrounds are exempt — they are meant to sit under things. So is any layer you
+   have dragged yourself: once you move something by hand it stays exactly there. */
+var autoFit=true;
+var BG_KINDS={fill:1,pattern:1,band:1,split:1,rail:1,hero:1,blob:1,rule:1};
+function resolveLayout(){
+  var r=card.getBoundingClientRect(); if(!r.height) return;
+  var GAP=.016, PAD=.014, shrunk=false;
+  for(var pass=0; pass<6; pass++){
+    var items=[];
+    [].forEach.call(card.querySelectorAll('.lay'),function(n){
+      var L=find(n.dataset.id); if(!L||L.hidden||BG_KINDS[L.k]) return;
+      var b=n.getBoundingClientRect();
+      items.push({n:n,L:L,
+        top:(b.top-r.top)/r.height, bot:(b.bottom-r.top)/r.height,
+        left:(b.left-r.left)/r.width, right:(b.right-r.left)/r.width});
+    });
+    items.sort(function(a,b){return a.top-b.top});
+    var moved=false, i, j;
+    for(i=1;i<items.length;i++){
+      var cur=items[i]; if(cur.L._man) continue;
+      for(j=0;j<i;j++){
+        var prev=items[j];
+        // only stack things that actually share horizontal space
+        if(cur.left >= prev.right-.02 || cur.right <= prev.left+.02) continue;
+        if(cur.top < prev.bot+GAP){
+          var push=(prev.bot+GAP)-cur.top;
+          cur.L.y+=push; cur.top+=push; cur.bot+=push; moved=true;
+        }
+      }
+    }
+    // then pull anything that now hangs off the card back inside it
+    for(i=0;i<items.length;i++){
+      var it=items[i]; if(it.L._man) continue;
+      if(it.right>1-PAD/2 || it.left<PAD/2){        // ran off the sides, not the ends
+        var cw=it.L.s==null?1:it.L.s; if(cw>.34){ it.L.s=cw*.9; shrunk=true; }
+      }
+      if(it.bot>1-PAD){ it.L.y-=(it.bot-(1-PAD)); moved=true; }
+      else if(it.top<PAD){ it.L.y+=(PAD-it.top); moved=true; }
+    }
+    if(!moved && !shrunk) break;
+    shrunk=false;
+    items.forEach(function(it){ it.n.style.top=(it.L.y*100)+'%' });
+    if(pass>=1){                        // pushing did not clear it: shrink instead
+      var over=items.filter(function(it){ return !it.L._man && (it.bot>1-PAD||it.top<PAD) });
+      over.forEach(function(it){
+        var cs=it.L.s==null?1:it.L.s;
+        if(cs>.34){ it.L.s=cs*.88; }
+      });
+      if(over.length) shrunk=true;
+    }
+  }
+}
+
+// a small hook so layout behaviour can be inspected from the console
+window.__tapstand={resolve:function(){return resolveLayout()},stack:function(){return S.stack},
+  fit:function(v){autoFit=v}};
 
 /* ---- Layers panel: front of card FIRST, like the studio ---- */
 var EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>';
@@ -2093,6 +2188,7 @@ card.addEventListener('pointerdown',function(e){
   var L=find(node.dataset.id); if(!L||L.locked||L.hidden) return;
   S.sel=L.id; paint();
   if(typeof pushUndo==='function') pushUndo();
+  L._man=true;
   var p=norm(e);
   drag={L:L,mode:hnd?'scale':'move',ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
         d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
@@ -2196,6 +2292,9 @@ $('addText').addEventListener('click',function(){
 });
 $('resetLay').addEventListener('click',function(){ if(typeof pushUndo==='function') pushUndo();
   S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
+$('autoFit').addEventListener('change',function(){ autoFit=this.checked;
+  if(autoFit) S.stack.forEach(function(L){ delete L._man });
+  S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
 
 var presetsEl=$('presets');
 presetsEl.innerHTML=PRESETS.map(function(p,i){
@@ -2221,7 +2320,8 @@ fmtEl.addEventListener('click',function(e){
   paint();
 });
 [elName,elCopy,elBrand,elBg].forEach(function(el){
-  el.addEventListener('input',paint); el.addEventListener('change',paint)});
+  el.addEventListener('input',function(){paint()});
+  el.addEventListener('change',function(){paint()})});
 /* Three ways in, because a logo usually arrives on the clipboard rather than as a
    tidy file on disk: paste anywhere on the page, drop onto the well, or click it. */
 function setLogo(src){
@@ -2260,7 +2360,7 @@ document.addEventListener('paste',function(e){
   }
 });
 $('logoClr').addEventListener('click',function(){ setLogo(null); });
-$('logoInv').addEventListener('change',paint);
+$('logoInv').addEventListener('change',function(){paint()});
 $('logoHideName').addEventListener('change',function(){
   if(!this.checked) S.stack.forEach(function(L){ if(L.k==='name') L.hidden=false; });
   else applyLogoName();
@@ -2558,6 +2658,7 @@ document.addEventListener('keydown',function(e){
   if(!S.sel) return;
   var L=find(S.sel); if(!L) return;
   var step=e.shiftKey?.02:.004;
+  L._man=true;
   if(e.key==='ArrowLeft'){ pushUndo(); L.x=Math.max(0,L.x-step); }
   else if(e.key==='ArrowRight'){ pushUndo(); L.x=Math.min(1,L.x+step); }
   else if(e.key==='ArrowUp'){ pushUndo(); L.y=Math.max(0,L.y-step); }
@@ -2579,7 +2680,7 @@ $('dupBtn').addEventListener('click',dupLayer);
 /* ============ 6. align the selected layer ============ */
 $('alignRow').addEventListener('click',function(e){
   var b=e.target.closest('button[data-al]'); if(!b||!S.sel)return;
-  var L=find(S.sel); if(!L)return; pushUndo();
+  var L=find(S.sel); if(!L)return; pushUndo(); L._man=true;
   ({l:function(){L.x=.09},c:function(){L.x=.5},r:function(){L.x=.91},
     t:function(){L.y=.09},m:function(){L.y=.5},b:function(){L.y=.91}})[b.dataset.al]();
   paint();
