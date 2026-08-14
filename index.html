@@ -545,6 +545,18 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
             </div>
             <label class="tog"><input type="checkbox" id="logoHideName" checked> Hide business name when a logo is set</label>
           </div>
+          <div class="grp"><span class="lbl">Tap mark — your own</span>
+            <div class="logodrop" id="tapDrop" tabindex="0" role="button"
+                 aria-label="Add your own tap mark: paste, drop a file, or click">
+              <div class="logoprev" id="tapPrev"></div>
+              <span class="logohint" id="tapHint">PASTE · DROP · CLICK · SVG OR PNG</span>
+              <input type="file" id="tapFile" accept="image/*" hidden>
+            </div>
+            <div class="row2">
+              <label class="tog"><input type="checkbox" id="tapAsIs"> Keep its own colours</label>
+              <button class="btn" id="tapClr" type="button">Clear</button>
+            </div>
+          </div>
           <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
           <div class="grp"><span class="lbl">Direction — pick this first</span>
             <div class="chips" id="dirs"></div></div>
@@ -1550,7 +1562,7 @@ function aSplit(f,g){ if(f===3) return wideFor(g,'motif');
 function aRadial(f,g){ if(f===3) return wideFor(g,'fill');
  if(f===2) return[   // a square is the right shape for this
  {t:"box",k:"hero",   x:.5,y:.5,s:1.25,g:g.hero,op:.45},
- {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.5,fw:750,arc:240,arcR:36},
+ {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.46,fw:750,arc:190,arcR:78},
  {t:"box",k:"logo",   x:.5,y:.115,s:.75,lw:36,lh:12},
  {t:"box",k:"name",   x:.5,y:.12,s:.85},
  {t:"box",k:"tap",    x:.5,y:.5,s:1,cap:"TAP",icon:"phone"},
@@ -1558,7 +1570,7 @@ function aRadial(f,g){ if(f===3) return wideFor(g,'fill');
  {t:"box",k:"qr",     x:.5,y:.905,s:.32}];
  return[
  {t:"box",k:"hero",   x:.5,y:.5,s:1.55,g:g.hero,op:.5},
- {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.62,fw:750,arc:210,arcR:44},
+ {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.58,fw:750,arc:186,arcR:74},
  {t:"box",k:"logo",   x:.5,y:.125,s:1,lw:42,lh:14},
  {t:"box",k:"name",   x:.5,y:.135,s:1.05},
  {t:"box",k:"tap",    x:.5,y:.5,s:1.2,cap:"TAP",icon:"phone"},
@@ -1911,19 +1923,30 @@ function bodyHTML(L,ctx){
         return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
           'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s)+'cqw;letter-spacing:.14em">'+
-          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(9*s)+
-          'cqw;height:'+(6*s)+'cqw;stroke:'+contrast(mc)+'"')+esc(L.cap||'TAP')+'</div>';
+          tapArt(9*s,6*s)+esc(L.cap||'TAP')+'</div>';
       if(L.style==='bare')
         return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+(1.6*s)+'cqw">'+
-          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(22*s)+
-          'cqw;height:'+(16*s)+'cqw;stroke:'+mc+'"')+'<b style="font-family:var(--f-disp);'+
+          tapArt(22*s,16*s)+'<b style="font-family:var(--f-disp);'+
           'font-size:'+(3.4*s)+'cqw;letter-spacing:.18em;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
       if(L.style==='underline')
         return '<div style="display:flex;align-items:center;gap:'+(2.4*s)+'cqw;border-bottom:'+
           (.9*s)+'cqw solid '+mc+';padding-bottom:'+(1.6*s)+'cqw;color:'+mc+'">'+
-          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(11*s)+
-          'cqw;height:'+(8*s)+'cqw;stroke:'+mc+'"')+'<b style="font-family:var(--f-disp);'+
+          tapArt(11*s,8*s)+'<b style="font-family:var(--f-disp);'+
           'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em">'+esc(L.cap||'TAP')+'</b></div>';
+      // A supplied mark is used as a MASK by default, so a transparent PNG or SVG
+      // takes the brand colour like the drawn ones do. 'As-is' keeps its own colours.
+      function tapArt(w,h){
+        if(L.icon==='custom' && S.tapImg){
+          return S.tapImgMode==='asis'
+            ? '<img src="'+S.tapImg+'" alt="" style="width:'+w+'cqw;height:'+h+
+              'cqw;object-fit:contain;display:block">'
+            : '<div style="width:'+w+'cqw;height:'+h+'cqw;background:'+mc+
+              ';-webkit-mask:url(\''+S.tapImg+'\') center/contain no-repeat;'+
+              'mask:url(\''+S.tapImg+'\') center/contain no-repeat"></div>';
+        }
+        return (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+w+
+          'cqw;height:'+h+'cqw;stroke:'+mc+'"');
+      }
       var rg=ctx.th.ring, rs='';
       if(rg==='none')   rs='border:none;';
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
@@ -1931,8 +1954,7 @@ function bodyHTML(L,ctx){
       if(rg==='dashed') rs='border-style:dashed;';
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
-        (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+
-          (11*s*(ICON_W[L.icon]||1))+'cqw;height:'+(11*s)+'cqw;stroke:'+mc+'"')+
+        tapArt(11*s*(ICON_W[L.icon]||1), 11*s)+
         '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
@@ -2160,7 +2182,8 @@ function drawInspector(){
        '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">'+
        '<span class="lbl">Tap mark</span>'+
        '<select id="iIcon"><option value="waves">Contactless waves</option>'+
-       '<option value="phone">Phone + waves</option></select>';
+       '<option value="phone">Phone + waves</option>'+
+       (S.tapImg?'<option value="custom">Your own mark</option>':'')+'</select>';
   }
   if(L.t==='text'){
     h+='<textarea id="iTxt">'+esc(L.text||'')+'</textarea>'+
@@ -2352,8 +2375,10 @@ function applyLogoName(){
   S.stack.forEach(function(L){ if(L.k==='name') L.hidden = !!S.logo; });
 }
 $('logo').addEventListener('change',function(e){ readImg(e.target.files&&e.target.files[0]); e.target.value=''; });
+var pasteTarget='logo';
 var drop=$('logoDrop');
-drop.addEventListener('click',function(){ $('logo').click(); });
+drop.addEventListener('click',function(){ pasteTarget='logo'; $('logo').click(); });
+drop.addEventListener('focus',function(){ pasteTarget='logo'; });
 drop.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();$('logo').click();} });
 ['dragenter','dragover'].forEach(function(t){ drop.addEventListener(t,function(e){
   e.preventDefault(); drop.classList.add('over'); }); });
@@ -2365,10 +2390,42 @@ document.addEventListener('paste',function(e){
   var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
   var items=(e.clipboardData&&e.clipboardData.items)||[];
   for(var i=0;i<items.length;i++){
-    if(items[i].type.indexOf('image')===0){ readImg(items[i].getAsFile()); e.preventDefault(); return; }
+    if(items[i].type.indexOf('image')===0){
+      var f=items[i].getAsFile();
+      (pasteTarget==='tap'?readTap:readImg)(f); e.preventDefault(); return; }
   }
 });
 $('logoClr').addEventListener('click',function(){ setLogo(null); });
+
+/* ---- your own tap mark ------------------------------------------------------
+   Masked by default so a transparent PNG or SVG recolours with the brand exactly
+   like the drawn marks. A full-colour mark can keep its own colours instead. */
+function setTapImg(src){
+  S.tapImg=src;
+  var pv=$('tapPrev');
+  pv.innerHTML = src ? '<img src="'+src+'" alt="">' : '';
+  pv.classList.toggle('has',!!src);
+  $('tapHint').textContent = src ? 'REPLACE: PASTE · DROP · CLICK' : 'PASTE · DROP · CLICK · SVG OR PNG';
+  if(src) S.stack.forEach(function(L){ if(L.k==='tap') L.icon='custom'; });
+  else    S.stack.forEach(function(L){ if(L.k==='tap'&&L.icon==='custom') L.icon='phone'; });
+  paint();
+}
+function readTap(file){
+  if(!file || file.type.indexOf('image')!==0) return false;
+  var r=new FileReader(); r.onload=function(){setTapImg(r.result)}; r.readAsDataURL(file);
+  return true;
+}
+var tapDrop=$('tapDrop');
+$('tapFile').addEventListener('change',function(e){ readTap(e.target.files&&e.target.files[0]); e.target.value=''; });
+tapDrop.addEventListener('click',function(){ pasteTarget='tap'; $('tapFile').click(); });
+tapDrop.addEventListener('focus',function(){ pasteTarget='tap'; });
+['dragenter','dragover'].forEach(function(t){ tapDrop.addEventListener(t,function(e){
+  e.preventDefault(); tapDrop.classList.add('over'); }); });
+['dragleave','drop'].forEach(function(t){ tapDrop.addEventListener(t,function(e){
+  e.preventDefault(); tapDrop.classList.remove('over'); }); });
+tapDrop.addEventListener('drop',function(e){ readTap(e.dataTransfer.files&&e.dataTransfer.files[0]); });
+$('tapClr').addEventListener('click',function(){ setTapImg(null); });
+$('tapAsIs').addEventListener('change',function(){ S.tapImgMode=this.checked?'asis':'tint'; paint(); });
 $('logoInv').addEventListener('change',function(){paint()});
 $('logoHideName').addEventListener('change',function(){
   if(!this.checked) S.stack.forEach(function(L){ if(L.k==='name') L.hidden=false; });
