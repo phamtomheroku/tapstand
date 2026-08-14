@@ -588,6 +588,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           </div>
           <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
           <div class="grp"><span class="lbl">Overlays</span>
+            <label class="tog"><input type="checkbox" id="qrOn"> Add a QR code (off = tap only)</label>
             <label class="tog"><input type="checkbox" id="autoFit" checked> Auto-fit (stop elements colliding)</label>
             <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
             <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
@@ -1596,7 +1597,7 @@ function aGrid(f,g){ if(f===3) return wideFor(g,'fill');
  {t:"box",k:"rule",   x:.5,y:.615,s:1,w:.84},
  {t:"box",k:"tap",    x:.08,y:.775,s:.85,cap:"TAP",icon:"phone",al:"left"},
  {t:"box",k:"qr",     x:.92,y:.775,s:.34,al:"right"},
- {t:"text",text:"SCAN OR TAP",x:.5,y:.94,s:.42,fw:700,ls:.14}];
+ {t:"text",text:"TAP TO REVIEW",x:.5,y:.94,s:.42,fw:700,ls:.14}];
  return[
  {t:"box",k:"logo",   x:.08,y:.085,s:.85,lw:38,lh:13,al:"left"},
  {t:"box",k:"name",   x:.08,y:.09,s:.95,al:"left"},
@@ -1607,7 +1608,7 @@ function aGrid(f,g){ if(f===3) return wideFor(g,'fill');
  {t:"box",k:"rule",   x:.5,y:.55,s:1,w:.84},
  {t:"box",k:"tap",    x:.08,y:.70,s:1.05,cap:"TAP",icon:"phone",al:"left"},
  {t:"box",k:"qr",     x:.92,y:.70,s:.46,al:"right"},
- {t:"text",text:"SCAN OR TAP · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
+ {t:"text",text:"TAP TO REVIEW · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
 
 function aBanded(f,g){ if(f===3) return wideFor(g,'pattern');
  if(f===2) return[
@@ -1905,6 +1906,7 @@ function bodyHTML(L,ctx){
       return '<span style="font-size:'+(4.5*s)+'cqw;line-height:1.28;font-weight:600;'+
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
     case 'tap':
+      if(!showQR) s*=1.08;              // sole call to action, so give it the room
       if(L.style==='bar')
         return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
@@ -1967,6 +1969,10 @@ function paint(quiet){
   var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,hasName:hasName,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
+
+  // tap-exclusive by default: the code layers are hidden rather than removed, and
+  // the tap target takes the emphasis the QR was sharing
+  S.stack.forEach(function(L){ if(L.k==='qr') L.hidden=!showQR; });
 
   // paint the stack bottom → top; z-index carries the order into hit-testing,
   // so the topmost visible, unlocked layer is the one a press lands on.
@@ -2035,7 +2041,7 @@ function paint(quiet){
 
    Backgrounds are exempt — they are meant to sit under things. So is any layer you
    have dragged yourself: once you move something by hand it stays exactly there. */
-var autoFit=true;
+var autoFit=true, showQR=false;
 var BG_KINDS={fill:1,pattern:1,band:1,split:1,rail:1,hero:1,blob:1,rule:1};
 function resolveLayout(){
   var r=card.getBoundingClientRect(); if(!r.height) return;
@@ -2055,8 +2061,11 @@ function resolveLayout(){
       var cur=items[i]; if(cur.L._man) continue;
       for(j=0;j<i;j++){
         var prev=items[j];
-        // only stack things that actually share horizontal space
-        if(cur.left >= prev.right-.02 || cur.right <= prev.left+.02) continue;
+        // only stack things that genuinely share a column — a couple of percent of
+        // grazing between two side-by-side items is not a collision
+        var ox=Math.min(cur.right,prev.right)-Math.max(cur.left,prev.left);
+        var minw=Math.min(cur.right-cur.left, prev.right-prev.left);
+        if(ox <= Math.max(.06, minw*.35)) continue;
         if(cur.top < prev.bot+GAP){
           var push=(prev.bot+GAP)-cur.top;
           cur.L.y+=push; cur.top+=push; cur.bot+=push; moved=true;
@@ -2366,6 +2375,8 @@ $('logoHideName').addEventListener('change',function(){
   else applyLogoName();
   paint();
 });
+$('qrOn').addEventListener('change',function(e){ showQR=e.target.checked;
+  fillCta(); paint(); });
 $('ovGrid').addEventListener('change',function(e){S.grid=e.target.checked;paint()});
 $('ovSafe').addEventListener('change',function(e){$('ovSafeEl').classList.toggle('on',e.target.checked)});
 $('ovTag').addEventListener('change',function(e){$('ovTagEl').classList.toggle('on',e.target.checked)});
@@ -2624,7 +2635,13 @@ $('copyTrade').addEventListener('click',function(){
   if(![].some.call(elCopy.options,function(o){return o.value===v})) elCopy.add(new Option(v,v));
   elCopy.value=v; lenGuard(); paint();
 });
-$('ctaSel').innerHTML=COPY.cta.map(function(t){return '<option>'+t+'</option>'}).join('');
+function fillCta(){
+  var list=COPY.cta.filter(function(t){ return showQR || t.indexOf('SCAN')<0; });
+  var cur=$('ctaSel').value;
+  $('ctaSel').innerHTML=list.map(function(t){return '<option>'+t+'</option>'}).join('');
+  if(list.indexOf(cur)>=0) $('ctaSel').value=cur;
+}
+fillCta();
 $('ctaSel').addEventListener('change',function(){
   var v=this.value; S.stack.forEach(function(L){ if(L.k==='tap') L.cap=v; }); paint();
 });
@@ -2698,10 +2715,14 @@ function preflight(){
   var fmt=FORMATS[S.fmt], out=[];
   var cr=ratio(pal.ink,pal.ground);
   out.push([cr>=4.5,'Text contrast '+cr.toFixed(1)+':1'+(cr>=4.5?'':' — too low to read at a counter')]);
-  var qr=S.stack.filter(function(L){return L.k==='qr'&&!L.hidden})[0];
-  var qmm=qr?(QW(qr.s==null?1:qr.s)/100)*fmt.mm:0;
-  var qmin=S.fmt===3?18:24;
-  out.push([qr&&qmm>=qmin,qr?('QR ≈ '+qmm.toFixed(0)+' mm'+(qmm>=qmin?'':' — under '+qmin+' mm, scans get flaky')):'No QR — NFC-only cards fail on older phones']);
+  if(showQR){
+    var qr=S.stack.filter(function(L){return L.k==='qr'&&!L.hidden})[0];
+    var qmm=qr?(QW(qr.s==null?1:qr.s)/100)*fmt.mm:0;
+    var qmin=S.fmt===3?18:24;
+    out.push([qr&&qmm>=qmin,qr?('QR ≈ '+qmm.toFixed(0)+' mm'+(qmm>=qmin?'':' — under '+qmin+' mm, scans get flaky')):'QR enabled but no code layer']);
+  } else {
+    out.push([true,'Tap-only — no QR code']);
+  }
   var tap=S.stack.filter(function(L){return L.k==='tap'&&!L.hidden})[0];
   out.push([!!tap,tap?'Tap target present':'No tap target — nothing marks where the tag is']);
   out.push([!!S.logo,S.logo?'Logo set':'No logo — placeholder will print']);
