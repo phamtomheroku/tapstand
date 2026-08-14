@@ -1084,7 +1084,8 @@ var FORMATS=[
  {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89}
 ];
 var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
-var KIND_LABEL={band:"Colour band",logo:"Logo",lockup:"Logo lockup",name:"Business name",
+var KIND_LABEL={band:"Colour band",fill:"Full bleed",split:"Diagonal split",rail:"Side rail",
+                blob:"Disc",rule:"Rule",logo:"Logo",lockup:"Logo lockup",name:"Business name",
                 stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block"};
 
 /* The banded "review card" plate — the layout every seller in this market ships,
@@ -1120,6 +1121,64 @@ function draftPlate(fmt){
    {t:"box",k:"tap",   x:wide?.72:.5, y:wide?.5:.715, s:wide?.7:1.12, cap:"TAP HERE"}
   ];
 }
+
+/* ---- Five alternates. Same content, structurally different arrangements —
+   the point is that the layer model can express a real design system, not one
+   template with the colours swapped. All tuned for the 4×6; drag from there. ---- */
+
+// 1. Brand wedge across the top, content stepping down out of it.
+function splitPlate(){return[
+ {t:"box",k:"split", x:.5,y:.25,s:1,w:1},
+ {t:"text",text:"TAP TO REVIEW",x:.5,y:.07,s:.6,fw:750,ls:.2,onBand:1},
+ {t:"box",k:"lockup",x:.5,y:.20,s:.95,onBand:1},
+ {t:"box",k:"stars", x:.5,y:.315,s:1,onBand:1},
+ {t:"box",k:"head",  x:.5,y:.56,s:1,w:.8},
+ {t:"box",k:"tap",   x:.5,y:.775,s:1.05,cap:"TAP HERE"},
+ {t:"box",k:"qr",    x:.16,y:.93,s:.38}]}
+
+// 2. Ticket stub — dashed tear line, the ring reads as the punch.
+function ticketPlate(){return[
+ {t:"box",k:"band",  x:.5,y:.075,s:.5,w:1},
+ {t:"text",text:"ADMIT ONE REVIEW",x:.5,y:.062,s:.52,fw:750,ls:.24,onBand:1},
+ {t:"box",k:"name",  x:.5,y:.185,s:1.05},
+ {t:"box",k:"stars", x:.5,y:.275,s:1.1},
+ {t:"box",k:"rule",  x:.5,y:.35,s:1,w:.86,dash:1},
+ {t:"box",k:"head",  x:.5,y:.44,s:.95,w:.8},
+ {t:"box",k:"tap",   x:.5,y:.665,s:1.15,cap:"PUNCH HERE"},
+ {t:"box",k:"rule",  x:.5,y:.83,s:1,w:.86,dash:1},
+ {t:"box",k:"qr",    x:.5,y:.915,s:.5}]}
+
+// 3. Full brand ground, tap knocked out of it. Loudest of the five.
+function discPlate(){return[
+ {t:"box",k:"fill",  x:.5,y:.5,s:1,w:1},
+ {t:"box",k:"lockup",x:.5,y:.13,s:.9,onBand:1},
+ {t:"box",k:"stars", x:.5,y:.245,s:1.05,onBand:1},
+ {t:"box",k:"blob",  x:.5,y:.545,s:1.25,bg:"ground"},
+ {t:"box",k:"tap",   x:.5,y:.545,s:1.05,cap:"TAP HERE"},
+ {t:"box",k:"head",  x:.5,y:.83,s:.95,w:.84,onBand:1},
+ {t:"box",k:"qr",    x:.5,y:.945,s:.34,onBand:1}]}
+
+// 4. Editorial — vertical rail, everything ranged left off it.
+function railPlate(){return[
+ {t:"box",k:"rail",  x:.085,y:.5,s:1},
+ {t:"text",text:"REVIEWS",x:.085,y:.5,s:.62,fw:750,ls:.34,onBand:1,rot:1},
+ {t:"box",k:"lockup",x:.28,y:.135,s:.82,al:"left"},
+ {t:"box",k:"rule",  x:.28,y:.225,s:1,w:.62,al:"left"},
+ {t:"box",k:"stars", x:.28,y:.31,s:.95,al:"left"},
+ {t:"box",k:"head",  x:.28,y:.47,s:1.05,w:.62,al:"left"},
+ {t:"box",k:"tap",   x:.30,y:.715,s:1.05,cap:"TAP",al:"left"},
+ {t:"box",k:"qr",    x:.28,y:.925,s:.42,al:"left"}]}
+
+// 5. Oversized outline type behind the ring.
+function typePlate(){return[
+ {t:"text",text:"THANK\nYOU",x:.5,y:.45,s:4.6,fw:850,ls:-.03,lh:.86,stroke:.22},
+ {t:"box",k:"name",  x:.5,y:.085,s:1},
+ {t:"box",k:"stars", x:.5,y:.165,s:.9},
+ {t:"box",k:"blob",  x:.5,y:.46,s:.76,bg:"ground"},
+ {t:"box",k:"tap",   x:.5,y:.46,s:1.25,cap:"TAP HERE"},
+ {t:"box",k:"head",  x:.5,y:.79,s:.95,w:.82},
+ {t:"box",k:"rule",  x:.5,y:.865,s:1,w:.5},
+ {t:"box",k:"qr",    x:.5,y:.94,s:.4}]}
 
 // bottom → top, exactly like stripDesign.stack
 function defaults(fmt){
@@ -1192,21 +1251,41 @@ function layerId(L){ if(!L.id) L.id='l'+(++S.uid); return L.id }
 
 function bodyHTML(L,ctx){
   var s=L.s==null?1:L.s;
+  var mc = L.onBand ? contrast(ctx.brand) : ctx.brand;   // mark colour
   if(L.t==='text'){
+    var stroke = L.stroke
+      ? ';-webkit-text-stroke:'+(L.stroke*s).toFixed(2)+'cqw '+
+        (L.col || (L.onBand ? contrast(ctx.brand) : ctx.fg))+
+        ';color:transparent;paint-order:stroke fill'
+      : ';color:'+(L.col||'currentColor');
     return '<span style="font-size:'+(4.2*s).toFixed(2)+'cqw;font-weight:'+(L.fw||600)+
-      ';color:'+(L.col||'currentColor')+';line-height:1.22;letter-spacing:'+(L.ls||0)+
-      'em;white-space:pre-wrap;display:block">'+esc(L.text||'Text')+'</span>';
+      ';line-height:'+(L.lh||1.22)+';letter-spacing:'+(L.ls||0)+
+      'em;white-space:pre-wrap;display:block'+stroke+'">'+esc(L.text||'Text')+'</span>';
   }
   switch(L.k){
     case 'band':
-      return '<div style="width:100%;height:'+(30*s)+'cqw;background:'+ctx.brand+
-        ';border-radius:0"></div>';
+      return '<div style="width:100%;height:'+(30*s)+'cqw;background:'+ctx.brand+'"></div>';
+    // Ground-covering shapes. Heights run past the card on purpose — #card clips them,
+    // so one primitive works at every trim size without per-format geometry.
+    case 'fill':
+      return '<div style="width:100%;height:'+(240*s)+'cqw;background:'+ctx.brand+'"></div>';
+    case 'split':
+      return '<div style="width:100%;height:'+(80*s)+'cqw;background:'+ctx.brand+
+        ';clip-path:polygon(0 0,100% 0,100% 74%,0 100%)"></div>';
+    case 'rail':
+      return '<div style="width:'+(16*s)+'cqw;height:'+(240*s)+'cqw;background:'+ctx.brand+'"></div>';
+    case 'blob':
+      return '<div style="width:'+(54*s)+'cqw;height:'+(54*s)+'cqw;border-radius:50%;background:'+
+        (L.bg==='ground'?ctx.bg:ctx.brand)+'"></div>';
+    case 'rule':
+      return '<div style="width:100%;border-top:'+(.7*s)+'cqw '+(L.dash?'dashed':'solid')+
+        ' currentColor;opacity:'+(L.dash?.45:.9)+'"></div>';
     case 'lockup':
       var mark = ctx.logo
         ? '<img src="'+ctx.logo+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(34*s)+
           'cqw;object-fit:contain;display:block">'
         : '<div class="logomark" style="height:'+(11*s)+'cqw;border-width:'+(.6*s)+
-          'cqw;border-color:'+ctx.brand+';color:'+ctx.brand+';font-size:'+(5*s)+'cqw">'+
+          'cqw;border-color:'+mc+';color:'+mc+';font-size:'+(5*s)+'cqw">'+
           esc(initials(ctx.name))+'</div>';
       return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
         '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
@@ -1217,7 +1296,7 @@ function bodyHTML(L,ctx){
        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(13*s)+'cqw;max-width:'+(56*s)+
          'cqw;object-fit:contain;display:block">'
        : '<div class="logomark" style="height:'+(13*s)+'cqw;border-width:'+(.7*s)+
-         'cqw;border-color:'+ctx.brand+';color:'+ctx.brand+';font-size:'+(6*s)+'cqw">'+
+         'cqw;border-color:'+mc+';color:'+mc+';font-size:'+(6*s)+'cqw">'+
          esc(initials(ctx.name))+'</div>';
     case 'name':
       return '<span style="font-weight:750;font-size:'+(5.4*s)+'cqw;letter-spacing:-.01em;'+
@@ -1232,9 +1311,9 @@ function bodyHTML(L,ctx){
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
     case 'tap':
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
-        (.85*s)+'cqw;border-color:'+ctx.brand+';gap:'+(.5*s)+'cqw">'+
-        WAVE.replace('<svg','<svg style="width:'+(11*s)+'cqw;height:'+(11*s)+'cqw"')+
-        '<b style="font-size:'+(2.9*s)+'cqw">'+esc(L.cap||'TAP')+'</b></div>';
+        (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw">'+
+        WAVE.replace('<svg','<svg style="width:'+(11*s)+'cqw;height:'+(11*s)+'cqw;stroke:'+mc+'"')+
+        '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
         '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
@@ -1256,7 +1335,7 @@ function paint(quiet){
   card.style.setProperty('--b-fg',fg);
   card.style.setProperty('--b-star',brand);
 
-  var ctx={name:name,brand:brand,copy:elCopy.value,logo:S.logo,
+  var ctx={name:name,brand:brand,bg:bg,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
@@ -1273,6 +1352,12 @@ function paint(quiet){
     // Anything sitting on the colour band flips to whatever reads against the brand,
     // resolved at paint time so it keeps up when the brand colour changes.
     if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
+    if(L.rot){ d.style.transform='translate(-50%,-50%) rotate(-90deg)'; }
+    if(L.al){ d.style.alignItems = L.al==='left'?'flex-start':L.al==='right'?'flex-end':'center';
+              d.style.textAlign = L.al;
+              if(!L.rot) d.style.transform = L.al==='left' ? 'translate(0,-50%)'
+                                           : L.al==='right' ? 'translate(-100%,-50%)'
+                                           : 'translate(-50%,-50%)'; }
     d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="1"></div>';
     card.appendChild(d);
   });
@@ -1425,7 +1510,9 @@ card.addEventListener('pointerup',endDrag);
 card.addEventListener('pointercancel',endDrag);   // iOS fires cancel instead of up
 
 /* ---- controls ---- */
-var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate]];
+var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate],
+  ["1 · Wedge",splitPlate],["2 · Ticket",ticketPlate],["3 · Knockout",discPlate],
+  ["4 · Editorial",railPlate],["5 · Big type",typePlate]];
 var platesEl=$('plates');
 platesEl.innerHTML=PLATES.map(function(p,i){
   return '<button class="chip" type="button" data-p="'+i+'" aria-pressed="'+(i===0)+'">'+p[0]+'</button>'}).join('');
