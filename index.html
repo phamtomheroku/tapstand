@@ -209,7 +209,35 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #card.f35{aspect-ratio:3/5}
 #card.f44{aspect-ratio:1/1}
 #card.ftap{aspect-ratio:3.5/2;width:min(430px,86vw)}
-.frame{position:absolute;inset:0;border:2.6cqw solid var(--b-brand);pointer-events:none;z-index:900}
+#card{font-family:var(--f-body,inherit)}
+.frame,.frame2{position:absolute;inset:0;pointer-events:none;z-index:900}
+.fr-solid    .frame{border:2.6cqw solid var(--b-brand)}
+.fr-hairline .frame{border:.55cqw solid var(--b-brand)}
+.fr-double   .frame{border:1.9cqw solid var(--b-brand)}
+.fr-double   .frame2{inset:3.4cqw;border:.5cqw solid var(--b-brand)}
+.fr-inset    .frame2{inset:4.2cqw;border:.6cqw solid var(--b-brand)}
+.fr-none     .frame{border:none}
+.fr-brackets .frame::before,.fr-brackets .frame::after,
+.fr-brackets .frame2::before,.fr-brackets .frame2::after{
+  content:"";position:absolute;width:14cqw;height:14cqw;border:1.1cqw solid var(--b-brand)}
+.fr-brackets .frame::before{top:3cqw;left:3cqw;border-right:none;border-bottom:none}
+.fr-brackets .frame::after{top:3cqw;right:3cqw;border-left:none;border-bottom:none}
+.fr-brackets .frame2::before{bottom:3cqw;left:3cqw;border-right:none;border-top:none}
+.fr-brackets .frame2::after{bottom:3cqw;right:3cqw;border-left:none;border-top:none}
+.fr-notched  .frame{border:1.6cqw solid var(--b-brand)}
+.fr-notched  .frame2::before,.fr-notched .frame2::after{
+  content:"";position:absolute;top:50%;width:7cqw;height:7cqw;border-radius:50%;
+  background:var(--b-brand);transform:translateY(-50%)}
+.fr-notched  .frame2::before{left:-3.5cqw}
+.fr-notched  .frame2::after{right:-3.5cqw}
+.tex{position:absolute;inset:0;pointer-events:none;z-index:60}
+.tx-none .tex{display:none}
+.tx-dots .tex{background-image:radial-gradient(var(--b-brand) 22%,transparent 23%);
+  background-size:3.4cqw 3.4cqw;opacity:.13}
+.tx-stripes .tex{background-image:repeating-linear-gradient(-45deg,var(--b-brand) 0 .9cqw,transparent .9cqw 5cqw);
+  opacity:.11}
+.tx-grain .tex{opacity:.30;mix-blend-mode:multiply;background-size:34cqw 34cqw;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.55'/></svg>")}
 .grid{position:absolute;inset:0;pointer-events:none;z-index:880;opacity:0;transition:opacity .12s}
 .grid.on{opacity:1}
 .lay{position:absolute;transform:translate(-50%,-50%);cursor:grab;
@@ -455,7 +483,8 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="grp"><span class="lbl">Logo</span>
             <label class="filebtn">UPLOAD PNG / SVG<input type="file" id="logo" accept="image/*"></label></div>
           <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
-          <div class="grp"><span class="lbl">Plate</span><div class="chips" id="plates"></div></div>
+          <div class="grp"><span class="lbl">Plate — layout</span><div class="chips" id="plates"></div></div>
+          <div class="grp"><span class="lbl">Theme — visual language</span><div class="chips" id="themes"></div></div>
         </div>
 
         <div class="pane">
@@ -487,7 +516,9 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <div class="disc" id="discEl"></div>
                 <div class="disclab" id="discLab"></div>
               </div>
+              <div class="tex"></div>
               <div class="frame"></div>
+              <div class="frame2"></div>
               <div class="guide v" id="gv"></div>
               <div class="guide h" id="gh"></div>
             </div>
@@ -1084,6 +1115,35 @@ var FORMATS=[
  {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89}
 ];
 var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
+/* ================= the design system =================
+   Layout (plate) and visual language (theme) are separate axes. A plate says where
+   things sit; a theme says what they're made of — typeface pairing, frame, star
+   glyph, ring shape, texture, corner radius, casing. 8 plates x 8 themes is 64
+   genuinely different cards instead of one template with the colours swapped.
+
+   Stacks prefer real system faces and fall back to whatever the machine has, so a
+   Mac shows Didot and a Linux box shows DejaVu Serif — same intent, different cut. */
+var FONTS={
+ grotesque:"system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Liberation Sans',sans-serif",
+ serif:"'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Liberation Serif','DejaVu Serif',serif",
+ didone:"Didot,'Bodoni MT','Playfair Display','Times New Roman',Georgia,'DejaVu Serif',serif",
+ slab:"Rockwell,'Roboto Slab','Bitstream Charter',Charter,Georgia,'DejaVu Serif',serif",
+ mono:"ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace",
+ condensed:"'Helvetica Neue Condensed','Arial Narrow','Roboto Condensed','Liberation Sans Narrow','DejaVu Sans Condensed',sans-serif",
+ rounded:"'SF Pro Rounded','Varela Round','Trebuchet MS','DejaVu Sans',sans-serif"
+};
+var THEMES=[
+ {k:"Clean",      disp:"grotesque",body:"grotesque",frame:"solid",   star:"solid",  ring:"circle",tex:"none",   rad:0, up:1,tr:.02},
+ {k:"Editorial",  disp:"didone",   body:"serif",    frame:"hairline",star:"outline",ring:"circle",tex:"none",   rad:0, up:0,tr:0},
+ {k:"Ticket",     disp:"mono",     body:"mono",     frame:"notched", star:"solid",  ring:"dashed",tex:"none",   rad:0, up:1,tr:.16},
+ {k:"Salon",      disp:"serif",    body:"serif",    frame:"double",  star:"single", ring:"circle",tex:"none",   rad:2.5,up:0,tr:.05},
+ {k:"Industrial", disp:"condensed",body:"grotesque",frame:"brackets",star:"pill",   ring:"square",tex:"stripes",rad:0, up:1,tr:.07},
+ {k:"Soft",       disp:"rounded",  body:"rounded",  frame:"inset",   star:"solid",  ring:"circle",tex:"dots",   rad:5,up:0,tr:0},
+ {k:"Press",      disp:"slab",     body:"serif",    frame:"solid",   star:"outline",ring:"hex",   tex:"grain",  rad:0, up:1,tr:.09},
+ {k:"Minimal",    disp:"grotesque",body:"grotesque",frame:"none",    star:"none",   ring:"none",  tex:"none",   rad:0, up:0,tr:0}
+];
+function TH(){ return THEMES[S.theme||0] }
+
 var KIND_LABEL={band:"Colour band",fill:"Full bleed",split:"Diagonal split",rail:"Side rail",
                 blob:"Disc",rule:"Rule",logo:"Logo",lockup:"Logo lockup",name:"Business name",
                 stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block"};
@@ -1128,13 +1188,13 @@ function draftPlate(fmt){
 
 // 1. Brand wedge across the top, content stepping down out of it.
 function splitPlate(){return[
- {t:"box",k:"split", x:.5,y:.25,s:1,w:1},
+ {t:"box",k:"split", x:.5,y:.275,s:1.05,w:1},
  {t:"text",text:"TAP TO REVIEW",x:.5,y:.07,s:.6,fw:750,ls:.2,onBand:1},
  {t:"box",k:"lockup",x:.5,y:.20,s:.95,onBand:1},
  {t:"box",k:"stars", x:.5,y:.315,s:1,onBand:1},
  {t:"box",k:"head",  x:.5,y:.56,s:1,w:.8},
  {t:"box",k:"tap",   x:.5,y:.775,s:1.05,cap:"TAP HERE"},
- {t:"box",k:"qr",    x:.16,y:.93,s:.38}]}
+ {t:"box",k:"qr",    x:.5,y:.935,s:.42}]}
 
 // 2. Ticket stub — dashed tear line, the ring reads as the punch.
 function ticketPlate(){return[
@@ -1171,13 +1231,11 @@ function railPlate(){return[
 
 // 5. Oversized outline type behind the ring.
 function typePlate(){return[
- {t:"text",text:"THANK\nYOU",x:.5,y:.45,s:4.6,fw:850,ls:-.03,lh:.86,stroke:.22},
+ {t:"text",text:"THANK\nYOU",x:.5,y:.375,s:4.2,fw:850,ls:-.03,lh:.86,stroke:.2},
  {t:"box",k:"name",  x:.5,y:.085,s:1},
  {t:"box",k:"stars", x:.5,y:.165,s:.9},
- {t:"box",k:"blob",  x:.5,y:.46,s:.76,bg:"ground"},
- {t:"box",k:"tap",   x:.5,y:.46,s:1.25,cap:"TAP HERE"},
- {t:"box",k:"head",  x:.5,y:.79,s:.95,w:.82},
- {t:"box",k:"rule",  x:.5,y:.865,s:1,w:.5},
+ {t:"box",k:"tap",   x:.5,y:.665,s:1.2,cap:"TAP HERE",icon:"phone"},
+ {t:"box",k:"head",  x:.5,y:.845,s:.9,w:.82},
  {t:"box",k:"qr",    x:.5,y:.94,s:.4}]}
 
 // bottom → top, exactly like stripDesign.stack
@@ -1205,7 +1263,7 @@ function defaults(fmt){
    {t:"box",k:"tap",  x:.5,y:.590,s:1}];
 }
 
-var S={fmt:0,plate:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
+var S={fmt:0,plate:0,theme:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
 var card=$('card'),gv=$('gv'),gh=$('gh');
 var elName=$('bname'),elCopy=$('copy'),elBrand=$('brand'),elBg=$('bg');
 
@@ -1316,16 +1374,32 @@ function bodyHTML(L,ctx){
       return '<span style="font-weight:750;font-size:'+(5.4*s)+'cqw;letter-spacing:-.01em;'+
         'line-height:1.16;display:block">'+esc(ctx.name)+'</span>';
     case 'stars':
+      var st=ctx.th.star, sz=(6.4*s);
+      if(st==='none') return '';
+      if(st==='single')
+        return '<div class="stars">'+STAR.replace('<svg','<svg style="width:'+(sz*2.7)+
+          'cqw;height:'+(sz*2.7)+'cqw"')+'</div>';
+      if(st==='pill')
+        return '<div style="display:flex;align-items:center;gap:'+(1.6*s)+'cqw;border:'+(.45*s)+
+          'cqw solid currentColor;border-radius:'+(9*s)+'cqw;padding:'+(1.2*s)+'cqw '+(3.4*s)+
+          'cqw;font-family:var(--f-disp);font-weight:750;font-size:'+(4.4*s)+'cqw;letter-spacing:.04em">'+
+          STAR.replace('<svg','<svg style="width:'+(sz*.85)+'cqw;height:'+(sz*.85)+'cqw"')+'5.0</div>';
+      var glyph = st==='outline'
+        ? STAR.replace('<svg','<svg style="width:'+sz+'cqw;height:'+sz+'cqw;fill:none;stroke:var(--b-star);stroke-width:1.7"')
+        : STAR.replace('<svg','<svg style="width:'+sz+'cqw;height:'+sz+'cqw"');
       return '<div class="stars" style="gap:'+(1.1*s)+'cqw">'+
-        new Array(6).join('x').split('x').map(function(){
-          return STAR.replace('<svg','<svg style="width:'+(6.4*s)+'cqw;height:'+(6.4*s)+'cqw"')
-        }).join('')+'</div>';
+        new Array(6).join('x').split('x').map(function(){return glyph}).join('')+'</div>';
     case 'head':
       return '<span style="font-size:'+(4.5*s)+'cqw;line-height:1.28;font-weight:600;'+
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
     case 'tap':
+      var rg=ctx.th.ring, rs='';
+      if(rg==='none')   rs='border:none;';
+      if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
+      if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
+      if(rg==='dashed') rs='border-style:dashed;';
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
-        (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw">'+
+        (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
         (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+
           (11*s*(ICON_W[L.icon]||1))+'cqw;height:'+(11*s)+'cqw;stroke:'+mc+'"')+
         '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
@@ -1342,15 +1416,20 @@ function bodyHTML(L,ctx){
 }
 
 function paint(quiet){
+  var th=TH();
   var name=elName.value||"Your Business",brand=elBrand.value,bg=elBg.value,fg=contrast(bg);
   var fmt=FORMATS[S.fmt];
-  card.className=fmt.cls;
+  card.className=fmt.cls+' fr-'+th.frame+' tx-'+th.tex;
+  card.style.setProperty('--f-disp',FONTS[th.disp]);
+  card.style.setProperty('--f-body',FONTS[th.body]);
+  card.style.setProperty('--rad',th.rad+'cqw');
+  card.style.borderRadius=th.rad+'cqw';
   card.style.setProperty('--b-brand',brand);
   card.style.setProperty('--b-bg',bg);
   card.style.setProperty('--b-fg',fg);
   card.style.setProperty('--b-star',brand);
 
-  var ctx={name:name,brand:brand,bg:bg,fg:fg,copy:elCopy.value,logo:S.logo,
+  var ctx={th:th,name:name,brand:brand,bg:bg,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
@@ -1367,6 +1446,12 @@ function paint(quiet){
     // Anything sitting on the colour band flips to whatever reads against the brand,
     // resolved at paint time so it keeps up when the brand colour changes.
     if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
+    if(L.t==='text' || L.k==='name' || L.k==='lockup'){
+      d.style.fontFamily='var(--f-disp)';
+      if(th.up) d.style.textTransform='uppercase';
+      if(th.tr) d.style.letterSpacing=th.tr+'em';
+    }
+    if(L.op!=null) d.style.opacity=L.op;
     if(L.rot){ d.style.transform='translate(-50%,-50%) rotate(-90deg)'; }
     if(L.al){ d.style.alignItems = L.al==='left'?'flex-start':L.al==='right'?'flex-end':'center';
               d.style.textAlign = L.al;
@@ -1532,6 +1617,17 @@ card.addEventListener('pointerup',endDrag);
 card.addEventListener('pointercancel',endDrag);   // iOS fires cancel instead of up
 
 /* ---- controls ---- */
+var themesEl=$('themes');
+themesEl.innerHTML=THEMES.map(function(t,i){
+  return '<button class="chip" type="button" data-t="'+i+'" aria-pressed="'+(i===0)+'">'+t.k+'</button>'}).join('');
+themesEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-t]'); if(!b)return;
+  S.theme=+b.dataset.t;
+  Array.prototype.forEach.call(themesEl.children,function(c){
+    c.setAttribute('aria-pressed',c===b?'true':'false')});
+  paint();
+});
+
 var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate],
   ["1 · Wedge",splitPlate],["2 · Ticket",ticketPlate],["3 · Knockout",discPlate],
   ["4 · Editorial",railPlate],["5 · Big type",typePlate]];
