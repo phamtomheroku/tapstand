@@ -1500,7 +1500,15 @@ function typePlate(){return[
    The plates all shared one shape: a centred vertical stack. These do not. Each
    is its own geometry — asymmetric, cropped, banded, rotated or radial — because
    composition, not typeface, is what makes two cards read as unrelated. ---- */
-function aFullbleed(f,g){return[
+function aFullbleed(f,g){ if(f===2) return[
+ {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
+ {t:"box",k:"fill",   x:.5,y:.795,s:1,w:1,hf:.41},
+ {t:"box",k:"logo",   x:.07,y:.685,s:.8,lw:40,lh:13,al:"left",onBand:1},
+ {t:"box",k:"name",   x:.07,y:.70,s:.85,al:"left",onBand:1},
+ {t:"box",k:"stars",  x:.07,y:.79,s:.62,al:"left",onBand:1},
+ {t:"box",k:"qr",     x:.86,y:.72,s:.34,onBand:1},
+ {t:"box",k:"tap",    x:.5,y:.945,s:.9,w:1,style:"bar",cap:"TAP TO REVIEW",icon:"phone"}];
+ return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
  {t:"box",k:"fill",   x:.5,y:.855,s:1,w:1,hf:.29},
  {t:"box",k:"logo",   x:.07,y:.775,s:1,lw:36,lh:12,al:"left",onBand:1},
@@ -1509,7 +1517,16 @@ function aFullbleed(f,g){return[
  {t:"box",k:"tap",    x:.5,y:.955,s:1,w:1,style:"bar",cap:"TAP TO REVIEW",icon:"phone"},
  {t:"box",k:"qr",     x:.86,y:.825,s:.38,onBand:1}]}
 
-function aSplit(f,g){return[
+function aSplit(f,g){ if(f===2) return[   // vertical split — the square's natural cut
+ {t:"box",k:"fill",   x:.22,y:.5,s:1,w:.44,hf:1.1},
+ {t:"box",k:"motif",  x:.22,y:.36,s:1.05,g:g.motif,onBand:1},
+ {t:"box",k:"stars",  x:.22,y:.63,s:.6,onBand:1},
+ {t:"box",k:"logo",   x:.63,y:.24,s:.78,lw:38,lh:13},
+ {t:"box",k:"name",   x:.63,y:.26,s:.9},
+ {t:"box",k:"head",   x:.63,y:.45,s:.72,w:.44},
+ {t:"box",k:"tap",    x:.63,y:.665,s:.85,style:"underline",cap:"TAP HERE",icon:"phone"},
+ {t:"box",k:"qr",     x:.63,y:.855,s:.3}];
+ return[
  {t:"box",k:"fill",   x:.5,y:.19,s:1,w:1,hf:.38},
  {t:"box",k:"motif",  x:.5,y:.17,s:1.45,g:g.motif,onBand:1},
  {t:"box",k:"logo",   x:.5,y:.475,s:1.05,lw:46,lh:16},
@@ -1519,7 +1536,15 @@ function aSplit(f,g){return[
  {t:"box",k:"tap",    x:.5,y:.82,s:1.05,style:"underline",cap:"TAP HERE",icon:"phone"},
  {t:"box",k:"qr",     x:.5,y:.94,s:.42}]}
 
-function aRadial(f,g){return[
+function aRadial(f,g){ if(f===2) return[   // a square is the right shape for this
+ {t:"box",k:"hero",   x:.5,y:.5,s:1.25,g:g.hero,op:.45},
+ {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.5,fw:750,arc:240,arcR:36},
+ {t:"box",k:"logo",   x:.5,y:.115,s:.75,lw:36,lh:12},
+ {t:"box",k:"name",   x:.5,y:.12,s:.85},
+ {t:"box",k:"tap",    x:.5,y:.5,s:1,cap:"TAP",icon:"phone"},
+ {t:"box",k:"stars",  x:.5,y:.815,s:.62},
+ {t:"box",k:"qr",     x:.5,y:.905,s:.32}];
+ return[
  {t:"box",k:"hero",   x:.5,y:.5,s:1.55,g:g.hero,op:.5},
  {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.62,fw:750,arc:210,arcR:44},
  {t:"box",k:"logo",   x:.5,y:.125,s:1,lw:42,lh:14},
@@ -1529,7 +1554,16 @@ function aRadial(f,g){return[
  {t:"box",k:"head",   x:.5,y:.875,s:.8,w:.76},
  {t:"box",k:"qr",     x:.5,y:.955,s:.34}]}
 
-function aEdge(f,g){return[
+function aEdge(f,g){ if(f===2) return[
+ {t:"box",k:"motif",  x:.90,y:.16,s:1.7,g:g.motif,op:.18},
+ {t:"box",k:"logo",   x:.09,y:.475,s:.85,lw:42,lh:14,al:"left"},
+ {t:"box",k:"name",   x:.09,y:.49,s:1,al:"left"},
+ {t:"box",k:"rule",   x:.09,y:.565,s:1,w:.4,al:"left"},
+ {t:"box",k:"head",   x:.09,y:.655,s:.72,w:.6,al:"left"},
+ {t:"box",k:"stars",  x:.09,y:.755,s:.6,al:"left"},
+ {t:"box",k:"tap",    x:.09,y:.875,s:.8,style:"bare",cap:"TAP",icon:"phone",al:"left"},
+ {t:"box",k:"qr",     x:.87,y:.87,s:.3}];
+ return[
  {t:"box",k:"motif",  x:.93,y:.14,s:2.4,g:g.motif,op:.16},
  {t:"box",k:"logo",   x:.09,y:.565,s:1.1,lw:46,lh:16,al:"left"},
  {t:"box",k:"name",   x:.09,y:.60,s:1.35,al:"left"},
@@ -1539,7 +1573,18 @@ function aEdge(f,g){return[
  {t:"box",k:"tap",    x:.09,y:.925,s:1,style:"bare",cap:"TAP",icon:"phone",al:"left"},
  {t:"box",k:"qr",     x:.88,y:.93,s:.36}]}
 
-function aGrid(f,g){return[
+function aGrid(f,g){ if(f===2) return[    // four true quadrants
+ {t:"box",k:"logo",   x:.08,y:.10,s:.72,lw:34,lh:11,al:"left"},
+ {t:"box",k:"name",   x:.08,y:.105,s:.78,al:"left"},
+ {t:"box",k:"stars",  x:.92,y:.105,s:.5,al:"right"},
+ {t:"box",k:"rule",   x:.5,y:.185,s:1,w:.84},
+ {t:"box",k:"motif",  x:.27,y:.40,s:1.15,g:g.motif},
+ {t:"box",k:"head",   x:.92,y:.40,s:.66,w:.4,al:"right"},
+ {t:"box",k:"rule",   x:.5,y:.615,s:1,w:.84},
+ {t:"box",k:"tap",    x:.08,y:.775,s:.85,cap:"TAP",icon:"phone",al:"left"},
+ {t:"box",k:"qr",     x:.92,y:.775,s:.34,al:"right"},
+ {t:"text",text:"SCAN OR TAP",x:.5,y:.94,s:.42,fw:700,ls:.14}];
+ return[
  {t:"box",k:"logo",   x:.08,y:.085,s:.85,lw:38,lh:13,al:"left"},
  {t:"box",k:"name",   x:.08,y:.09,s:.95,al:"left"},
  {t:"box",k:"stars",  x:.92,y:.09,s:.62,al:"right"},
@@ -1551,7 +1596,17 @@ function aGrid(f,g){return[
  {t:"box",k:"qr",     x:.92,y:.70,s:.46,al:"right"},
  {t:"text",text:"SCAN OR TAP · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
 
-function aBanded(f,g){return[
+function aBanded(f,g){ if(f===2) return[
+ {t:"box",k:"fill",   x:.5,y:.115,s:1,w:1,hf:.23},
+ {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.26},
+ {t:"box",k:"logo",   x:.5,y:.10,s:.72,lw:34,lh:11,onBand:1},
+ {t:"box",k:"name",   x:.5,y:.105,s:.85,onBand:1},
+ {t:"box",k:"stars",  x:.5,y:.325,s:.72},
+ {t:"box",k:"head",   x:.5,y:.44,s:.72,w:.76},
+ {t:"box",k:"fill",   x:.5,y:.685,s:1,w:1,hf:.21},
+ {t:"box",k:"tap",    x:.5,y:.685,s:.9,cap:"TAP HERE",icon:"phone",onBand:1},
+ {t:"box",k:"qr",     x:.5,y:.895,s:.32}];
+ return[
  {t:"box",k:"fill",   x:.5,y:.10,s:1,w:1,hf:.20},
  {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.28},
  {t:"box",k:"logo",   x:.5,y:.10,s:.9,lw:40,lh:13,onBand:1},
@@ -1562,7 +1617,16 @@ function aBanded(f,g){return[
  {t:"box",k:"tap",    x:.5,y:.70,s:1.1,cap:"TAP HERE",icon:"phone",onBand:1},
  {t:"box",k:"qr",     x:.5,y:.92,s:.44}]}
 
-function aDiagonal(f,g){return[
+function aDiagonal(f,g){ if(f===2) return[
+ {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
+ {t:"box",k:"logo",   x:.46,y:.185,s:.8,lw:40,lh:13,rotd:-7},
+ {t:"box",k:"name",   x:.46,y:.20,s:.95,rotd:-7},
+ {t:"box",k:"stars",  x:.46,y:.315,s:.66,rotd:-7},
+ {t:"box",k:"head",   x:.46,y:.44,s:.72,w:.72,rotd:-7},
+ {t:"box",k:"hero",   x:1.04,y:.72,s:.85,g:g.hero,op:.3},
+ {t:"box",k:"tap",    x:.44,y:.665,s:.9,cap:"TAP HERE",icon:"phone",rotd:-7},
+ {t:"box",k:"qr",     x:.5,y:.885,s:.32,rotd:-7}];
+ return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
  {t:"box",k:"logo",   x:.46,y:.175,s:1,lw:44,lh:15,rotd:-7},
  {t:"box",k:"name",   x:.46,y:.20,s:1.2,rotd:-7},
@@ -1572,7 +1636,17 @@ function aDiagonal(f,g){return[
  {t:"box",k:"tap",    x:.44,y:.70,s:1.15,cap:"TAP HERE",icon:"phone",rotd:-7},
  {t:"box",k:"qr",     x:.5,y:.93,s:.42,rotd:-7}]}
 
-function aDepth(f,g){return[
+function aDepth(f,g){ if(f===2) return[
+ {t:"box",k:"fill",   x:.57,y:.40,s:1,w:.74,hf:.30,op:.25},
+ {t:"box",k:"fill",   x:.43,y:.355,s:1,w:.74,hf:.30},
+ {t:"box",k:"logo",   x:.43,y:.285,s:.75,lw:34,lh:11,onBand:1},
+ {t:"box",k:"name",   x:.43,y:.295,s:.85,onBand:1},
+ {t:"box",k:"stars",  x:.43,y:.40,s:.6,onBand:1},
+ {t:"box",k:"head",   x:.5,y:.60,s:.72,w:.74},
+ {t:"box",k:"tap",    x:.5,y:.775,s:.88,cap:"TAP HERE",icon:"phone"},
+ {t:"box",k:"qr",     x:.5,y:.915,s:.32},
+ {t:"box",k:"motif",  x:.11,y:.09,s:.85,g:g.motif,op:.3}];
+ return[
  {t:"box",k:"fill",   x:.56,y:.42,s:1,w:.78,hf:.24,op:.25},
  {t:"box",k:"fill",   x:.44,y:.38,s:1,w:.78,hf:.24},
  {t:"box",k:"logo",   x:.44,y:.325,s:.95,lw:40,lh:13,onBand:1},
@@ -1761,6 +1835,7 @@ function bodyHTML(L,ctx){
         esc(L.word||'Google')+'</span></div>';
     case 'logo':
       var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
+      if(!ctx.logo && ctx.hasName) return '';    // the name is holding this slot
       if(ctx.logo)
         return '<img src="'+ctx.logo+'" alt="" style="width:'+LW+'cqw;height:'+LH+
           'cqw;object-fit:contain;object-position:center;display:block'+ctx.logoFx+'">';
@@ -1796,7 +1871,7 @@ function bodyHTML(L,ctx){
         ? STAR.replace('<svg','<svg style="width:'+sz+'cqw;height:'+sz+'cqw;fill:none;stroke:var(--b-star);stroke-width:1.7"')
         : STAR.replace('<svg','<svg style="width:'+sz+'cqw;height:'+sz+'cqw"');
       return '<div class="stars" style="gap:'+(1.1*s)+'cqw">'+
-        new Array(6).join('x').split('x').map(function(){return glyph}).join('')+'</div>';
+        [0,1,2,3,4].map(function(){return glyph}).join('')+'</div>';
     case 'head':
       return '<span style="font-size:'+(4.5*s)+'cqw;line-height:1.28;font-weight:600;'+
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
@@ -1859,7 +1934,8 @@ function paint(quiet){
   card.style.setProperty('--b-star',brand);
 
   var logoFx = $('logoInv').checked ? ';filter:invert(1) hue-rotate(180deg)' : '';
-  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
+  var hasName = S.stack.some(function(L){ return L.k==='name' && !L.hidden; });
+  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,hasName:hasName,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
