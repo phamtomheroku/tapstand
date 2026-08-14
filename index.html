@@ -1118,7 +1118,7 @@ function draftPlate(fmt){
    {t:"box",k:"stars", x:.5,y:wide?.53:.335,s:wide?.62:1.05},
    {t:"box",k:"head",  x:.5,y:wide?.74:.475,s:wide?.55:1, w:.86},
    {t:"box",k:"qr",    x:wide?.93:.845,y:wide?.5:.925,s:wide?.4:.46},
-   {t:"box",k:"tap",   x:wide?.72:.5, y:wide?.5:.715, s:wide?.7:1.12, cap:"TAP HERE"}
+   {t:"box",k:"tap",   x:wide?.72:.5, y:wide?.5:.715, s:wide?.7:1.12, cap:"TAP HERE",icon:"phone"}
   ];
 }
 
@@ -1154,7 +1154,7 @@ function discPlate(){return[
  {t:"box",k:"lockup",x:.5,y:.13,s:.9,onBand:1},
  {t:"box",k:"stars", x:.5,y:.245,s:1.05,onBand:1},
  {t:"box",k:"blob",  x:.5,y:.545,s:1.25,bg:"ground"},
- {t:"box",k:"tap",   x:.5,y:.545,s:1.05,cap:"TAP HERE"},
+ {t:"box",k:"tap",   x:.5,y:.545,s:1.05,cap:"TAP HERE",icon:"phone"},
  {t:"box",k:"head",  x:.5,y:.83,s:.95,w:.84,onBand:1},
  {t:"box",k:"qr",    x:.5,y:.945,s:.34,onBand:1}]}
 
@@ -1222,8 +1222,22 @@ function initials(s){
 }
 var STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 '+
  '1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
-var WAVE='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 26c14 12 14 36 0 48"/>'+
- '<path d="M48 18c20 17 20 47 0 64"/><path d="M66 10c26 22 26 58 0 80"/></svg>';
+var TAP_ICONS={
+ // the bare contactless mark
+ waves:'<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 26c14 12 14 36 0 48"/>'+
+   '<path d="M48 18c20 17 20 47 0 64"/><path d="M66 10c26 22 26 58 0 80"/></svg>',
+ // device + waves. Wider viewBox so the arcs get room instead of stacking on the
+ // handset, and a size multiplier so it fills the ring like the bare mark does.
+ phone:'<svg viewBox="0 0 124 100" aria-hidden="true">'+
+   '<rect x="74" y="14" width="38" height="72" rx="8"/>'+
+   '<path d="M86 25h14"/>'+
+   '<path d="M52 36c8 8 8 20 0 28"/>'+
+   '<path d="M36 27c15 14 15 32 0 46"/>'+
+   '<path d="M20 18c22 19 22 45 0 64"/></svg>'
+};
+// the bare mark fills a square; the device mark is wider, so it gets scaled to match
+var ICON_W={waves:1, phone:1.55};
+var WAVE=TAP_ICONS.waves;
 
 function qrSVG(seedStr,fg,bg){
   var N=25,seed=0,i;
@@ -1312,7 +1326,8 @@ function bodyHTML(L,ctx){
     case 'tap':
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw">'+
-        WAVE.replace('<svg','<svg style="width:'+(11*s)+'cqw;height:'+(11*s)+'cqw;stroke:'+mc+'"')+
+        (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+
+          (11*s*(ICON_W[L.icon]||1))+'cqw;height:'+(11*s)+'cqw;stroke:'+mc+'"')+
         '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
@@ -1445,7 +1460,10 @@ function drawInspector(){
   }
   if(L.k==='tap'){
     h+='<span class="lbl">Ring caption</span>'+
-       '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
+       '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">'+
+       '<span class="lbl">Tap mark</span>'+
+       '<select id="iIcon"><option value="waves">Contactless waves</option>'+
+       '<option value="phone">Phone + waves</option></select>';
   }
   if(L.t==='text'){
     h+='<textarea id="iTxt">'+esc(L.text||'')+'</textarea>'+
@@ -1457,7 +1475,11 @@ function drawInspector(){
      '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
   box.innerHTML=h;
   if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
-  if(L.k==='tap')    $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
+  if(L.k==='tap'){
+    $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
+    $('iIcon').value=L.icon||'waves';
+    $('iIcon').addEventListener('change',function(){L.icon=this.value;paint(true)});
+  }
   if(L.t==='text'){
     $('iFw').value=String(L.fw||600);
     $('iTxt').addEventListener('input',function(){L.text=this.value;paint(true)});
