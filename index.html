@@ -483,8 +483,12 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="grp"><span class="lbl">Logo</span>
             <label class="filebtn">UPLOAD PNG / SVG<input type="file" id="logo" accept="image/*"></label></div>
           <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
-          <div class="grp"><span class="lbl">Plate — layout</span><div class="chips" id="plates"></div></div>
-          <div class="grp"><span class="lbl">Theme — visual language</span><div class="chips" id="themes"></div></div>
+          <div class="grp"><span class="lbl">Direction — pick this first</span>
+            <div class="chips" id="dirs"></div></div>
+          <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
+          <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
+          <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
+          <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
         </div>
 
         <div class="pane">
@@ -1109,10 +1113,10 @@ var PRESETS=[
  {k:"Gym",n:"Iron Yard Fitness",b:"#D64500",g:"#101315",c:3}
 ];
 var FORMATS=[
- {k:"4×6 counter",cls:"",d:"102 × 152 mm",mm:102},
- {k:"3×5 table",cls:"f35",d:"76 × 127 mm",mm:76},
- {k:"4×4 square",cls:"f44",d:"102 × 102 mm",mm:102},
- {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89}
+ {k:"4×6 counter",cls:"",d:"102 × 152 mm",mm:102,ar:1.5},
+ {k:"3×5 table",cls:"f35",d:"76 × 127 mm",mm:76,ar:1.667},
+ {k:"4×4 square",cls:"f44",d:"102 × 102 mm",mm:102,ar:1},
+ {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89,ar:.5714}
 ];
 var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
 /* ================= the design system =================
@@ -1123,6 +1127,110 @@ var DISC_MM=30;   // Seritag 30mm on-metal PVC disc, NTAG213
 
    Stacks prefer real system faces and fall back to whatever the machine has, so a
    Mac shows Didot and a Linux box shows DejaVu Serif — same intent, different cut. */
+/* ---- colour engine -------------------------------------------------------
+   Two flat colours on every card was a bigger cause of sameness than the fonts
+   were. A palette derives roles from the one brand colour the client gives us:
+   an accent by hue rotation, a tint for low-contrast grounds, and an ink that
+   always passes against whatever ground it lands on. */
+function _h2r(h){h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function _r2h(r){return '#'+r.map(function(v){v=Math.max(0,Math.min(255,Math.round(v)));
+  return (v<16?'0':'')+v.toString(16)}).join('')}
+function mix(a,b,t){var A=_h2r(a),B=_h2r(b);return _r2h([0,1,2].map(function(i){return A[i]+(B[i]-A[i])*t}))}
+function shiftHue(hex,deg){
+  var c=_h2r(hex).map(function(v){return v/255});
+  var mx=Math.max.apply(null,c),mn=Math.min.apply(null,c),d=mx-mn,h=0,l=(mx+mn)/2;
+  var sat=d===0?0:d/(1-Math.abs(2*l-1));
+  if(d){ h = mx===c[0] ? ((c[1]-c[2])/d)%6 : mx===c[1] ? (c[2]-c[0])/d+2 : (c[0]-c[1])/d+4; h*=60; }
+  h=(h+deg+360)%360;
+  var C=(1-Math.abs(2*l-1))*sat, X=C*(1-Math.abs((h/60)%2-1)), m=l-C/2, r=[0,0,0];
+  if(h<60)r=[C,X,0];else if(h<120)r=[X,C,0];else if(h<180)r=[0,C,X];
+  else if(h<240)r=[0,X,C];else if(h<300)r=[X,0,C];else r=[C,0,X];
+  return _r2h(r.map(function(v){return (v+m)*255}));
+}
+var PALETTES=[
+ {k:"Flat",     fn:function(b,g){return{ground:g,groundCSS:g,brand:b,accent:shiftHue(b,150),tint:mix(b,g,.88)}}},
+ {k:"Tinted",   fn:function(b,g){var t=mix(b,g,.9);return{ground:t,groundCSS:t,brand:b,accent:shiftHue(b,150),tint:mix(b,g,.78)}}},
+ {k:"Inverted", fn:function(b,g){return{ground:b,groundCSS:b,brand:g,accent:shiftHue(b,150),tint:mix(b,g,.25)}}},
+ {k:"Gradient", fn:function(b,g){var b2=shiftHue(b,38);
+    return{ground:b,groundCSS:'linear-gradient(155deg,'+b+' 0%,'+b2+' 100%)',brand:g,accent:g,tint:mix(b,g,.3)}}},
+ {k:"Duotone",  fn:function(b,g){var b2=shiftHue(b,175);
+    return{ground:b,groundCSS:'linear-gradient(135deg,'+b+' 0%,'+b+' 46%,'+b2+' 46%,'+b2+' 100%)',
+           brand:g,accent:g,tint:mix(b,g,.3)}}},
+ {k:"Halo",     fn:function(b,g){var t=mix(b,g,.82);
+    return{ground:g,groundCSS:'radial-gradient(circle at 50% 42%,'+t+' 0%,'+g+' 62%)',
+           brand:b,accent:shiftHue(b,150),tint:t}}}
+];
+
+/* ---- procedural graphics -------------------------------------------------
+   No photography is reachable from here and there are no generation credits, so
+   the imagery is drawn. For print that is the better answer anyway: vector,
+   recolours per client, and sharp at any size. Every entry returns an SVG data
+   URI tinted from the palette. */
+function _svg(w,h,body){return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+body+'</svg>')}
+var PATTERNS={
+ none:null,
+ terrazzo:function(c){var r='',i,S=[[8,11,5],[38,7,3.4],[62,20,6],[22,34,4],[52,44,3],[14,58,5.5],[44,66,4.4],[68,52,3.2],[30,50,2.6],[58,72,2.8]];
+   for(i=0;i<S.length;i++)r+='<circle cx="'+S[i][0]+'" cy="'+S[i][1]+'" r="'+S[i][2]+'" fill="'+(i%3?c.brand:c.accent)+'"/>';
+   return _svg(80,80,r)},
+ halftone:function(c){var r='',x,y;for(y=0;y<6;y++)for(x=0;x<6;x++)
+   r+='<circle cx="'+(x*14+7)+'" cy="'+(y*14+7)+'" r="'+(1.2+((x+y)%4)*1.1)+'" fill="'+c.brand+'"/>';
+   return _svg(84,84,r)},
+ topo:function(c){var r='',i;for(i=0;i<7;i++)
+   r+='<path d="M0 '+(14+i*13)+' C22 '+(4+i*13)+' 42 '+(26+i*13)+' 64 '+(12+i*13)+' S96 '+(22+i*13)+' 120 '+(10+i*13)+'" fill="none" stroke="'+c.brand+'" stroke-width="1.6"/>';
+   return _svg(120,104,r)},
+ arcs:function(c){var r='',i;for(i=1;i<6;i++)
+   r+='<circle cx="0" cy="90" r="'+(i*19)+'" fill="none" stroke="'+(i%2?c.brand:c.accent)+'" stroke-width="2.4"/>';
+   return _svg(96,96,r)},
+ confetti:function(c){var r='',i,P=[[10,14,18],[40,8,-24],[68,26,40],[24,44,12],[54,58,-40],[80,66,20],[16,74,-14],[46,84,32]];
+   for(i=0;i<P.length;i++)r+='<rect x="'+P[i][0]+'" y="'+P[i][1]+'" width="9" height="3.4" rx="1.7" fill="'+(i%2?c.brand:c.accent)+'" transform="rotate('+P[i][2]+' '+P[i][0]+' '+P[i][1]+')"/>';
+   return _svg(96,96,r)},
+ grid:function(c){return _svg(40,40,'<path d="M0 0H40M0 20H40M0 0V40M20 0V40" stroke="'+c.brand+'" stroke-width="1"/>')},
+ waves:function(c){var r='',i;for(i=0;i<4;i++)
+   r+='<path d="M0 '+(12+i*22)+' q16 -10 32 0 t32 0 t32 0" fill="none" stroke="'+c.brand+'" stroke-width="2.2"/>';
+   return _svg(96,92,r)},
+ memphis:function(c){return _svg(100,100,
+   '<circle cx="18" cy="20" r="8" fill="none" stroke="'+c.brand+'" stroke-width="2.6"/>'+
+   '<path d="M46 10l12 18H34z" fill="'+c.accent+'"/>'+
+   '<path d="M70 44h22M70 52h22M70 60h22" stroke="'+c.brand+'" stroke-width="2.6"/>'+
+   '<rect x="14" y="56" width="16" height="16" fill="'+c.accent+'" transform="rotate(18 22 64)"/>'+
+   '<circle cx="56" cy="78" r="6" fill="'+c.brand+'"/>')}
+};
+var HEROES={
+ none:null,
+ starburst:function(c){var r='',i;for(i=0;i<28;i++){var a=i*(360/28)*Math.PI/180;
+   r+='<line x1="100" y1="100" x2="'+(100+Math.cos(a)*96)+'" y2="'+(100+Math.sin(a)*96)+'" stroke="'+c.brand+'" stroke-width="'+(i%2?7:3)+'"/>'}
+   return _svg(200,200,r)},
+ rays:function(c){var r='',i;for(i=0;i<9;i++){var a=(-90+(i-4)*11)*Math.PI/180;
+   r+='<path d="M100 200 L'+(100+Math.cos(a)*210)+' '+(200+Math.sin(a)*210)+' L'+(100+Math.cos(a+.09)*210)+' '+(200+Math.sin(a+.09)*210)+'Z" fill="'+(i%2?c.brand:c.accent)+'"/>'}
+   return _svg(200,200,r)},
+ blob:function(c){return _svg(200,200,'<path d="M158 54c18 24 14 62-6 84s-58 34-84 20-42-48-32-76 44-42 74-42 30-10 48 14z" fill="'+c.brand+'"/>')},
+ concentric:function(c){var r='',i;for(i=1;i<8;i++)
+   r+='<circle cx="100" cy="100" r="'+(i*13)+'" fill="none" stroke="'+(i%2?c.brand:c.accent)+'" stroke-width="4"/>';
+   return _svg(200,200,r)}
+};
+var MOTIFS={
+ none:null,
+ coffee:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
+   '<path d="M44 76h94v50a34 34 0 0 1-34 34H78a34 34 0 0 1-34-34z"/><path d="M138 90h20a20 20 0 0 1 0 40h-20"/>'+
+   '<path d="M70 52c0-10 8-12 8-22M96 52c0-10 8-12 8-22M122 52c0-10 8-12 8-22"/><path d="M34 176h132"/></g>')},
+ scissors:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round">'+
+   '<circle cx="58" cy="150" r="20"/><circle cx="142" cy="150" r="20"/>'+
+   '<path d="M72 136 148 44M128 136 52 44"/></g>')},
+ tooth:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linejoin="round">'+
+   '<path d="M62 40c-20 0-30 18-28 40 3 30 12 44 16 66 3 16 8 22 16 22s12-10 14-26 4-24 20-24 18 8 20 24 6 26 14 26 13-6 16-22c4-22 13-36 16-66 2-22-8-40-28-40-14 0-18 8-38 8s-24-8-38-8z"/></g>')},
+ dumbbell:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round">'+
+   '<path d="M70 100h60"/><rect x="40" y="72" width="24" height="56" rx="6"/><rect x="136" y="72" width="24" height="56" rx="6"/>'+
+   '<path d="M24 86v28M176 86v28"/></g>')},
+ wine:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
+   '<path d="M64 34h72l-6 46a30 30 0 0 1-60 0z"/><path d="M100 110v52M74 168h52"/></g>')},
+ wrench:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
+   '<path d="M148 36a34 34 0 0 0-44 44L60 124a16 16 0 0 0 0 22l4 4a16 16 0 0 0 22 0l44-44a34 34 0 0 0 44-44l-24 24-20-6-6-20z"/></g>')},
+ flower:function(c){var r='',i;for(i=0;i<6;i++)r+='<ellipse cx="100" cy="58" rx="17" ry="34" fill="none" stroke="'+c.brand+'" stroke-width="6" transform="rotate('+(i*60)+' 100 100)"/>';
+   return _svg(200,200,r+'<circle cx="100" cy="100" r="13" fill="'+c.accent+'"/>')}
+};
+
 var FONTS={
  grotesque:"system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Liberation Sans',sans-serif",
  serif:"'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Liberation Serif','DejaVu Serif',serif",
@@ -1238,6 +1346,105 @@ function typePlate(){return[
  {t:"box",k:"head",  x:.5,y:.845,s:.9,w:.82},
  {t:"box",k:"qr",    x:.5,y:.94,s:.4}]}
 
+/* ---- composition archetypes ------------------------------------------------
+   The plates all shared one shape: a centred vertical stack. These do not. Each
+   is its own geometry — asymmetric, cropped, banded, rotated or radial — because
+   composition, not typeface, is what makes two cards read as unrelated. ---- */
+function aFullbleed(f,g){return[
+ {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
+ {t:"box",k:"fill",   x:.5,y:.855,s:1,w:1,hf:.29},
+ {t:"box",k:"name",   x:.07,y:.79,s:1,al:"left",onBand:1},
+ {t:"box",k:"stars",  x:.07,y:.865,s:.72,al:"left",onBand:1},
+ {t:"box",k:"tap",    x:.5,y:.955,s:1,w:1,style:"bar",cap:"TAP TO REVIEW",icon:"phone"},
+ {t:"box",k:"qr",     x:.86,y:.825,s:.38,onBand:1}]}
+
+function aSplit(f,g){return[
+ {t:"box",k:"fill",   x:.5,y:.19,s:1,w:1,hf:.38},
+ {t:"box",k:"motif",  x:.5,y:.17,s:1.45,g:g.motif,onBand:1},
+ {t:"box",k:"name",   x:.5,y:.50,s:1.15},
+ {t:"box",k:"stars",  x:.5,y:.565,s:.95},
+ {t:"box",k:"head",   x:.5,y:.665,s:.92,w:.8},
+ {t:"box",k:"tap",    x:.5,y:.82,s:1.05,style:"underline",cap:"TAP HERE",icon:"phone"},
+ {t:"box",k:"qr",     x:.5,y:.94,s:.42}]}
+
+function aRadial(f,g){return[
+ {t:"box",k:"hero",   x:.5,y:.5,s:1.55,g:g.hero,op:.5},
+ {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.62,fw:750,arc:210,arcR:44},
+ {t:"box",k:"name",   x:.5,y:.135,s:1.05},
+ {t:"box",k:"tap",    x:.5,y:.5,s:1.2,cap:"TAP",icon:"phone"},
+ {t:"box",k:"stars",  x:.5,y:.79,s:.9},
+ {t:"box",k:"head",   x:.5,y:.875,s:.8,w:.76},
+ {t:"box",k:"qr",     x:.5,y:.955,s:.34}]}
+
+function aEdge(f,g){return[
+ {t:"box",k:"motif",  x:.93,y:.14,s:2.4,g:g.motif,op:.16},
+ {t:"box",k:"name",   x:.09,y:.60,s:1.35,al:"left"},
+ {t:"box",k:"rule",   x:.09,y:.66,s:1,w:.42,al:"left"},
+ {t:"box",k:"head",   x:.09,y:.745,s:.95,w:.62,al:"left"},
+ {t:"box",k:"stars",  x:.09,y:.835,s:.8,al:"left"},
+ {t:"box",k:"tap",    x:.09,y:.925,s:1,style:"bare",cap:"TAP",icon:"phone",al:"left"},
+ {t:"box",k:"qr",     x:.88,y:.93,s:.36}]}
+
+function aGrid(f,g){return[
+ {t:"box",k:"name",   x:.08,y:.09,s:.95,al:"left"},
+ {t:"box",k:"stars",  x:.92,y:.09,s:.62,al:"right"},
+ {t:"box",k:"rule",   x:.5,y:.155,s:1,w:.84},
+ {t:"box",k:"motif",  x:.30,y:.36,s:1.5,g:g.motif},
+ {t:"box",k:"head",   x:.92,y:.36,s:.86,w:.42,al:"right"},
+ {t:"box",k:"rule",   x:.5,y:.55,s:1,w:.84},
+ {t:"box",k:"tap",    x:.08,y:.70,s:1.05,cap:"TAP",icon:"phone",al:"left"},
+ {t:"box",k:"qr",     x:.92,y:.70,s:.46,al:"right"},
+ {t:"text",text:"SCAN OR TAP · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
+
+function aBanded(f,g){return[
+ {t:"box",k:"fill",   x:.5,y:.10,s:1,w:1,hf:.20},
+ {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.28},
+ {t:"box",k:"name",   x:.5,y:.10,s:1.05,onBand:1},
+ {t:"box",k:"stars",  x:.5,y:.30,s:1},
+ {t:"box",k:"head",   x:.5,y:.42,s:.95,w:.78},
+ {t:"box",k:"fill",   x:.5,y:.70,s:1,w:1,hf:.19},
+ {t:"box",k:"tap",    x:.5,y:.70,s:1.1,cap:"TAP HERE",icon:"phone",onBand:1},
+ {t:"box",k:"qr",     x:.5,y:.92,s:.44}]}
+
+function aDiagonal(f,g){return[
+ {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
+ {t:"box",k:"name",   x:.46,y:.20,s:1.2,rotd:-7},
+ {t:"box",k:"stars",  x:.46,y:.30,s:.95,rotd:-7},
+ {t:"box",k:"head",   x:.46,y:.44,s:.95,w:.76,rotd:-7},
+ {t:"box",k:"hero",   x:1.02,y:.66,s:1.1,g:g.hero,op:.3},
+ {t:"box",k:"tap",    x:.44,y:.70,s:1.15,cap:"TAP HERE",icon:"phone",rotd:-7},
+ {t:"box",k:"qr",     x:.5,y:.93,s:.42,rotd:-7}]}
+
+function aDepth(f,g){return[
+ {t:"box",k:"fill",   x:.56,y:.42,s:1,w:.78,hf:.24,op:.25},
+ {t:"box",k:"fill",   x:.44,y:.38,s:1,w:.78,hf:.24},
+ {t:"box",k:"name",   x:.44,y:.335,s:1,onBand:1},
+ {t:"box",k:"stars",  x:.44,y:.425,s:.85,onBand:1},
+ {t:"box",k:"head",   x:.5,y:.62,s:.95,w:.78},
+ {t:"box",k:"tap",    x:.5,y:.80,s:1.1,cap:"TAP HERE",icon:"phone"},
+ {t:"box",k:"qr",     x:.5,y:.94,s:.42},
+ {t:"box",k:"motif",  x:.12,y:.10,s:1.1,g:g.motif,op:.3}]}
+
+var ARCHETYPES=[["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
+ ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth]];
+
+/* ---- direction ------------------------------------------------------------
+   Chosen first, and it governs the rest: which compositions, themes and palettes
+   are on offer, and which drawn graphics get used. Everything stays overridable
+   underneath — the direction sets the starting point, it doesn't lock the door. */
+var DIRECTIONS=[
+ {k:"All",        th:null, pal:null, pl:null, g:{pat:"terrazzo",hero:"concentric",motif:"coffee"}},
+ {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:[8,13,12,10],
+                  g:{pat:"memphis",hero:"starburst",motif:"dumbbell"}, def:[0,3,8]},
+ {k:"Premium",    th:[1,3,7], pal:[0,1,5], pl:[11,12,9],
+                  g:{pat:"topo",hero:"concentric",motif:"flower"},    def:[1,5,11]},
+ {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:[9,15,13],
+                  g:{pat:"confetti",hero:"blob",motif:"coffee"},      def:[5,1,9]},
+ {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:[12,11,13],
+                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,12]}
+];
+function DIR(){ return DIRECTIONS[S.dir||0] }
+
 // bottom → top, exactly like stripDesign.stack
 function defaults(fmt){
   if(fmt===3) return [                                    // 3.5×2 landscape
@@ -1263,7 +1470,7 @@ function defaults(fmt){
    {t:"box",k:"tap",  x:.5,y:.590,s:1}];
 }
 
-var S={fmt:0,plate:0,theme:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
+var S={fmt:0,plate:0,theme:0,dir:0,pal:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
 var card=$('card'),gv=$('gv'),gh=$('gh');
 var elName=$('bname'),elCopy=$('copy'),elBrand=$('brand'),elBg=$('bg');
 
@@ -1324,7 +1531,20 @@ function layerId(L){ if(!L.id) L.id='l'+(++S.uid); return L.id }
 function bodyHTML(L,ctx){
   var s=L.s==null?1:L.s;
   var mc = L.onBand ? contrast(ctx.brand) : ctx.brand;   // mark colour
+  var gc = L.onBand ? {brand:mc,accent:mc,ground:ctx.brand} : ctx.pal;  // graphic colours
   if(L.t==='text'){
+    if(L.arc){   // glyphs stepped around a circle, same approach as the strip editor
+      var t=String(L.text||'Text'), n=t.length, span=L.arc, step=span/Math.max(n-1,1),
+          R=(L.arcR||34)*s, out='';
+      for(var gi=0;gi<n;gi++){
+        var ang=-span/2+gi*step;
+        out+='<span style="position:absolute;left:50%;top:50%;transform-origin:0 '+R+
+          'cqw;transform:translate(-50%,-'+R+'cqw) rotate('+ang+'deg)">'+esc(t[gi])+'</span>';
+      }
+      return '<div style="position:relative;width:'+(R*2.2)+'cqw;height:'+(R*1.15)+
+        'cqw;font-size:'+(4.2*s).toFixed(2)+'cqw;font-weight:'+(L.fw||700)+';letter-spacing:'+
+        (L.ls||0)+'em;color:'+(L.col||'currentColor')+'">'+out+'</div>';
+    }
     var stroke = L.stroke
       ? ';-webkit-text-stroke:'+(L.stroke*s).toFixed(2)+'cqw '+
         (L.col || (L.onBand ? contrast(ctx.brand) : ctx.fg))+
@@ -1336,11 +1556,24 @@ function bodyHTML(L,ctx){
   }
   switch(L.k){
     case 'band':
-      return '<div style="width:100%;height:'+(30*s)+'cqw;background:'+ctx.brand+'"></div>';
+      return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:30*s)+
+        'cqw;background:'+ctx.brand+'"></div>';
     // Ground-covering shapes. Heights run past the card on purpose — #card clips them,
     // so one primitive works at every trim size without per-format geometry.
+    case 'pattern':
+      var pf=PATTERNS[L.g||'terrazzo']; if(!pf) return '';
+      return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:240*s)+
+        'cqw;background-image:url(\''+pf(gc)+
+        '\');background-size:'+(22*s)+'cqw auto;opacity:'+(L.op==null?.9:L.op)+'"></div>';
+    case 'hero':
+      var hf=HEROES[L.g||'concentric']; if(!hf) return '';
+      return '<img src="'+hf(gc)+'" alt="" style="width:'+(60*s)+'cqw;height:'+(60*s)+'cqw;display:block">';
+    case 'motif':
+      var mf=MOTIFS[L.g||'coffee']; if(!mf) return '';
+      return '<img src="'+mf(gc)+'" alt="" style="width:'+(30*s)+'cqw;height:'+(30*s)+'cqw;display:block">';
     case 'fill':
-      return '<div style="width:100%;height:'+(240*s)+'cqw;background:'+ctx.brand+'"></div>';
+      return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:240*s)+
+        'cqw;background:'+(L.c==='accent'?ctx.pal.accent:ctx.brand)+';opacity:'+(L.op==null?1:L.op)+'"></div>';
     case 'split':
       return '<div style="width:100%;height:'+(80*s)+'cqw;background:'+ctx.brand+
         ';clip-path:polygon(0 0,100% 0,100% 74%,0 100%)"></div>';
@@ -1393,6 +1626,23 @@ function bodyHTML(L,ctx){
       return '<span style="font-size:'+(4.5*s)+'cqw;line-height:1.28;font-weight:600;'+
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
     case 'tap':
+      if(L.style==='bar')
+        return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
+          'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
+          'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s)+'cqw;letter-spacing:.14em">'+
+          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(9*s)+
+          'cqw;height:'+(6*s)+'cqw;stroke:'+contrast(mc)+'"')+esc(L.cap||'TAP')+'</div>';
+      if(L.style==='bare')
+        return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+(1.6*s)+'cqw">'+
+          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(22*s)+
+          'cqw;height:'+(16*s)+'cqw;stroke:'+mc+'"')+'<b style="font-family:var(--f-disp);'+
+          'font-size:'+(3.4*s)+'cqw;letter-spacing:.18em;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
+      if(L.style==='underline')
+        return '<div style="display:flex;align-items:center;gap:'+(2.4*s)+'cqw;border-bottom:'+
+          (.9*s)+'cqw solid '+mc+';padding-bottom:'+(1.6*s)+'cqw;color:'+mc+'">'+
+          (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+(11*s)+
+          'cqw;height:'+(8*s)+'cqw;stroke:'+mc+'"')+'<b style="font-family:var(--f-disp);'+
+          'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em">'+esc(L.cap||'TAP')+'</b></div>';
       var rg=ctx.th.ring, rs='';
       if(rg==='none')   rs='border:none;';
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
@@ -1418,6 +1668,9 @@ function bodyHTML(L,ctx){
 function paint(quiet){
   var th=TH();
   var name=elName.value||"Your Business",brand=elBrand.value,bg=elBg.value,fg=contrast(bg);
+  var pal=PALETTES[S.pal||0].fn(brand,bg);
+  pal.ink=contrast(pal.ground);
+  brand=pal.brand; fg=pal.ink;
   var fmt=FORMATS[S.fmt];
   card.className=fmt.cls+' fr-'+th.frame+' tx-'+th.tex;
   card.style.setProperty('--f-disp',FONTS[th.disp]);
@@ -1425,11 +1678,12 @@ function paint(quiet){
   card.style.setProperty('--rad',th.rad+'cqw');
   card.style.borderRadius=th.rad+'cqw';
   card.style.setProperty('--b-brand',brand);
-  card.style.setProperty('--b-bg',bg);
+  card.style.background=pal.groundCSS;
+  card.style.setProperty('--b-bg',pal.ground);
   card.style.setProperty('--b-fg',fg);
   card.style.setProperty('--b-star',brand);
 
-  var ctx={th:th,name:name,brand:brand,bg:bg,fg:fg,copy:elCopy.value,logo:S.logo,
+  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
@@ -1453,6 +1707,7 @@ function paint(quiet){
     }
     if(L.op!=null) d.style.opacity=L.op;
     if(L.rot){ d.style.transform='translate(-50%,-50%) rotate(-90deg)'; }
+    else if(L.rotd){ d.style.transform='translate(-50%,-50%) rotate('+L.rotd+'deg)'; }
     if(L.al){ d.style.alignItems = L.al==='left'?'flex-start':L.al==='right'?'flex-end':'center';
               d.style.textAlign = L.al;
               if(!L.rot) d.style.transform = L.al==='left' ? 'translate(0,-50%)'
@@ -1617,29 +1872,64 @@ card.addEventListener('pointerup',endDrag);
 card.addEventListener('pointercancel',endDrag);   // iOS fires cancel instead of up
 
 /* ---- controls ---- */
-var themesEl=$('themes');
-themesEl.innerHTML=THEMES.map(function(t,i){
-  return '<button class="chip" type="button" data-t="'+i+'" aria-pressed="'+(i===0)+'">'+t.k+'</button>'}).join('');
-themesEl.addEventListener('click',function(e){
-  var b=e.target.closest('button[data-t]'); if(!b)return;
-  S.theme=+b.dataset.t;
-  Array.prototype.forEach.call(themesEl.children,function(c){
+/* One renderer for every filterable row. `allow` is the direction's whitelist, or
+   null for no filtering; the current selection is always shown even when it falls
+   outside, so choosing a direction never silently drops what you already picked. */
+function drawRow(el,items,label,cur,allow,attr){
+  el.innerHTML=items.map(function(it,i){
+    if(allow && allow.indexOf(i)<0 && i!==cur) return '';
+    return '<button class="chip" type="button" data-'+attr+'="'+i+'" aria-pressed="'+
+      (i===cur)+'">'+label(it)+'</button>';
+  }).join('');
+}
+function drawAxes(){
+  var d=DIR();
+  drawRow($('plates'),PLATES,function(x){return x[0]},S.plate,d.pl,'p');
+  drawRow($('themes'),THEMES,function(x){return x.k},S.theme,d.th,'t');
+  drawRow($('pals'),PALETTES,function(x){return x.k},S.pal,d.pal,'a');
+  var mk=Object.keys(MOTIFS);
+  $('motifs').innerHTML=mk.map(function(k){
+    return '<button class="chip" type="button" data-m="'+k+'" aria-pressed="'+
+      (k===(S.motif||d.g.motif))+'">'+k+'</button>'}).join('');
+}
+var dirsEl=$('dirs');
+dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
+  return '<button class="chip" type="button" data-d="'+i+'" aria-pressed="'+(i===0)+'">'+t.k+'</button>'}).join('');
+dirsEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-d]'); if(!b)return;
+  S.dir=+b.dataset.d; var d=DIR();
+  if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2]; S.motif=d.g.motif;
+             S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; }
+  Array.prototype.forEach.call(dirsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
-  paint();
+  drawAxes(); paint();
+});
+$('themes').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-t]'); if(!b)return;
+  S.theme=+b.dataset.t; drawAxes(); paint();
+});
+$('pals').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-a]'); if(!b)return;
+  S.pal=+b.dataset.a; drawAxes(); paint();
+});
+$('motifs').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-m]'); if(!b)return;
+  S.motif=b.dataset.m;
+  S.stack.forEach(function(L){ if(L.k==='motif') L.g=S.motif; });
+  drawAxes(); paint();
 });
 
 var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate],
-  ["1 · Wedge",splitPlate],["2 · Ticket",ticketPlate],["3 · Knockout",discPlate],
-  ["4 · Editorial",railPlate],["5 · Big type",typePlate]];
+  ["Wedge",splitPlate],["Ticket",ticketPlate],["Knockout",discPlate],
+  ["Editorial",railPlate],["Big type",typePlate]]
+  .concat(ARCHETYPES.map(function(a){
+    return [a[0], function(f){ return a[1](f, DIRECTIONS[S.dir||0].g); }];
+  }));
 var platesEl=$('plates');
-platesEl.innerHTML=PLATES.map(function(p,i){
-  return '<button class="chip" type="button" data-p="'+i+'" aria-pressed="'+(i===0)+'">'+p[0]+'</button>'}).join('');
 platesEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-p]'); if(!b)return;
   S.plate=+b.dataset.p; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
-  Array.prototype.forEach.call(platesEl.children,function(c){
-    c.setAttribute('aria-pressed',c===b?'true':'false')});
-  paint();
+  drawAxes(); paint();
 });
 
 // New text lands at the top of the card — that's where a headline wants to be — and
@@ -1908,6 +2198,7 @@ $('clrBtn').addEventListener('click',function(){
   STORE.marks={}; STORE.notes={}; persist(); drawSrc(); markNoted(); drawNotes();
 });
 
+drawAxes();
 markNoted(); drawNotes();
 })();
 </script>
