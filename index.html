@@ -323,6 +323,34 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   padding:2px 5px;border-radius:2px;vertical-align:1px;margin-left:5px;white-space:nowrap}
 .gap{font-family:var(--mono);font-size:9px;letter-spacing:.1em;border:1px solid var(--rule);
   color:var(--ink-3);padding:2px 5px;border-radius:2px;vertical-align:1px;margin-left:5px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.lenhint{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--ink-3)}
+.lenhint.warn{color:var(--accent)}
+.preflight{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.preflight li{font-size:12px;line-height:1.35;padding-left:17px;position:relative;color:var(--ink-2)}
+.preflight li::before{position:absolute;left:0;font-family:var(--mono);font-size:11px}
+.preflight li.ok::before{content:"✓";color:var(--cyan)}
+.preflight li.no::before{content:"!";color:var(--accent);font-weight:700}
+.preflight li.no{color:var(--ink)}
+.sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;
+  width:100%;margin-top:18px}
+.sheet[hidden]{display:none}
+.sheetcell{display:flex;flex-direction:column;gap:5px;align-items:center}
+.sheetcell span{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-3)}
+.sheetcard{container-type:inline-size;width:100%;aspect-ratio:4/6;position:relative;
+  overflow:hidden;border:1px solid var(--rule)}
+/* print: the card alone, at trim size, so Save as PDF gives a placeable file */
+@media print{
+  body.printing>*{display:none!important}
+  body.printing .stage,body.printing .baseline,body.printing .holderwrap{display:block!important;
+    background:none!important;border:none!important;padding:0!important;min-height:0!important}
+  body.printing #studio,body.printing #studio .wrap,body.printing .studio{display:block!important;
+    padding:0!important;margin:0!important;max-width:none!important;border:none!important}
+  body.printing .controls,body.printing .dims,body.printing .hint,body.printing .sheet,
+  body.printing .shead,body.printing .slede,body.printing .flag{display:none!important}
+  body.printing #card{width:102mm!important;box-shadow:none!important;margin:0 auto}
+  @page{margin:8mm}
+}
 .srcfoot{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.03em;
   margin:14px 0 0;line-height:1.6}
 /* marks */
@@ -482,6 +510,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="grp"><span class="lbl">Industry preset</span><div class="chips" id="presets"></div></div>
           <div class="grp"><span class="lbl">Business name</span>
             <input type="text" id="bname" value="Moka Beauty Bar" autocomplete="off"></div>
+          <div class="grp"><span class="lbl">Tone</span><div class="chips" id="tones"></div></div>
           <div class="grp"><span class="lbl">Headline</span>
             <select id="copy">
               <option>We'd greatly appreciate your Google review</option>
@@ -489,7 +518,13 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
               <option>Loved your visit? Tell Google.</option>
               <option>Leave us a review — it takes 20 seconds</option>
               <option>Your review helps our small business grow</option>
-            </select></div>
+            </select>
+            <div class="row2">
+              <button class="btn" id="copyShuffle" type="button">Shuffle</button>
+              <button class="btn" id="copyTrade" type="button">Trade line</button>
+            </div>
+            <span class="lenhint" id="lenHint"></span></div>
+          <div class="grp"><span class="lbl">Call to action</span><select id="ctaSel"></select></div>
           <div class="grp"><span class="lbl">Brand colour · card ground</span>
             <div class="row2">
               <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
@@ -526,7 +561,30 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
             <button class="btn solid" id="addText" type="button">+ Text</button>
             <button class="btn" id="resetLay" type="button">Reset</button>
           </div>
+          <div class="row3">
+            <button class="btn" id="undoBtn" type="button" title="⌘Z">Undo</button>
+            <button class="btn" id="redoBtn" type="button" title="⇧⌘Z">Redo</button>
+            <button class="btn" id="dupBtn" type="button" title="⌘D">Duplicate</button>
+          </div>
+          <div class="grp"><span class="lbl">Align selected</span>
+            <div class="chips" id="alignRow">
+              <button class="chip" type="button" data-al="l">Left</button>
+              <button class="chip" type="button" data-al="c">Centre</button>
+              <button class="chip" type="button" data-al="r">Right</button>
+              <button class="chip" type="button" data-al="t">Top</button>
+              <button class="chip" type="button" data-al="m">Middle</button>
+              <button class="chip" type="button" data-al="b">Bottom</button>
+            </div></div>
           <div class="grp" id="inspector"></div>
+          <div class="grp"><span class="lbl">Preflight</span>
+            <ul class="preflight" id="preflight"></ul></div>
+          <div class="row3">
+            <button class="btn solid" id="printBtn" type="button">Print / PDF</button>
+            <button class="btn" id="saveDesign" type="button">Save</button>
+            <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
+              <input type="file" id="loadDesign" accept="application/json" hidden></label>
+          </div>
+          <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
           <div class="grp"><span class="lbl">Overlays</span>
             <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
             <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
@@ -556,7 +614,8 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="base"></div>
         </div>
         <p class="dims" id="dims"></p>
-        <p class="hint">DRAG TO MOVE · CORNER DOT TO SCALE · CLICK EMPTY CARD TO DESELECT</p>
+        <p class="hint">DRAG TO MOVE · CORNER DOT TO SCALE · ARROWS NUDGE · ⌘Z UNDO · ⌘D DUPLICATE</p>
+        <div class="sheet" id="sheet" hidden></div>
       </div>
     </div>
 
@@ -1257,6 +1316,71 @@ var MOTIFS={
    return _svg(200,200,r+'<circle cx="100" cy="100" r="13" fill="'+c.accent+'"/>')}
 };
 
+/* ---- copy library ----------------------------------------------------------
+   Every line here is compliance-safe by construction: none asks for five stars,
+   none offers anything in exchange for a positive review, and none routes an
+   unhappy customer anywhere private. That is the FTC rule and Google's policy,
+   and it is the one part of this product that can actually cost you money.
+   Lengths are kept short because these are read at arm's length, in passing. */
+var COPY={
+ headline:{
+  Neutral:[
+   "How did we do?",
+   "We'd greatly appreciate your Google review",
+   "Leave us a review — it takes 20 seconds",
+   "Tell us how your visit went",
+   "Your feedback helps us improve",
+   "Share your experience"],
+  Warm:[
+   "Your review helps our small business grow",
+   "Thanks for stopping by — tell others about us",
+   "We loved having you. Mind sharing?",
+   "A minute of your time means a lot to us",
+   "Every review helps a local business",
+   "Made your day better? Let people know"],
+  Direct:[
+   "Leave a Google review",
+   "Rate your visit",
+   "Review us on Google",
+   "Tap. Rate. Done.",
+   "20 seconds. One review.",
+   "Tell Google how we did"],
+  Playful:[
+   "Loved your visit? Tell Google.",
+   "Was it good? Say it louder.",
+   "Reviews are the new tip jar",
+   "Caught you smiling — write it down",
+   "Be the review someone else reads",
+   "Tap here, brag about us"],
+  Premium:[
+   "We would value your review",
+   "Your impressions, kindly shared",
+   "Tell others what you found here",
+   "A word from you carries further than ours",
+   "Reviews from guests like you guide the next",
+   "Share your visit"]
+ },
+ cta:["TAP HERE","TAP TO REVIEW","TAP","HOLD PHONE HERE","TAP OR SCAN","REVIEW US","TAP TO RATE","START HERE"],
+ micro:["or scan the code","works with any phone","no app needed","takes about 20 seconds",
+        "tap the top of your phone here","scan if tapping doesn't work"],
+ eyebrow:["THANKS FOR VISITING","WE'D LOVE YOUR FEEDBACK","ONE TAP","BEFORE YOU GO",
+          "TELL US HOW WE DID","YOUR REVIEW MATTERS"],
+ back:["Scan or tap to leave a Google review. Your feedback is public and helps other people find us.",
+       "This card opens our review page directly. No app, no account setup beyond your Google login.",
+       "Trouble tapping? Scan the code instead — it goes to the same place."]
+};
+// per-industry alternates, offered on top of the tonal sets
+var COPY_TRADE={
+ "Beauty salon":["Happy with your hair?","Loving the result?"],
+ "Café":["Good coffee today?","Was the coffee right?"],
+ "Restaurant":["How was the meal?","Enjoyed dinner?"],
+ "Barbershop":["Happy with the cut?","Looking sharp? Say so."],
+ "Auto detail":["Happy with the finish?","Car looking right?"],
+ "Dental":["How was your appointment?","Comfortable visit?"],
+ "Boutique":["Find something you love?","Happy with your find?"],
+ "Gym":["Good session today?","How's the gym treating you?"]
+};
+
 var FONTS={
  grotesque:"system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Liberation Sans',sans-serif",
  serif:"'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Liberation Serif','DejaVu Serif',serif",
@@ -1504,6 +1628,7 @@ function defaults(fmt){
    {t:"box",k:"tap",  x:.5,y:.590,s:1}];
 }
 
+var curPreset=0;
 var S={fmt:0,plate:0,theme:0,dir:0,pal:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
 var card=$('card'),gv=$('gv'),gh=$('gh');
 var elName=$('bname'),elCopy=$('copy'),elBrand=$('brand'),elBg=$('bg');
@@ -1538,6 +1663,9 @@ var TAP_ICONS={
 var ICON_W={waves:1, phone:1.55};
 var WAVE=TAP_ICONS.waves;
 
+// scanning floor: a QR under about 25 mm gets unreliable at arm's length, so the
+// per-plate scale can shrink the block around it but not the code itself
+function QW(s){ return Math.max(19*s, 25) }
 function qrSVG(seedStr,fg,bg){
   var N=25,seed=0,i;
   for(i=0;i<seedStr.length;i++){seed=(seed*31+seedStr.charCodeAt(i))>>>0}
@@ -1704,8 +1832,8 @@ function bodyHTML(L,ctx){
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
         '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
         (2.4*s)+'cqw">OR SCAN</div>'+
-        '<img class="qrimg" src="'+ctx.qr+'" alt="QR placeholder" style="width:'+(19*s)+
-        'cqw;height:'+(19*s)+'cqw">'+
+        '<img class="qrimg" src="'+ctx.qr+'" alt="QR placeholder" style="width:'+QW(s)+
+        'cqw;height:'+QW(s)+'cqw">'+
         '<span class="qrcap" style="font-size:'+(2.5*s)+'cqw;margin-top:'+(1.4*s)+'cqw">'+
         esc(ctx.host)+'</span></div>';
   }
@@ -1785,7 +1913,7 @@ function paint(quiet){
 
   $('dims').innerHTML='<span><b>'+fmt.k+'</b> — '+fmt.d+' trim</span><span>BLEED 3 MM</span>'+
     '<span>SAFE 5 MM</span><span>QR ≥ 30 MM</span><span>'+S.stack.length+' LAYERS</span>';
-  drawPanel();
+  drawPanel(); preflight();
   // Rebuilding the inspector mid-keystroke would steal focus out of the textarea,
   // so a live edit repaints the card and leaves its own controls alone.
   if(!quiet) drawInspector();
@@ -1823,6 +1951,7 @@ $('layers').addEventListener('click',function(e){
   if(b){
     var L=find(b.dataset.id),i=idx(b.dataset.id),a=b.dataset.a;
     if(!L)return;
+    if(typeof pushUndo==='function') pushUndo();
     if(a==='eye'){ L.hidden=!L.hidden; if(L.hidden&&S.sel===L.id)S.sel=null; }
     if(a==='lock'){ L.locked=!L.locked; if(L.locked&&S.sel===L.id)S.sel=null; }
     if(a==='up'&&i<S.stack.length-1){ S.stack.splice(i,1); S.stack.splice(i+1,0,L); }
@@ -1887,6 +2016,7 @@ card.addEventListener('pointerdown',function(e){
   if(!node){ S.sel=null; paint(); return; }
   var L=find(node.dataset.id); if(!L||L.locked||L.hidden) return;
   S.sel=L.id; paint();
+  if(typeof pushUndo==='function') pushUndo();
   var p=norm(e);
   drag={L:L,mode:hnd?'scale':'move',ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
         d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
@@ -1983,11 +2113,13 @@ platesEl.addEventListener('click',function(e){
 // New text lands at the top of the card — that's where a headline wants to be — and
 // each additional one steps down so they don't stack on the same spot. Drag from there.
 $('addText').addEventListener('click',function(){
+  if(typeof pushUndo==='function') pushUndo();
   var n=S.stack.filter(function(o){return o.t==='text'}).length;
   var L={t:'text',text:'New text',x:.5,y:Math.min(.08+n*.07,.9),s:1,fw:700,w:.8};
   layerId(L); S.stack.push(L); S.sel=L.id; paint();
 });
-$('resetLay').addEventListener('click',function(){ S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
+$('resetLay').addEventListener('click',function(){ if(typeof pushUndo==='function') pushUndo();
+  S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
 
 var presetsEl=$('presets');
 presetsEl.innerHTML=PRESETS.map(function(p,i){
@@ -1995,7 +2127,8 @@ presetsEl.innerHTML=PRESETS.map(function(p,i){
    '<span class="sw" style="background:'+p.b+'"></span>'+p.k+'</button>'}).join('');
 presetsEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-i]'); if(!b)return;
-  var p=PRESETS[+b.dataset.i];
+  var p=PRESETS[+b.dataset.i]; curPreset=+b.dataset.i;
+  if(typeof fillCopy==='function') setTimeout(function(){fillCopy(true)},0);
   elName.value=p.n; elBrand.value=p.b; elBg.value=p.g; elCopy.selectedIndex=p.c;
   Array.prototype.forEach.call(presetsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
@@ -2284,6 +2417,177 @@ $('clrBtn').addEventListener('click',function(){
   STORE.marks={}; STORE.notes={}; persist(); drawSrc(); markNoted(); drawNotes();
 });
 
+/* ===================== 1. copy ===================== */
+var TONES=Object.keys(COPY.headline), curTone=0;
+$('tones').innerHTML=TONES.map(function(t,i){
+  return '<button class="chip" type="button" data-c="'+i+'" aria-pressed="'+(i===0)+'">'+t+'</button>'}).join('');
+function fillCopy(keep){
+  var list=COPY.headline[TONES[curTone]].slice();
+  var pre=PRESETS[curPreset]&&COPY_TRADE[PRESETS[curPreset].k];
+  if(pre) list=list.concat(pre);
+  var cur=keep?elCopy.value:list[0];
+  elCopy.innerHTML=list.map(function(t){return '<option>'+esc(t)+'</option>'}).join('');
+  if(list.indexOf(cur)>=0) elCopy.value=cur;
+  lenGuard();
+}
+$('tones').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-c]'); if(!b)return;
+  curTone=+b.dataset.c;
+  Array.prototype.forEach.call($('tones').children,function(c){
+    c.setAttribute('aria-pressed',c===b?'true':'false')});
+  fillCopy(false); paint();
+});
+$('copyShuffle').addEventListener('click',function(){
+  var o=elCopy.options; if(!o.length)return;
+  elCopy.selectedIndex=Math.floor(Math.random()*o.length); lenGuard(); paint();
+});
+$('copyTrade').addEventListener('click',function(){
+  var pre=PRESETS[curPreset]&&COPY_TRADE[PRESETS[curPreset].k];
+  if(!pre){ alert('No trade line for this industry yet.'); return; }
+  var v=pre[Math.floor(Math.random()*pre.length)];
+  if(![].some.call(elCopy.options,function(o){return o.value===v})) elCopy.add(new Option(v,v));
+  elCopy.value=v; lenGuard(); paint();
+});
+$('ctaSel').innerHTML=COPY.cta.map(function(t){return '<option>'+t+'</option>'}).join('');
+$('ctaSel').addEventListener('change',function(){
+  var v=this.value; S.stack.forEach(function(L){ if(L.k==='tap') L.cap=v; }); paint();
+});
+
+/* ============ 2. copy length guard ============ */
+var LEN={0:44,1:38,2:40,3:30};   // chars that read comfortably per trim size
+function lenGuard(){
+  var n=(elCopy.value||'').length, max=LEN[S.fmt]||44, el=$('lenHint');
+  el.textContent=n+' / '+max+' chars'+(n>max?' — long for this size, it will wrap small':'');
+  el.className='lenhint'+(n>max?' warn':'');
+}
+elCopy.addEventListener('change',lenGuard);
+
+/* ============ 3. undo / redo ============ */
+var UNDO=[],REDO=[];
+function snap(){ return JSON.stringify({stack:S.stack,plate:S.plate,theme:S.theme,pal:S.pal,dir:S.dir}) }
+function pushUndo(){ UNDO.push(snap()); if(UNDO.length>40)UNDO.shift(); REDO.length=0; }
+function restore(j){ var o=JSON.parse(j); S.stack=o.stack; S.plate=o.plate; S.theme=o.theme;
+  S.pal=o.pal; S.dir=o.dir; S.sel=null; drawAxes(); paint(); }
+function undo(){ if(!UNDO.length)return; REDO.push(snap()); restore(UNDO.pop()); }
+function redo(){ if(!REDO.length)return; UNDO.push(snap()); restore(REDO.pop()); }
+$('undoBtn').addEventListener('click',undo);
+$('redoBtn').addEventListener('click',redo);
+
+/* ============ 4. keyboard ============ */
+document.addEventListener('keydown',function(e){
+  var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
+  var meta=e.metaKey||e.ctrlKey;
+  if(meta && e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(meta && e.key.toLowerCase()==='d'){ e.preventDefault(); dupLayer(); return; }
+  if(!S.sel) return;
+  var L=find(S.sel); if(!L) return;
+  var step=e.shiftKey?.02:.004;
+  if(e.key==='ArrowLeft'){ pushUndo(); L.x=Math.max(0,L.x-step); }
+  else if(e.key==='ArrowRight'){ pushUndo(); L.x=Math.min(1,L.x+step); }
+  else if(e.key==='ArrowUp'){ pushUndo(); L.y=Math.max(0,L.y-step); }
+  else if(e.key==='ArrowDown'){ pushUndo(); L.y=Math.min(1,L.y+step); }
+  else if(e.key==='Backspace'||e.key==='Delete'){ pushUndo(); var i=idx(S.sel); S.stack.splice(i,1); S.sel=null; }
+  else return;
+  e.preventDefault(); paint();
+});
+
+/* ============ 5. duplicate layer ============ */
+function dupLayer(){
+  if(!S.sel) return; var L=find(S.sel); if(!L) return;
+  pushUndo();
+  var c=JSON.parse(JSON.stringify(L)); c.id=null; c.x=Math.min(.96,L.x+.03); c.y=Math.min(.96,L.y+.03);
+  layerId(c); S.stack.splice(idx(S.sel)+1,0,c); S.sel=c.id; paint();
+}
+$('dupBtn').addEventListener('click',dupLayer);
+
+/* ============ 6. align the selected layer ============ */
+$('alignRow').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-al]'); if(!b||!S.sel)return;
+  var L=find(S.sel); if(!L)return; pushUndo();
+  ({l:function(){L.x=.09},c:function(){L.x=.5},r:function(){L.x=.91},
+    t:function(){L.y=.09},m:function(){L.y=.5},b:function(){L.y=.91}})[b.dataset.al]();
+  paint();
+});
+
+/* ============ 7. contrast check ============ */
+function lum(hex){var c=_h2r(hex).map(function(v){v/=255;
+  return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});
+  return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ratio(a,b){var A=lum(a),B=lum(b);return ((Math.max(A,B)+.05)/(Math.min(A,B)+.05))}
+
+/* ============ 8. preflight ============ */
+function preflight(){
+  var pal=PALETTES[S.pal||0].fn(elBrand.value,elBg.value); pal.ink=contrast(pal.ground);
+  var fmt=FORMATS[S.fmt], out=[];
+  var cr=ratio(pal.ink,pal.ground);
+  out.push([cr>=4.5,'Text contrast '+cr.toFixed(1)+':1'+(cr>=4.5?'':' — too low to read at a counter')]);
+  var qr=S.stack.filter(function(L){return L.k==='qr'&&!L.hidden})[0];
+  var qmm=qr?(QW(qr.s==null?1:qr.s)/100)*fmt.mm:0;
+  var qmin=S.fmt===3?18:24;
+  out.push([qr&&qmm>=qmin,qr?('QR ≈ '+qmm.toFixed(0)+' mm'+(qmm>=qmin?'':' — under '+qmin+' mm, scans get flaky')):'No QR — NFC-only cards fail on older phones']);
+  var tap=S.stack.filter(function(L){return L.k==='tap'&&!L.hidden})[0];
+  out.push([!!tap,tap?'Tap target present':'No tap target — nothing marks where the tag is']);
+  out.push([!!S.logo,S.logo?'Logo set':'No logo — placeholder will print']);
+  var edge=S.stack.filter(function(L){return !L.hidden&&(L.x<.05||L.x>.95||L.y<.05||L.y>.95)&&
+    ['fill','pattern','band','split','rail'].indexOf(L.k)<0}).length;
+  out.push([edge===0,edge?edge+' layer(s) inside the 5 mm safe margin — the holder lip may clip them':'Nothing in the safe margin']);
+  out.push([(elCopy.value||'').length<=((typeof LEN!=='undefined'&&LEN[S.fmt])||44),'Headline length']);
+  $('preflight').innerHTML=out.map(function(r){
+    return '<li class="'+(r[0]?'ok':'no')+'">'+esc(r[1])+'</li>'}).join('');
+}
+
+/* ============ 9. save / load a design ============ */
+$('saveDesign').addEventListener('click',function(){
+  var d={v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
+    name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo};
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
+  a.download=(elName.value||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.tapcard.json'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+});
+$('loadDesign').addEventListener('change',function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){ try{
+      var d=JSON.parse(r.result); pushUndo();
+      S.stack=d.stack; S.dir=d.dir|0; S.plate=d.plate|0; S.theme=d.theme|0; S.pal=d.pal|0; S.fmt=d.fmt|0;
+      elName.value=d.name||''; elBrand.value=d.brand||'#000000'; elBg.value=d.bg||'#ffffff';
+      fillCopy(false); if(d.copy){ if([].indexOf.call(elCopy.options,d.copy)<0)
+        elCopy.add(new Option(d.copy,d.copy)); elCopy.value=d.copy; }
+      setLogo(d.logo||null); S.sel=null; drawAxes(); paint();
+    }catch(err){ alert('That file is not a saved card.'); } e.target.value=''; };
+  r.readAsText(f);
+});
+
+/* ============ 10. print / PDF ============
+   A print stylesheet beats rasterising to PNG here: the output is vector, so it
+   stays sharp at any size, and every browser can Save as PDF from the dialog. */
+$('printBtn').addEventListener('click',function(){
+  document.body.classList.add('printing'); window.print();
+  setTimeout(function(){ document.body.classList.remove('printing'); },600);
+});
+
+/* ============ contact sheet: the design across every industry ============ */
+$('sheetBtn').addEventListener('click',function(){
+  var keepName=elName.value, keepB=elBrand.value, keepG=elBg.value, keepC=elCopy.value, keepP=curPreset;
+  var host=$('sheet'); host.innerHTML=''; host.hidden=false;
+  PRESETS.forEach(function(pr,i){
+    curPreset=i; elName.value=pr.n; elBrand.value=pr.b; elBg.value=pr.g;
+    fillCopy(true); paint();
+    var w=document.createElement('div'); w.className='sheetcell';
+    w.innerHTML='<div class="sheetcard">'+card.innerHTML+'</div><span>'+esc(pr.k)+'</span>';
+    var c=w.querySelector('.sheetcard');
+    c.style.cssText+=';background:'+card.style.background+';color:'+card.style.color;
+    ['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'].forEach(function(v){
+      c.style.setProperty(v,card.style.getPropertyValue(v)) });
+    c.className='sheetcard '+card.className;
+    host.appendChild(w);
+  });
+  curPreset=keepP; elName.value=keepName; elBrand.value=keepB; elBg.value=keepG;
+  fillCopy(true); elCopy.value=keepC; paint();
+});
+
+fillCopy(false);
 drawAxes();
 markNoted(); drawNotes();
 })();
