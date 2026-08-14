@@ -156,6 +156,21 @@ input[type=color]{width:100%;height:34px;padding:2px;border:1px solid var(--rule
   background:var(--paper);border-radius:2px;cursor:pointer}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* logo well — landscape, because that is the shape a wordmark actually is */
+.logodrop{border:1.5px dashed var(--rule);border-radius:3px;padding:10px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--paper);
+  transition:border-color .12s,background .12s}
+.logodrop:hover,.logodrop:focus-visible{border-color:var(--accent)}
+.logodrop.over{border-color:var(--accent);background:var(--paper-2)}
+.logoprev{width:100%;aspect-ratio:2.8/1;display:flex;align-items:center;justify-content:center;
+  background:repeating-conic-gradient(var(--rule-2) 0% 25%,transparent 0% 50%) 0 0/14px 14px;
+  border:1px solid var(--rule-2);border-radius:2px}
+.logoprev img{max-width:92%;max-height:88%;object-fit:contain;display:block}
+.logoprev.has{background:var(--panel)}
+.logoprev:not(.has)::after{content:"2.8 : 1";font-family:var(--mono);font-size:10px;
+  letter-spacing:.14em;color:var(--ink-3)}
+.logohint{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;color:var(--ink-3);
+  text-align:center;line-height:1.4}
 .filebtn{display:block;text-align:center;padding:8px;border:1px dashed var(--rule);
   font-family:var(--mono);font-size:11px;color:var(--ink-3);cursor:pointer;letter-spacing:.04em}
 .filebtn:hover{border-color:var(--accent);color:var(--accent)}
@@ -481,7 +496,18 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
               <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
             </div></div>
           <div class="grp"><span class="lbl">Logo</span>
-            <label class="filebtn">UPLOAD PNG / SVG<input type="file" id="logo" accept="image/*"></label></div>
+            <div class="logodrop" id="logoDrop" tabindex="0" role="button"
+                 aria-label="Add a logo: paste, drop a file, or click">
+              <div class="logoprev" id="logoPrev"></div>
+              <span class="logohint" id="logoHint">PASTE (⌘V) · DROP A FILE · CLICK</span>
+              <input type="file" id="logo" accept="image/*" hidden>
+            </div>
+            <div class="row2">
+              <label class="tog"><input type="checkbox" id="logoInv"> Invert (white marks)</label>
+              <button class="btn" id="logoClr" type="button">Clear</button>
+            </div>
+            <label class="tog"><input type="checkbox" id="logoHideName" checked> Hide business name when a logo is set</label>
+          </div>
           <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
           <div class="grp"><span class="lbl">Direction — pick this first</span>
             <div class="chips" id="dirs"></div></div>
@@ -1353,6 +1379,7 @@ function typePlate(){return[
 function aFullbleed(f,g){return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
  {t:"box",k:"fill",   x:.5,y:.855,s:1,w:1,hf:.29},
+ {t:"box",k:"logo",   x:.07,y:.775,s:1,lw:36,lh:12,al:"left",onBand:1},
  {t:"box",k:"name",   x:.07,y:.79,s:1,al:"left",onBand:1},
  {t:"box",k:"stars",  x:.07,y:.865,s:.72,al:"left",onBand:1},
  {t:"box",k:"tap",    x:.5,y:.955,s:1,w:1,style:"bar",cap:"TAP TO REVIEW",icon:"phone"},
@@ -1361,6 +1388,7 @@ function aFullbleed(f,g){return[
 function aSplit(f,g){return[
  {t:"box",k:"fill",   x:.5,y:.19,s:1,w:1,hf:.38},
  {t:"box",k:"motif",  x:.5,y:.17,s:1.45,g:g.motif,onBand:1},
+ {t:"box",k:"logo",   x:.5,y:.475,s:1.05,lw:46,lh:16},
  {t:"box",k:"name",   x:.5,y:.50,s:1.15},
  {t:"box",k:"stars",  x:.5,y:.565,s:.95},
  {t:"box",k:"head",   x:.5,y:.665,s:.92,w:.8},
@@ -1370,6 +1398,7 @@ function aSplit(f,g){return[
 function aRadial(f,g){return[
  {t:"box",k:"hero",   x:.5,y:.5,s:1.55,g:g.hero,op:.5},
  {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.62,fw:750,arc:210,arcR:44},
+ {t:"box",k:"logo",   x:.5,y:.125,s:1,lw:42,lh:14},
  {t:"box",k:"name",   x:.5,y:.135,s:1.05},
  {t:"box",k:"tap",    x:.5,y:.5,s:1.2,cap:"TAP",icon:"phone"},
  {t:"box",k:"stars",  x:.5,y:.79,s:.9},
@@ -1378,6 +1407,7 @@ function aRadial(f,g){return[
 
 function aEdge(f,g){return[
  {t:"box",k:"motif",  x:.93,y:.14,s:2.4,g:g.motif,op:.16},
+ {t:"box",k:"logo",   x:.09,y:.565,s:1.1,lw:46,lh:16,al:"left"},
  {t:"box",k:"name",   x:.09,y:.60,s:1.35,al:"left"},
  {t:"box",k:"rule",   x:.09,y:.66,s:1,w:.42,al:"left"},
  {t:"box",k:"head",   x:.09,y:.745,s:.95,w:.62,al:"left"},
@@ -1386,6 +1416,7 @@ function aEdge(f,g){return[
  {t:"box",k:"qr",     x:.88,y:.93,s:.36}]}
 
 function aGrid(f,g){return[
+ {t:"box",k:"logo",   x:.08,y:.085,s:.85,lw:38,lh:13,al:"left"},
  {t:"box",k:"name",   x:.08,y:.09,s:.95,al:"left"},
  {t:"box",k:"stars",  x:.92,y:.09,s:.62,al:"right"},
  {t:"box",k:"rule",   x:.5,y:.155,s:1,w:.84},
@@ -1399,6 +1430,7 @@ function aGrid(f,g){return[
 function aBanded(f,g){return[
  {t:"box",k:"fill",   x:.5,y:.10,s:1,w:1,hf:.20},
  {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.28},
+ {t:"box",k:"logo",   x:.5,y:.10,s:.9,lw:40,lh:13,onBand:1},
  {t:"box",k:"name",   x:.5,y:.10,s:1.05,onBand:1},
  {t:"box",k:"stars",  x:.5,y:.30,s:1},
  {t:"box",k:"head",   x:.5,y:.42,s:.95,w:.78},
@@ -1408,6 +1440,7 @@ function aBanded(f,g){return[
 
 function aDiagonal(f,g){return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
+ {t:"box",k:"logo",   x:.46,y:.175,s:1,lw:44,lh:15,rotd:-7},
  {t:"box",k:"name",   x:.46,y:.20,s:1.2,rotd:-7},
  {t:"box",k:"stars",  x:.46,y:.30,s:.95,rotd:-7},
  {t:"box",k:"head",   x:.46,y:.44,s:.95,w:.76,rotd:-7},
@@ -1418,6 +1451,7 @@ function aDiagonal(f,g){return[
 function aDepth(f,g){return[
  {t:"box",k:"fill",   x:.56,y:.42,s:1,w:.78,hf:.24,op:.25},
  {t:"box",k:"fill",   x:.44,y:.38,s:1,w:.78,hf:.24},
+ {t:"box",k:"logo",   x:.44,y:.325,s:.95,lw:40,lh:13,onBand:1},
  {t:"box",k:"name",   x:.44,y:.335,s:1,onBand:1},
  {t:"box",k:"stars",  x:.44,y:.425,s:.85,onBand:1},
  {t:"box",k:"head",   x:.5,y:.62,s:.95,w:.78},
@@ -1587,16 +1621,29 @@ function bodyHTML(L,ctx){
         ' currentColor;opacity:'+(L.dash?.45:.9)+'"></div>';
     case 'lockup':
       var mark = ctx.logo
-        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(34*s)+
-          'cqw;object-fit:contain;display:block">'
-        : '<div class="logomark" style="height:'+(11*s)+'cqw;border-width:'+(.6*s)+
-          'cqw;border-color:'+mc+';color:'+mc+';font-size:'+(5*s)+'cqw">'+
-          esc(initials(ctx.name))+'</div>';
+        ? '<img src="'+ctx.logo+'" alt="" style="width:'+(30*s)+'cqw;height:'+(11*s)+
+          'cqw;object-fit:contain;object-position:left center;display:block'+ctx.logoFx+'">'
+        : '<div style="width:'+(30*s)+'cqw;height:'+(11*s)+'cqw;border:'+(.45*s)+
+          'cqw dashed '+mc+';border-radius:'+(.8*s)+'cqw;display:flex;align-items:center;'+
+          'justify-content:center;font-family:var(--f-disp);font-weight:750;font-size:'+
+          (3.2*s)+'cqw;letter-spacing:.14em;color:'+mc+';opacity:.8">LOGO</div>';
       return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
         '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
         '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
         esc(L.word||'Google')+'</span></div>';
     case 'logo':
+      var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
+      if(ctx.logo)
+        return '<img src="'+ctx.logo+'" alt="" style="width:'+LW+'cqw;height:'+LH+
+          'cqw;object-fit:contain;object-position:center;display:block'+ctx.logoFx+'">';
+      return '<div style="width:'+LW+'cqw;height:'+LH+'cqw;border:'+(.5*s)+
+        'cqw dashed '+mc+';border-radius:'+(1*s)+'cqw;display:flex;flex-direction:column;'+
+        'align-items:center;justify-content:center;gap:'+(.8*s)+'cqw;opacity:.8">'+
+        '<span style="font-family:var(--f-disp);font-weight:750;font-size:'+(3.6*s)+
+        'cqw;letter-spacing:.16em;color:'+mc+'">LOGO</span>'+
+        '<span style="font-family:var(--mono,monospace);font-size:'+(2.1*s)+
+        'cqw;letter-spacing:.08em;color:'+mc+';opacity:.7">PASTE · DROP · CLICK</span></div>';
+    case 'logoOld':
       return ctx.logo
        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(13*s)+'cqw;max-width:'+(56*s)+
          'cqw;object-fit:contain;display:block">'
@@ -1683,7 +1730,8 @@ function paint(quiet){
   card.style.setProperty('--b-fg',fg);
   card.style.setProperty('--b-star',brand);
 
-  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
+  var logoFx = $('logoInv').checked ? ';filter:invert(1) hue-rotate(180deg)' : '';
+  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
@@ -1965,11 +2013,49 @@ fmtEl.addEventListener('click',function(e){
 });
 [elName,elCopy,elBrand,elBg].forEach(function(el){
   el.addEventListener('input',paint); el.addEventListener('change',paint)});
-$('logo').addEventListener('change',function(e){
-  var f=e.target.files&&e.target.files[0]; if(!f)return;
-  var r=new FileReader();
-  r.onload=function(){S.logo=r.result;paint()};
-  r.readAsDataURL(f);                        // local only — nothing leaves the page
+/* Three ways in, because a logo usually arrives on the clipboard rather than as a
+   tidy file on disk: paste anywhere on the page, drop onto the well, or click it. */
+function setLogo(src){
+  S.logo=src;
+  var pv=$('logoPrev'), hint=$('logoHint');
+  pv.innerHTML = src ? '<img src="'+src+'" alt="">' : '';
+  pv.classList.toggle('has',!!src);
+  hint.textContent = src ? 'REPLACE: PASTE · DROP · CLICK' : 'PASTE (⌘V) · DROP A FILE · CLICK';
+  applyLogoName(); paint();
+}
+function readImg(file){
+  if(!file || file.type.indexOf('image')!==0) return false;
+  var r=new FileReader(); r.onload=function(){setLogo(r.result)}; r.readAsDataURL(file);
+  return true;                                // local only — nothing leaves the page
+}
+// a logo usually carries the business name already, so the text version steps aside
+function applyLogoName(){
+  if(!$('logoHideName').checked) return;
+  S.stack.forEach(function(L){ if(L.k==='name') L.hidden = !!S.logo; });
+}
+$('logo').addEventListener('change',function(e){ readImg(e.target.files&&e.target.files[0]); e.target.value=''; });
+var drop=$('logoDrop');
+drop.addEventListener('click',function(){ $('logo').click(); });
+drop.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();$('logo').click();} });
+['dragenter','dragover'].forEach(function(t){ drop.addEventListener(t,function(e){
+  e.preventDefault(); drop.classList.add('over'); }); });
+['dragleave','drop'].forEach(function(t){ drop.addEventListener(t,function(e){
+  e.preventDefault(); drop.classList.remove('over'); }); });
+drop.addEventListener('drop',function(e){ readImg(e.dataTransfer.files&&e.dataTransfer.files[0]); });
+// paste works from anywhere on the page except while typing into a field
+document.addEventListener('paste',function(e){
+  var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
+  var items=(e.clipboardData&&e.clipboardData.items)||[];
+  for(var i=0;i<items.length;i++){
+    if(items[i].type.indexOf('image')===0){ readImg(items[i].getAsFile()); e.preventDefault(); return; }
+  }
+});
+$('logoClr').addEventListener('click',function(){ setLogo(null); });
+$('logoInv').addEventListener('change',paint);
+$('logoHideName').addEventListener('change',function(){
+  if(!this.checked) S.stack.forEach(function(L){ if(L.k==='name') L.hidden=false; });
+  else applyLogoName();
+  paint();
 });
 $('ovGrid').addEventListener('change',function(e){S.grid=e.target.checked;paint()});
 $('ovSafe').addEventListener('change',function(e){$('ovSafeEl').classList.toggle('on',e.target.checked)});
