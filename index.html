@@ -136,7 +136,8 @@ td.pri{font-weight:650}
 
 /* ---------------- editor ---------------- */
 .studio{display:grid;gap:24px;margin-top:34px;grid-template-columns:1fr}
-@media(min-width:980px){.studio{grid-template-columns:312px 1fr;align-items:start}}
+@media(min-width:980px){.studio{grid-template-columns:312px 1fr;align-items:start}
+  .stage{position:sticky;top:16px;align-self:start}}
 .controls{display:flex;flex-direction:column;gap:14px}
 .pane{background:var(--panel);border:1px solid var(--rule);padding:15px;
   display:flex;flex-direction:column;gap:13px}
@@ -271,7 +272,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .hnd{position:absolute;width:3.4cqw;height:3.4cqw;border-radius:50%;
   background:var(--b-brand);border:.4cqw solid var(--b-bg);display:none}
 .hnd[data-h="1"]{right:-2.6cqw;bottom:-2.6cqw;cursor:nwse-resize}
-.hnd[data-h="w"]{right:-2.6cqw;top:50%;transform:translateY(-50%);cursor:ew-resize}
+.hnd[data-h="w"]{right:-2.6cqw;top:-2.6cqw;cursor:ew-resize}
 .lay.sel .hnd{display:block}
 .guide{position:absolute;background:var(--accent);z-index:950;pointer-events:none;display:none}
 .guide.v{width:1px;top:0;bottom:0}
