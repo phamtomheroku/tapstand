@@ -1,4 +1,5 @@
 <title>Tap Stand — Holder Suite &amp; Insert System</title>
+<style id="pageCSS"></style>
 <style>
 :root{
   --paper:#EEF1F2; --paper-2:#E3E9EB; --panel:#FAFCFC;
@@ -226,6 +227,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #card.ftap{aspect-ratio:3.5/2;width:min(430px,86vw)}
 #card.f4878{aspect-ratio:48/78;width:min(300px,68vw)}
 #card.fcr80{aspect-ratio:85.6/54;width:min(430px,86vw)}
+#card.f57{aspect-ratio:127/178;width:min(360px,78vw)}
 #card{font-family:var(--f-body,inherit)}
 .frame,.frame2{position:absolute;inset:0;pointer-events:none;z-index:900}
 .fr-solid    .frame{border:2.6cqw solid var(--b-brand)}
@@ -348,17 +350,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .sheetcell span{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--ink-3)}
 .sheetcard{container-type:inline-size;width:100%;aspect-ratio:4/6;position:relative;
   overflow:hidden;border:1px solid var(--rule)}
-/* print: the card alone, at trim size, so Save as PDF gives a placeable file */
+/* print / PDF: the card is reparented onto <body> first, so everything else can be
+   removed from flow outright. That keeps the document exactly one page tall, and the
+   card keeps its own container queries because container-type sits on #card itself. */
 @media print{
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  /* every child of <body> is display:none below, but the whitespace between them is
+     still text in <body> and can generate a line box that shoves the card down onto a
+     second sheet. Zeroing the font collapses it. */
+  body.printing{font-size:0!important;line-height:0!important}
   body.printing>*{display:none!important}
-  body.printing .stage,body.printing .baseline,body.printing .holderwrap{display:block!important;
-    background:none!important;border:none!important;padding:0!important;min-height:0!important}
-  body.printing #studio,body.printing #studio .wrap,body.printing .studio{display:block!important;
-    padding:0!important;margin:0!important;max-width:none!important;border:none!important}
-  body.printing .controls,body.printing .dims,body.printing .hint,body.printing .sheet,
-  body.printing .shead,body.printing .slede,body.printing .flag{display:none!important}
-  body.printing #card{width:102mm!important;box-shadow:none!important;margin:0 auto}
-  @page{margin:8mm}
+  /* relative, never static: the whole design is absolutely-positioned .lay layers,
+     and a static card stops being their containing block — they'd escape to the page
+     box and spill onto a second sheet */
+  body.printing>#card{display:block!important;position:relative!important;
+    margin:0!important;box-shadow:none!important;border-radius:0!important;
+    max-width:none!important;aspect-ratio:auto!important}
+  /* browsers strip backgrounds on print unless told otherwise — without this the
+     brand fills, gradients and textures vanish and you get white paper */
+  body.printing>#card,body.printing>#card *{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body.printing .lay.sel::before,body.printing .hnd,
+  body.printing .guide,body.printing .grid,body.printing .ov{display:none!important}
 }
 .srcfoot{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.03em;
   margin:14px 0 0;line-height:1.6}
@@ -1239,7 +1252,8 @@ var FORMATS=[
  {k:"4×4 square",cls:"f44",d:"102 × 102 mm",mm:102,ar:1},
  {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89,ar:.5714},
  {k:"ST820 48×78",cls:"f4878",d:"48 × 78 mm",mm:48,ar:1.625,tag:2},
- {k:"ST783 CR80",cls:"fcr80",d:"85.6 × 54 mm",mm:85.6,ar:.6308,tag:3}
+ {k:"ST783 CR80",cls:"fcr80",d:"85.6 × 54 mm",mm:85.6,ar:.6308,tag:3},
+ {k:"5×7 frame",cls:"f57",d:"127 × 178 mm",mm:127,ar:1.4016}
 ];
 /* ---- the tags actually delivered (Seritag order x49745, 10 of each) ----------
    Two of these ARE the printed surface, so they get their own trim sizes and you
@@ -2981,13 +2995,45 @@ $('loadDesign').addEventListener('change',function(e){
   r.readAsText(f);
 });
 
-/* ============ 10. print / PDF ============
-   A print stylesheet beats rasterising to PNG here: the output is vector, so it
-   stays sharp at any size, and every browser can Save as PDF from the dialog. */
-$('printBtn').addEventListener('click',function(){
-  document.body.classList.add('printing'); window.print();
-  setTimeout(function(){ document.body.classList.remove('printing'); },600);
-});
+/* ============ 10. PDF export ============
+   Vector rather than a rasterised PNG, so it stays sharp at any size and any
+   browser can Save as PDF from the print dialog. The page is sized to the card's
+   exact trim, so the PDF IS the artwork — no letter sheet with a card floating on
+   it, and nothing for a print shop to scale or guess at. */
+function exportPDF(){
+  var f=FORMATS[S.fmt];
+  var w=+f.mm.toFixed(2), h=+(f.mm*(f.ar||1.5)).toFixed(2);
+  // @page has to be written at print time because it cannot read a CSS variable
+  $('pageCSS').textContent =
+    '@page{size:'+w+'mm '+h+'mm;margin:0}'+
+    '@media print{'+
+      'html,body.printing{width:'+w+'mm!important;height:'+h+'mm!important;'+
+        'overflow:hidden!important}'+
+      'body.printing>#card{width:'+w+'mm!important;height:'+h+'mm!important}'+
+    '}';
+  // Move the card to be a direct child of <body> for the duration of the print, so
+  // the print stylesheet can drop every sibling out of flow with one rule. Hiding
+  // them by visibility instead leaves them occupying layout and the document stays
+  // its full 39-page length with the card stranded on page one.
+  var home=card.parentNode, after=card.nextSibling;
+  document.body.appendChild(card);
+  document.body.classList.add('printing');
+  // Chrome and Edge seed the Save-as-PDF filename from document.title, so borrow it
+  // for the duration of the dialog rather than shipping "Tap Stand — Holder Suite.pdf"
+  var keepTitle=document.title;
+  var slug=(elName.value||'tap card').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
+  document.title=slug+'_'+w+'x'+h+'mm';
+  var restore=function(){
+    document.title=keepTitle;
+    document.body.classList.remove('printing');
+    home.insertBefore(card, after);
+    window.removeEventListener('afterprint',restore);
+  };
+  window.addEventListener('afterprint',restore);
+  window.print();
+  setTimeout(restore,1500);            // belt and braces if afterprint never fires
+}
+$('printBtn').addEventListener('click',exportPDF);
 
 /* ============ contact sheet: the design across every industry ============ */
 $('sheetBtn').addEventListener('click',function(){
