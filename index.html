@@ -268,8 +268,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lay.sel{cursor:grabbing}
 .lay.sel::before{content:"";position:absolute;inset:-1.6cqw;border:.55cqw solid var(--b-brand);
   border-radius:.6cqw;opacity:.95;pointer-events:none}
-.hnd{position:absolute;right:-2.6cqw;bottom:-2.6cqw;width:3.4cqw;height:3.4cqw;border-radius:50%;
-  background:var(--b-brand);border:.4cqw solid var(--b-bg);cursor:nwse-resize;display:none}
+.hnd{position:absolute;width:3.4cqw;height:3.4cqw;border-radius:50%;
+  background:var(--b-brand);border:.4cqw solid var(--b-bg);display:none}
+.hnd[data-h="1"]{right:-2.6cqw;bottom:-2.6cqw;cursor:nwse-resize}
+.hnd[data-h="w"]{right:-2.6cqw;top:50%;transform:translateY(-50%);cursor:ew-resize}
 .lay.sel .hnd{display:block}
 .guide{position:absolute;background:var(--accent);z-index:950;pointer-events:none;display:none}
 .guide.v{width:1px;top:0;bottom:0}
@@ -414,6 +416,38 @@ code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1p
   border:1px solid var(--rule-2);border-radius:2px}
 footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.05em}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* custom fonts — a drop area plus a list of loaded families */
+.fntgroup{background:var(--paper-2);border:1px solid var(--rule);border-radius:3px;padding:8px 9px;margin-top:6px}
+.fnthead{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fntname{flex:1;min-width:0;background:transparent;border:1px solid transparent;color:var(--ink);
+  font-family:var(--sans);font-size:13px;padding:2px 4px;border-radius:2px}
+.fntname:hover{border-color:var(--rule)}
+.fntname:focus{border-color:var(--accent);background:var(--paper);outline:none}
+.fntcount{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink-3);flex:none}
+.fntprev{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:7px 9px;
+  margin:5px 0 6px;font-size:16px;line-height:1.2;color:var(--ink);display:flex;
+  justify-content:space-between;align-items:baseline;gap:12px;overflow:hidden;white-space:nowrap}
+.fntprev .r{font-weight:400}
+.fntprev .b{font-weight:700}
+.fntface{display:flex;align-items:center;gap:5px;padding:3px 0;border-top:1px solid var(--rule);
+  margin-top:3px}
+.fntface:first-of-type{border-top:none;margin-top:0}
+.fntface select{flex:none;width:auto;font-family:var(--mono);font-size:10.5px;padding:3px 5px;
+  background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:2px}
+.fntfile{flex:1;min-width:0;font-family:var(--mono);font-size:10px;color:var(--ink-3);
+  letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fntx{background:none;border:none;color:var(--ink-3);cursor:pointer;font-family:var(--mono);
+  font-size:14px;padding:0 4px;line-height:1}
+.fntx:hover{color:var(--accent)}
+.fntbad{color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.06em}
+.fntsel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.fntsel .col{display:flex;flex-direction:column;gap:3px}
+.fntsel .col label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3)}
+.fntsel select{background:var(--paper);color:var(--ink);border:1px solid var(--rule);
+  border-radius:2px;font-family:var(--sans);font-size:12.5px;padding:5px 7px}
+.fnthint{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--ink-3);
+  line-height:1.45;margin:4px 0 0}
 </style>
 
 <!-- shared material defs — referenced by every elevation below -->
@@ -577,6 +611,20 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
               <button class="btn" id="tapClr" type="button">Clear</button>
             </div>
           </div>
+          <div class="grp"><span class="lbl">Platform mark — for the lockup</span>
+            <div class="logodrop" id="platDrop" tabindex="0" role="button"
+                 aria-label="Add a platform mark for the lockup: paste, drop, or click">
+              <div class="logoprev" id="platPrev"></div>
+              <span class="logohint" id="platHint">DROP A GOOGLE / YELP / PLATFORM LOGO</span>
+              <input type="file" id="platFile" accept="image/*" hidden>
+            </div>
+            <div class="row2">
+              <label class="tog"><input type="checkbox" id="platAsIs" checked> Keep its own colours</label>
+              <button class="btn" id="platClr" type="button">Clear</button>
+            </div>
+            <p class="fnthint">Replaces the text word in the lockup layer (<code>LOGO × Google</code>)
+              with an actual image. Both images sit side by side at the same height.</p>
+          </div>
           <div class="grp"><span class="lbl">NFC tag — what you actually have</span>
             <div class="chips" id="tags"></div>
             <span class="taghint" id="tagHint"></span></div>
@@ -585,6 +633,23 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
             <div class="chips" id="dirs"></div></div>
           <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
           <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
+          <div class="grp"><span class="lbl">Custom type — upload a font</span>
+            <label class="logodrop" id="fontDrop" tabindex="0" role="button"
+                   aria-label="Add a font: drop .ttf / .otf / .woff / .woff2 files or click">
+              <span class="logohint">DROP .TTF · .OTF · .WOFF · .WOFF2 · OR CLICK</span>
+              <input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" multiple hidden>
+            </label>
+            <div class="fntsel">
+              <div class="col"><label for="dispFontSel">Display</label>
+                <select id="dispFontSel"><option value="">Theme default</option></select></div>
+              <div class="col"><label for="bodyFontSel">Body</label>
+                <select id="bodyFontSel"><option value="">Theme default</option></select></div>
+            </div>
+            <div id="fontList"></div>
+            <p class="fnthint">Faces of one family group together — drop Regular <em>and</em> Bold and the
+              card gets real weights instead of a synthesised bold. Fonts bake into the printed insert
+              and are saved inside your <code>.tapcard.json</code>.</p>
+          </div>
           <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
           <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
         </div>
@@ -1801,7 +1866,159 @@ function defaults(fmt){
 }
 
 var curPreset=0;
-var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false};
+var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
+       userFonts:[],dispFont:'',bodyFont:''};
+
+/* ---- custom fonts --------------------------------------------------------
+   Uploaded font files, held as base64 data URLs and registered through the
+   FontFace API. A face carries a family, a weight and a style, so dropping
+   in Inter-Regular and Inter-Bold gives ONE family whose 400 and 700 map
+   to real files instead of two unrelated families with a synthesised bold.
+   Fonts live in memory + inside a saved .tapcard.json; not in localStorage
+   (files are heavy and the sourcing/notes STORE already lives there). */
+var FONT_MIME={ttf:'font/ttf',otf:'font/otf',woff:'font/woff',woff2:'font/woff2'};
+/* longest names first so "extrabold" isn't matched as "bold" */
+var WEIGHT_WORDS=[
+  [/(^|[-_ ])(thin|hairline)/i,100],[/(extra|ultra)-?light/i,200],[/(^|[-_ ])light/i,300],
+  [/(semi|demi)-?bold/i,600],[/(extra|ultra)-?bold/i,800],[/(^|[-_ ])(black|heavy)/i,900],
+  [/(^|[-_ ])medium/i,500],[/(^|[-_ ])bold/i,700],[/(^|[-_ ])(regular|normal|book)/i,400]
+];
+var WEIGHT_NAMES={100:'Thin',200:'ExtraLight',300:'Light',400:'Regular',500:'Medium',
+                  600:'SemiBold',700:'Bold',800:'ExtraBold',900:'Black'};
+function guessFace(name){
+  var stem=name.replace(/\.[^.]+$/,''),weight=400,style='normal';
+  for(var i=0;i<WEIGHT_WORDS.length;i++){ if(WEIGHT_WORDS[i][0].test(stem)){ weight=WEIGHT_WORDS[i][1]; break; } }
+  if(/italic|oblique/i.test(stem)) style='italic';
+  var fam=stem
+    .replace(/(thin|hairline|(extra|ultra)-?light|light|(semi|demi)-?bold|(extra|ultra)-?bold|black|heavy|medium|bold|regular|normal|book|italic|oblique)/ig,'')
+    .replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim()
+    .replace(/[^A-Za-z0-9 ]/g,'') || stem.replace(/[^A-Za-z0-9 ]/g,'') || 'Custom';
+  return {family:fam,weight:weight,style:style};
+}
+/* a family name with a space is only valid in a CSS shorthand when quoted;
+   always append a real fallback so a face that failed to load degrades */
+function fontStack(fam){
+  if(!fam) return '';
+  var needsQuote=/[^A-Za-z0-9-]/.test(fam);
+  return (needsQuote?'"'+fam.replace(/"/g,'')+'"':fam)+
+    ",system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+}
+function registerFace(f){
+  var face=new FontFace(f.family,'url('+f.data+')',
+    {weight:String(f.weight),style:f.style,display:'swap'});
+  return face.load().then(function(loaded){ document.fonts.add(loaded); f.ok=true; return true; })
+                    .catch(function(){ f.ok=false; return false; });
+}
+function registerAllFaces(list){
+  return Promise.all((list||[]).map(registerFace));
+}
+function userFontFamilies(){
+  var out=[],seen={};
+  S.userFonts.forEach(function(f){ if(!seen[f.family]){ seen[f.family]=1; out.push(f.family); } });
+  return out;
+}
+function addFontFiles(files){
+  var arr=[].slice.call(files||[]); if(!arr.length) return;
+  var ok=0,bad=0,pending=arr.length;
+  arr.forEach(function(file){
+    var ext=(file.name.split('.').pop()||'').toLowerCase();
+    if(!FONT_MIME[ext]){ bad++; if(!--pending) done(); return; }
+    var r=new FileReader();
+    r.onload=function(e){
+      var g=guessFace(file.name);
+      var rec={id:'f'+(++S.uid),family:g.family,weight:g.weight,style:g.style,
+               format:ext,data:e.target.result,file:file.name};
+      /* replacing the same family+weight+style keeps re-uploads from stacking up */
+      S.userFonts=S.userFonts.filter(function(x){
+        return !(x.family===rec.family && x.weight===rec.weight && x.style===rec.style);
+      });
+      S.userFonts.push(rec);
+      registerFace(rec).then(function(good){
+        if(good) ok++; else bad++;
+        if(!--pending) done();
+      });
+    };
+    r.onerror=function(){ bad++; if(!--pending) done(); };
+    r.readAsDataURL(file);
+  });
+  function done(){ refreshFontsUI(); paint(); }
+}
+function removeUserFont(id){
+  S.userFonts=S.userFonts.filter(function(f){ return f.id!==id; });
+  var remaining={}; S.userFonts.forEach(function(f){ remaining[f.family]=1; });
+  if(S.dispFont && !remaining[S.dispFont]) S.dispFont='';
+  if(S.bodyFont && !remaining[S.bodyFont]) S.bodyFont='';
+  refreshFontsUI(); paint();
+}
+function removeUserFontFamily(fam){
+  S.userFonts=S.userFonts.filter(function(f){ return f.family!==fam; });
+  if(S.dispFont===fam) S.dispFont='';
+  if(S.bodyFont===fam) S.bodyFont='';
+  refreshFontsUI(); paint();
+}
+function renameUserFontFamily(oldName,newName){
+  var nn=String(newName||'').replace(/[^A-Za-z0-9 _-]/g,'').trim();
+  if(!nn || nn===oldName){ refreshFontsUI(); return; }
+  var promises=[];
+  S.userFonts.filter(function(f){ return f.family===oldName; })
+             .forEach(function(f){ f.family=nn; promises.push(registerFace(f)); });
+  if(S.dispFont===oldName) S.dispFont=nn;
+  if(S.bodyFont===oldName) S.bodyFont=nn;
+  Promise.all(promises).then(function(){ refreshFontsUI(); paint(); });
+}
+function setFontFaceProp(id,k,v){
+  var f=S.userFonts.find(function(x){ return x.id===id; }); if(!f) return;
+  f[k]= (k==='weight') ? +v : v;
+  registerFace(f).then(function(){ refreshFontsUI(); paint(); });
+}
+function setFontOverride(role,fam){
+  if(role==='disp') S.dispFont=fam||''; else if(role==='body') S.bodyFont=fam||'';
+  paint();
+}
+/* Rebuild the loaded-family list and the two override dropdowns. Called on
+   upload, remove, rename, and after a .tapcard.json is loaded. */
+function refreshFontsUI(){
+  var host=$('fontList'); if(!host) return;
+  var fams=userFontFamilies();
+  host.innerHTML=fams.map(function(fam){
+    var faces=S.userFonts.filter(function(f){ return f.family===fam; })
+                         .sort(function(a,b){ return a.weight-b.weight||a.style.localeCompare(b.style); });
+    var rows=faces.map(function(f){
+      var opts=Object.keys(WEIGHT_NAMES).map(function(w){
+        return '<option value="'+w+'"'+(+w===f.weight?' selected':'')+'>'+w+' '+WEIGHT_NAMES[w]+'</option>';
+      }).join('');
+      return '<div class="fntface">'+
+        '<span class="fntfile" title="'+esc(f.file||'')+'">'+esc(f.file||'font')+'</span>'+
+        (f.ok===false?'<span class="fntbad" title="Failed to load">!</span>':'')+
+        '<select title="Weight" onchange="setFontFaceProp(\''+f.id+'\',\'weight\',this.value)">'+opts+'</select>'+
+        '<select title="Style" onchange="setFontFaceProp(\''+f.id+'\',\'style\',this.value)">'+
+          '<option value="normal"'+(f.style==='normal'?' selected':'')+'>Normal</option>'+
+          '<option value="italic"'+(f.style==='italic'?' selected':'')+'>Italic</option>'+
+        '</select>'+
+        '<button class="fntx" title="Remove this face" onclick="removeUserFont(\''+f.id+'\')">×</button>'+
+      '</div>';
+    }).join('');
+    return '<div class="fntgroup">'+
+      '<div class="fnthead">'+
+        '<input class="fntname" value="'+esc(fam)+'" title="Rename this family" '+
+          'onchange="renameUserFontFamily(\''+esc(fam).replace(/'/g,"\\'")+'\',this.value)">'+
+        '<span class="fntcount">'+faces.length+' FACE'+(faces.length===1?'':'S')+'</span>'+
+        '<button class="fntx" title="Remove the whole family" '+
+          'onclick="removeUserFontFamily(\''+esc(fam).replace(/'/g,"\\'")+'\')">🗑</button>'+
+      '</div>'+
+      '<div class="fntprev" style="font-family:'+fontStack(fam)+'">'+
+        '<span class="r">Aa Bb Cc</span><span class="b">123 Rewards</span>'+
+      '</div>'+
+      rows+
+    '</div>';
+  }).join('');
+  ['disp','body'].forEach(function(role){
+    var sel=$(role+'FontSel'); if(!sel) return;
+    var cur = (role==='disp'?S.dispFont:S.bodyFont) || '';
+    sel.innerHTML='<option value="">Theme default</option>'+
+      fams.map(function(f){ return '<option value="'+esc(f)+'"'+(cur===f?' selected':'')+'>'+esc(f)+'</option>'; }).join('');
+  });
+}
 var card=$('card'),gv=$('gv'),gh=$('gh');
 var elName=$('bname'),elCopy=$('copy'),elBrand=$('brand'),elBg=$('bg');
 
@@ -1829,10 +2046,23 @@ var TAP_ICONS={
    '<path d="M86 25h14"/>'+
    '<path d="M52 36c8 8 8 20 0 28"/>'+
    '<path d="M36 27c15 14 15 32 0 46"/>'+
-   '<path d="M20 18c22 19 22 45 0 64"/></svg>'
+   '<path d="M20 18c22 19 22 45 0 64"/></svg>',
+ // hand holding a phone with NFC arcs radiating from the top
+ hand:'<svg viewBox="0 0 100 120" aria-hidden="true">'+
+   '<path d="M38 22c6 5 6 14 0 20"/>'+
+   '<path d="M44 14c10 9 10 24 0 34"/>'+
+   '<path d="M50 6c15 13 15 34 0 48"/>'+
+   '<rect x="30" y="36" width="30" height="54" rx="5"/>'+
+   '<line x1="40" y1="42" x2="54" y2="42"/>'+
+   '<path d="M30 60 C26 58 20 56 18 62 C16 68 14 72 14 78"/>'+
+   '<path d="M60 52 C64 50 68 50 70 54 C72 58 72 62 70 68"/>'+
+   '<path d="M70 68 C68 72 68 76 66 80"/>'+
+   '<path d="M60 60 C64 62 68 66 68 72"/>'+
+   '<path d="M60 68 C62 70 64 74 64 78"/>'+
+   '<path d="M14 78 C14 84 16 92 22 96 C26 98 30 96 30 90"/></svg>'
 };
-// the bare mark fills a square; the device mark is wider, so it gets scaled to match
-var ICON_W={waves:1, phone:1.55};
+// the bare mark fills a square; the device mark is wider; hand mark is taller
+var ICON_W={waves:1, phone:1.55, hand:.88};
 var WAVE=TAP_ICONS.waves;
 
 // scanning floor: a QR under about 25 mm gets unreliable at arm's length, so the
@@ -1927,10 +2157,14 @@ function bodyHTML(L,ctx){
           'cqw dashed '+mc+';border-radius:'+(.8*s)+'cqw;display:flex;align-items:center;'+
           'justify-content:center;font-family:var(--f-disp);font-weight:750;font-size:'+
           (3.2*s)+'cqw;letter-spacing:.14em;color:'+mc+';opacity:.8">LOGO</div>';
+      var platSide = S.platImg
+        ? '<img src="'+S.platImg+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(30*s)+
+          'cqw;object-fit:contain;display:block'+(S.platImgMode==='asis'?'':';filter:brightness(0) saturate(0)')+'">'
+        : '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
+          esc(L.word||'Google')+'</span>';
       return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
         '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
-        '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
-        esc(L.word||'Google')+'</span></div>';
+        platSide+'</div>';
     case 'logo':
       var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
       if(!ctx.logo && ctx.hasName) return '';    // the name is holding this slot
@@ -2035,8 +2269,9 @@ function paint(quiet){
   brand=pal.brand; fg=pal.ink;
   var fmt=FORMATS[S.fmt];
   card.className=fmt.cls+' fr-'+th.frame+' tx-'+th.tex;
-  card.style.setProperty('--f-disp',FONTS[th.disp]);
-  card.style.setProperty('--f-body',FONTS[th.body]);
+  /* user-uploaded families override the theme's picks; system fallback is always appended */
+  card.style.setProperty('--f-disp', S.dispFont ? fontStack(S.dispFont) : FONTS[th.disp]);
+  card.style.setProperty('--f-body', S.bodyFont ? fontStack(S.bodyFont) : FONTS[th.body]);
   card.style.setProperty('--rad',th.rad+'cqw');
   card.style.borderRadius=th.rad+'cqw';
   card.style.setProperty('--b-brand',brand);
@@ -2069,7 +2304,7 @@ function paint(quiet){
     // resolved at paint time so it keeps up when the brand colour changes.
     if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
     if(L.t==='text' || L.k==='name' || L.k==='lockup'){
-      d.style.fontFamily='var(--f-disp)';
+      d.style.fontFamily = (L.fontFamily && fontStack(L.fontFamily)) || 'var(--f-disp)';
       if(th.up) d.style.textTransform='uppercase';
       if(th.tr) d.style.letterSpacing=th.tr+'em';
     }
@@ -2081,7 +2316,7 @@ function paint(quiet){
               if(!L.rot) d.style.transform = L.al==='left' ? 'translate(0,-50%)'
                                            : L.al==='right' ? 'translate(-100%,-50%)'
                                            : 'translate(-50%,-50%)'; }
-    d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="1"></div>';
+    d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="w"></div><div class="hnd" data-h="1"></div>';
     card.appendChild(d);
   });
 
@@ -2261,16 +2496,25 @@ function drawInspector(){
        (defaultTapOK?'<option value="">Default mark (tap-mark.png)</option>':'')+
        '<option value="waves">Contactless waves</option>'+
        '<option value="phone">Phone + waves</option>'+
+       '<option value="hand">Hand holding phone</option>'+
        (S.tapImg?'<option value="custom">Your own mark</option>':'')+'</select>';
   }
   if(L.t==='text'){
+    var fFams=userFontFamilies();
+    var fOpts='<option value="">Inherit (Display)</option>'+
+      fFams.map(function(f){ return '<option value="'+esc(f)+'"'+(L.fontFamily===f?' selected':'')+'>'+esc(f)+'</option>'; }).join('');
     h+='<textarea id="iTxt">'+esc(L.text||'')+'</textarea>'+
        '<div class="row2"><input type="color" id="iCol" value="'+(L.col||'#000000')+'" aria-label="Text colour">'+
        '<select id="iFw"><option value="400">Regular</option><option value="600">Medium</option>'+
-       '<option value="750">Bold</option><option value="850">Heavy</option></select></div>';
+       '<option value="750">Bold</option><option value="850">Heavy</option></select></div>'+
+       (fFams.length ? '<select id="iFf" title="Font family">'+fOpts+'</select>' : '');
   }
   h+='<span class="lbl">Scale · '+Math.round((L.s==null?1:L.s)*100)+'%</span>'+
      '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
+  if(L.w!=null){
+    h+='<span class="lbl">Width · '+Math.round(L.w*100)+'%</span>'+
+       '<input type="range" id="iW" min="15" max="100" value="'+Math.round(L.w*100)+'">';
+  }
   box.innerHTML=h;
   if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
   if(L.k==='tap'){
@@ -2283,8 +2527,10 @@ function drawInspector(){
     $('iTxt').addEventListener('input',function(){L.text=this.value;paint(true)});
     $('iCol').addEventListener('input',function(){L.col=this.value;paint(true)});
     $('iFw').addEventListener('change',function(){L.fw=+this.value;paint(true)});
+    if($('iFf')) $('iFf').addEventListener('change',function(){L.fontFamily=this.value||'';paint(true)});
   }
   $('iS').addEventListener('input',function(){L.s=+this.value/100;paint(true)});
+  if($('iW')) $('iW').addEventListener('input',function(){L.w=+this.value/100;paint(true)});
 }
 
 /* ---- drag: pointer capture + pointercancel, same as the studio's armDrag ---- */
@@ -2300,7 +2546,9 @@ card.addEventListener('pointerdown',function(e){
   if(typeof pushUndo==='function') pushUndo();
   L._man=true;
   var p=norm(e);
-  drag={L:L,mode:hnd?'scale':'move',ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
+  var mode = hnd ? (hnd.dataset.h==='w' ? 'width' : 'scale') : 'move';
+  drag={L:L,mode:mode,ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
+        w0:(L.w||0), x0:p.x,
         d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
   try{ card.setPointerCapture(e.pointerId); }catch(err){}
   e.preventDefault();
@@ -2311,6 +2559,10 @@ card.addEventListener('pointermove',function(e){
   if(drag.mode==='scale'){
     var d=Math.hypot(p.x-drag.L.x,p.y-drag.L.y);
     drag.L.s=Math.max(.3,Math.min(2.2,drag.s0*(d/drag.d0)));
+  }else if(drag.mode==='width'){
+    var dx=p.x-drag.x0;
+    var nw=Math.max(.15,Math.min(1,(drag.w0||.86)+dx*2));
+    drag.L.w=Math.round(nw*100)/100;
   }else{
     var x=p.x-drag.ox,y=p.y-drag.oy,T=.018,sx=null,sy=null;
     [0.5,0.12,0.88].forEach(function(g){ if(Math.abs(x-g)<T){x=g;sx=g} });
@@ -2492,7 +2744,7 @@ document.addEventListener('paste',function(e){
   for(var i=0;i<items.length;i++){
     if(items[i].type.indexOf('image')===0){
       var f=items[i].getAsFile();
-      (pasteTarget==='tap'?readTap:readImg)(f); e.preventDefault(); return; }
+      (pasteTarget==='plat'?readPlat:pasteTarget==='tap'?readTap:readImg)(f); e.preventDefault(); return; }
   }
 });
 $('logoClr').addEventListener('click',function(){ setLogo(null); });
@@ -2526,6 +2778,33 @@ tapDrop.addEventListener('focus',function(){ pasteTarget='tap'; });
 tapDrop.addEventListener('drop',function(e){ readTap(e.dataTransfer.files&&e.dataTransfer.files[0]); });
 $('tapClr').addEventListener('click',function(){ setTapImg(null); });
 $('tapAsIs').addEventListener('change',function(){ S.tapImgMode=this.checked?'asis':'tint'; paint(); });
+
+/* ---- platform mark — the right-hand side of the lockup ---- */
+function setPlatImg(src){
+  S.platImg=src;
+  var pv=$('platPrev');
+  pv.innerHTML = src ? '<img src="'+src+'" alt="">' : '';
+  pv.classList.toggle('has',!!src);
+  $('platHint').textContent = src ? 'REPLACE: PASTE · DROP · CLICK' : 'DROP A GOOGLE / YELP / PLATFORM LOGO';
+  paint();
+}
+function readPlat(file){
+  if(!file || file.type.indexOf('image')!==0) return false;
+  var r=new FileReader(); r.onload=function(){setPlatImg(r.result)}; r.readAsDataURL(file);
+  return true;
+}
+var platDrop=$('platDrop');
+$('platFile').addEventListener('change',function(e){ readPlat(e.target.files&&e.target.files[0]); e.target.value=''; });
+platDrop.addEventListener('click',function(){ pasteTarget='plat'; $('platFile').click(); });
+platDrop.addEventListener('focus',function(){ pasteTarget='plat'; });
+['dragenter','dragover'].forEach(function(t){ platDrop.addEventListener(t,function(e){
+  e.preventDefault(); platDrop.classList.add('over'); }); });
+['dragleave','drop'].forEach(function(t){ platDrop.addEventListener(t,function(e){
+  e.preventDefault(); platDrop.classList.remove('over'); }); });
+platDrop.addEventListener('drop',function(e){ readPlat(e.dataTransfer.files&&e.dataTransfer.files[0]); });
+$('platClr').addEventListener('click',function(){ setPlatImg(null); });
+$('platAsIs').addEventListener('change',function(){ S.platImgMode=this.checked?'asis':'tint'; paint(); });
+
 $('logoInv').addEventListener('change',function(){paint()});
 $('logoHideName').addEventListener('change',function(){
   if(!this.checked) S.stack.forEach(function(L){ if(L.k==='name') L.hidden=false; });
@@ -2880,10 +3159,12 @@ elCopy.addEventListener('change',lenGuard);
 
 /* ============ 3. undo / redo ============ */
 var UNDO=[],REDO=[];
-function snap(){ return JSON.stringify({stack:S.stack,plate:S.plate,theme:S.theme,pal:S.pal,dir:S.dir}) }
+function snap(){ return JSON.stringify({stack:S.stack,plate:S.plate,theme:S.theme,pal:S.pal,dir:S.dir,
+  dispFont:S.dispFont,bodyFont:S.bodyFont}) }
 function pushUndo(){ UNDO.push(snap()); if(UNDO.length>40)UNDO.shift(); REDO.length=0; }
 function restore(j){ var o=JSON.parse(j); S.stack=o.stack; S.plate=o.plate; S.theme=o.theme;
-  S.pal=o.pal; S.dir=o.dir; S.sel=null; drawAxes(); paint(); }
+  S.pal=o.pal; S.dir=o.dir; S.dispFont=o.dispFont||''; S.bodyFont=o.bodyFont||'';
+  S.sel=null; refreshFontsUI(); drawAxes(); paint(); }
 function undo(){ if(!UNDO.length)return; REDO.push(snap()); restore(UNDO.pop()); }
 function redo(){ if(!REDO.length)return; UNDO.push(snap()); restore(REDO.pop()); }
 $('undoBtn').addEventListener('click',undo);
@@ -2975,7 +3256,9 @@ function preflight(){
 /* ============ 9. save / load a design ============ */
 $('saveDesign').addEventListener('click',function(){
   var d={v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
-    name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo};
+    name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo,
+    userFonts:S.userFonts,dispFont:S.dispFont,bodyFont:S.bodyFont,
+    platImg:S.platImg||null,platImgMode:S.platImgMode||'asis'};
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
   a.download=(elName.value||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.tapcard.json'; a.click();
@@ -2990,6 +3273,14 @@ $('loadDesign').addEventListener('change',function(e){
       elName.value=d.name||''; elBrand.value=d.brand||'#000000'; elBg.value=d.bg||'#ffffff';
       fillCopy(false); if(d.copy){ if([].indexOf.call(elCopy.options,d.copy)<0)
         elCopy.add(new Option(d.copy,d.copy)); elCopy.value=d.copy; }
+      /* restore custom fonts */
+      S.userFonts=(d.userFonts&&d.userFonts.length)?d.userFonts:[];
+      S.dispFont=d.dispFont||''; S.bodyFont=d.bodyFont||'';
+      registerAllFaces(S.userFonts).then(function(){ refreshFontsUI(); paint(); });
+      /* restore platform mark */
+      setPlatImg(d.platImg||null);
+      S.platImgMode=d.platImgMode||'asis';
+      if($('platAsIs')) $('platAsIs').checked=(S.platImgMode==='asis');
       setLogo(d.logo||null); S.sel=null; drawAxes(); paint();
     }catch(err){ alert('That file is not a saved card.'); } e.target.value=''; };
   r.readAsText(f);
@@ -3047,7 +3338,7 @@ $('sheetBtn').addEventListener('click',function(){
     var c=w.querySelector('.sheetcard');
     c.style.cssText+=';background:'+card.style.background+';color:'+card.style.color;
     ['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'].forEach(function(v){
-      c.style.setProperty(v,card.style.getPropertyValue(v)) });
+      c.style.setProperty(v,card.style.getPropertyValue(v)); });
     c.className='sheetcard '+card.className;
     host.appendChild(w);
   });
@@ -3057,6 +3348,21 @@ $('sheetBtn').addEventListener('click',function(){
 
 fillCopy(false);
 tagHint();
+
+/* ============ font upload / select wiring ============ */
+var fontDrop=$('fontDrop');
+fontDrop.addEventListener('click',function(){ $('fontFile').click(); });
+['dragenter','dragover'].forEach(function(t){ fontDrop.addEventListener(t,function(e){
+  e.preventDefault(); fontDrop.classList.add('over'); }); });
+fontDrop.addEventListener('dragleave',function(){ fontDrop.classList.remove('over'); });
+fontDrop.addEventListener('drop',function(e){
+  e.preventDefault(); fontDrop.classList.remove('over');
+  addFontFiles(e.dataTransfer.files);
+});
+$('fontFile').addEventListener('change',function(e){ addFontFiles(e.target.files); e.target.value=''; });
+$('dispFontSel').addEventListener('change',function(){ setFontOverride('disp',this.value); });
+$('bodyFontSel').addEventListener('change',function(){ setFontOverride('body',this.value); });
+
 drawAxes();
 markNoted(); drawNotes();
 })();
