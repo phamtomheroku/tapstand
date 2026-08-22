@@ -587,6 +587,11 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
               <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
               <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
             </div></div>
+          <div class="grp"><span class="lbl">Star colour</span>
+            <div class="row2">
+              <input type="color" id="starCol" value="#B4577A" aria-label="Star colour">
+              <label class="tog"><input type="checkbox" id="starSync" checked> Sync with brand</label>
+            </div></div>
           <div class="grp"><span class="lbl">Logo</span>
             <div class="logodrop" id="logoDrop" tabindex="0" role="button"
                  aria-label="Add a logo: paste, drop a file, or click">
@@ -2286,7 +2291,8 @@ function paint(quiet){
   card.style.background=pal.groundCSS;
   card.style.setProperty('--b-bg',pal.ground);
   card.style.setProperty('--b-fg',fg);
-  card.style.setProperty('--b-star',brand);
+  var starC = $('starSync').checked ? brand : $('starCol').value;
+  card.style.setProperty('--b-star',starC);
 
   var logoFx = $('logoInv').checked ? ';filter:invert(1) hue-rotate(180deg)' : '';
   var hasName = S.stack.some(function(L){ return L.k==='name' && !L.hidden; });
@@ -2812,6 +2818,17 @@ platDrop.addEventListener('drop',function(e){ readPlat(e.dataTransfer.files&&e.d
 $('platClr').addEventListener('click',function(){ setPlatImg(null); });
 $('platAsIs').addEventListener('change',function(){ S.platImgMode=this.checked?'asis':'tint'; paint(); });
 
+/* star colour: when synced, the picker follows the brand; when unsynced it's independent */
+$('starCol').addEventListener('input',function(){ paint(); });
+$('starSync').addEventListener('change',function(){
+  if(this.checked) $('starCol').value=elBrand.value;
+  paint();
+});
+/* keep the star picker in sync when the brand changes and sync is on */
+elBrand.addEventListener('input',function(){
+  if($('starSync').checked) $('starCol').value=elBrand.value;
+});
+
 $('logoInv').addEventListener('change',function(){paint()});
 $('logoHideName').addEventListener('change',function(){
   if(!this.checked) S.stack.forEach(function(L){ if(L.k==='name') L.hidden=false; });
@@ -3265,7 +3282,8 @@ $('saveDesign').addEventListener('click',function(){
   var d={v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
     name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo,
     userFonts:S.userFonts,dispFont:S.dispFont,bodyFont:S.bodyFont,
-    platImg:S.platImg||null,platImgMode:S.platImgMode||'asis'};
+    platImg:S.platImg||null,platImgMode:S.platImgMode||'asis',
+    starCol:$('starSync').checked?null:$('starCol').value};
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
   a.download=(elName.value||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.tapcard.json'; a.click();
@@ -3288,6 +3306,9 @@ $('loadDesign').addEventListener('change',function(e){
       setPlatImg(d.platImg||null);
       S.platImgMode=d.platImgMode||'asis';
       if($('platAsIs')) $('platAsIs').checked=(S.platImgMode==='asis');
+      /* restore star colour */
+      if(d.starCol){ $('starCol').value=d.starCol; $('starSync').checked=false; }
+      else { $('starSync').checked=true; $('starCol').value=d.brand||'#B4577A'; }
       setLogo(d.logo||null); S.sel=null; drawAxes(); paint();
     }catch(err){ alert('That file is not a saved card.'); } e.target.value=''; };
   r.readAsText(f);
