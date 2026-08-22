@@ -1,0 +1,134 @@
+{
+  "IMAGE-FETCH-PROMPT.md": {
+    "mtime": 1786144179.1712728,
+    "seen": 1787439629.3665092,
+    "ast_hash": "a920b732cdd966803ece73579825f5b9",
+    "semantic_hash": "a920b732cdd966803ece73579825f5b9"
+  },
+  "README.md": {
+    "mtime": 1786144179.1712728,
+    "seen": 1787439629.3665092,
+    "ast_hash": "501b2293ef0a1cf0c5d22c05c20813a7",
+    "semantic_hash": "501b2293ef0a1cf0c5d22c05c20813a7"
+  },
+  "SOURCING-PROMPT.md": {
+    "mtime": 1787302787.1453893,
+    "seen": 1787439629.3665092,
+    "ast_hash": "d8594e18fdacbdd1ad23190d16481948",
+    "semantic_hash": "d8594e18fdacbdd1ad23190d16481948"
+  },
+  "img/README.md": {
+    "mtime": 1786305836.1621573,
+    "seen": 1787439629.3665092,
+    "ast_hash": "da853e17c89f96a4aaf0a1315d8ffd8a",
+    "semantic_hash": "da853e17c89f96a4aaf0a1315d8ffd8a"
+  },
+  "index.html": {
+    "mtime": 1787438447.4450002,
+    "seen": 1787439629.3665092,
+    "ast_hash": "b14ca580f08a685ef363830f95ebfa14",
+    "semantic_hash": "b14ca580f08a685ef363830f95ebfa14"
+  },
+  "img/a-frame.jpg": {
+    "mtime": 1786305460.0562136,
+    "seen": 1787439629.3665092,
+    "ast_hash": "e6b226f88250fa21f9de39fd4073028d",
+    "semantic_hash": "e6b226f88250fa21f9de39fd4073028d"
+  },
+  "img/adhesive-card.jpg": {
+    "mtime": 1786305460.135077,
+    "seen": 1787439629.3665092,
+    "ast_hash": "5bbdb5264c9c2c35a3eee594b4e514d5",
+    "semantic_hash": "5bbdb5264c9c2c35a3eee594b4e514d5"
+  },
+  "img/bare-disc.jpg": {
+    "mtime": 1786305460.1503723,
+    "seen": 1787439629.3665092,
+    "ast_hash": "2909b3f15ffc0555b00713ed969736c0",
+    "semantic_hash": "2909b3f15ffc0555b00713ed969736c0"
+  },
+  "img/brass-pedestal.jpg": {
+    "mtime": 1786305460.0862207,
+    "seen": 1787439629.3665092,
+    "ast_hash": "2439d89a875c2fc04b4c892a6951757f",
+    "semantic_hash": "2439d89a875c2fc04b4c892a6951757f"
+  },
+  "img/compact-square.jpg": {
+    "mtime": 1786305459.9585495,
+    "seen": 1787439629.3665092,
+    "ast_hash": "5a811df69aee9fdc12a40281a83ac1bb",
+    "semantic_hash": "5a811df69aee9fdc12a40281a83ac1bb"
+  },
+  "img/curved-frosted.jpg": {
+    "mtime": 1786305459.820784,
+    "seen": 1787439629.3665092,
+    "ast_hash": "ade2ee1de4d34ab16a6d01b87cc59d1a",
+    "semantic_hash": "ade2ee1de4d34ab16a6d01b87cc59d1a"
+  },
+  "img/easel-back.jpg": {
+    "mtime": 1786305460.011875,
+    "seen": 1787439629.3665092,
+    "ast_hash": "35b532894cdcc4116cf63354be34ad21",
+    "semantic_hash": "35b532894cdcc4116cf63354be34ad21"
+  },
+  "img/magnetic-block.jpg": {
+    "mtime": 1786305459.7839077,
+    "seen": 1787439629.3665092,
+    "ast_hash": "6bb5d14613ff404f0c1a0adaf57a1524",
+    "semantic_hash": "6bb5d14613ff404f0c1a0adaf57a1524"
+  },
+  "img/slant-back.jpg": {
+    "mtime": 1786305459.7535238,
+    "seen": 1787439629.3665092,
+    "ast_hash": "c116401b9b6707a3345d4853613347e6",
+    "semantic_hash": "c116401b9b6707a3345d4853613347e6"
+  },
+  "img/solid-block.jpg": {
+    "mtime": 1786305459.886992,
+    "seen": 1787439629.3665092,
+    "ast_hash": "6304771eaf47ef232cfbf8aa79ef3993",
+    "semantic_hash": "6304771eaf47ef232cfbf8aa79ef3993"
+  },
+  "img/table-wedge.jpg": {
+    "mtime": 1786305460.1170373,
+    "seen": 1787439629.3665092,
+    "ast_hash": "e581a31c214e0d494c045c2611929b79",
+    "semantic_hash": "e581a31c214e0d494c045c2611929b79"
+  },
+  "img/tap-card.jpg": {
+    "mtime": 1786305459.9770901,
+    "seen": 1787439629.3665092,
+    "ast_hash": "4df8f759813d68de85bbb5f1ead82733",
+    "semantic_hash": "4df8f759813d68de85bbb5f1ead82733"
+  },
+  "img/terrazzo.jpg": {
+    "mtime": 1786305459.926567,
+    "seen": 1787439629.3665092,
+    "ast_hash": "df196e6de5f62eb163ac8a4e2ff6cf01",
+    "semantic_hash": "df196e6de5f62eb163ac8a4e2ff6cf01"
+  },
+  "img/wall-plaque.jpg": {
+    "mtime": 1786305460.1674216,
+    "seen": 1787439629.3665092,
+    "ast_hash": "43096e8c0dbb2edc8c4ff52a1272c3a6",
+    "semantic_hash": "43096e8c0dbb2edc8c4ff52a1272c3a6"
+  },
+  "img/walnut-wedge.jpg": {
+    "mtime": 1786305459.8561106,
+    "seen": 1787439629.3665092,
+    "ast_hash": "a6d385673624efe4afa7ad7b8ebd8e6b",
+    "semantic_hash": "a6d385673624efe4afa7ad7b8ebd8e6b"
+  },
+  "tap-mark.png": {
+    "mtime": 1787302787.1477375,
+    "seen": 1787439629.3665092,
+    "ast_hash": "5293f76a6105f53fe720f6e424217517",
+    "semantic_hash": "5293f76a6105f53fe720f6e424217517"
+  },
+  "tap-stand-form-factors.svg": {
+    "mtime": 1786144179.173784,
+    "seen": 1787439629.3665092,
+    "ast_hash": "80cfda8a13ee10ead55fcd3a1de97335",
+    "semantic_hash": "80cfda8a13ee10ead55fcd3a1de97335"
+  }
+}

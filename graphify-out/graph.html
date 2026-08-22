@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>graphify - graphify-out/graph.html</title>
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"
+        integrity="sha384-Ux6phic9PEHJ38YtrijhkzyJ8yQlH8i/+buBR8s3mAZOJrP1gwyvAcIYl3GWtpX1"
+        crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: flex; height: 100vh; overflow: hidden; }
+  #graph { flex: 1; }
+  #sidebar { width: 280px; background: #1a1a2e; border-left: 1px solid #2a2a4e; display: flex; flex-direction: column; overflow: hidden; }
+  #search-wrap { padding: 12px; border-bottom: 1px solid #2a2a4e; }
+  #search { width: 100%; background: #0f0f1a; border: 1px solid #3a3a5e; color: #e0e0e0; padding: 7px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+  #search:focus { border-color: #4E79A7; }
+  #search-results { max-height: 140px; overflow-y: auto; padding: 4px 12px; border-bottom: 1px solid #2a2a4e; display: none; }
+  .search-item { padding: 4px 6px; cursor: pointer; border-radius: 4px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-item:hover { background: #2a2a4e; }
+  #info-panel { padding: 14px; border-bottom: 1px solid #2a2a4e; min-height: 140px; }
+  #info-panel h3 { font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  #info-content { font-size: 13px; color: #ccc; line-height: 1.6; }
+  #info-content .field { margin-bottom: 5px; }
+  #info-content .field b { color: #e0e0e0; }
+  #info-content .empty { color: #555; font-style: italic; }
+  .neighbor-link { display: block; padding: 2px 6px; margin: 2px 0; border-radius: 3px; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid #333; }
+  .neighbor-link:hover { background: #2a2a4e; }
+  #neighbors-list { max-height: 160px; overflow-y: auto; margin-top: 4px; }
+  #legend-wrap { flex: 1; overflow-y: auto; padding: 12px; }
+  #legend-wrap h3 { font-size: 13px; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .legend-item:hover { background: #2a2a4e; padding-left: 4px; }
+  .legend-item.dimmed { opacity: 0.35; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend-count { color: #666; font-size: 11px; }
+  #stats { padding: 10px 14px; border-top: 1px solid #2a2a4e; font-size: 11px; color: #555; }
+  #legend-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 4px 0; }
+  #legend-controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #aaa; user-select: none; }
+  #legend-controls label:hover { color: #e0e0e0; }
+  .legend-cb, #select-all-cb { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1.5px solid #3a3a5e; border-radius: 3px; background: #0f0f1a; cursor: pointer; position: relative; flex-shrink: 0; }
+  .legend-cb:checked, #select-all-cb:checked { background: #4E79A7; border-color: #4E79A7; }
+  .legend-cb:checked::after, #select-all-cb:checked::after { content: ''; position: absolute; left: 3.5px; top: 1px; width: 4px; height: 7px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  #select-all-cb:indeterminate { background: #4E79A7; border-color: #4E79A7; }
+  #select-all-cb:indeterminate::after { content: ''; position: absolute; left: 2px; top: 5px; width: 8px; height: 2px; background: #fff; border: none; transform: none; }
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="sidebar">
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="Search nodes..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="info-panel">
+    <h3>Node Info</h3>
+    <div id="info-content"><span class="empty">Click a node to inspect it</span></div>
+  </div>
+  <div id="legend-wrap">
+    <h3>Communities</h3>
+    <div id="legend-controls">
+      <label><input type="checkbox" id="select-all-cb" checked onchange="toggleAllCommunities(!this.checked)">Select All</label>
+    </div>
+    <div id="legend"></div>
+  </div>
+  <div id="stats">53 nodes &middot; 58 edges &middot; 11 communities</div>
+</div>
+<script>
+const RAW_NODES = [{"id": "index_tapstand_app", "label": "Tap Stand \u2014 Holder Suite & Insert System", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 20.7, "font": {"size": 12, "color": "#ffffff"}, "title": "Tap Stand \u2014 Holder Suite &amp; Insert System", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "code", "degree": 5}, {"id": "readme_tapstand", "label": "Tap Stand README", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Tap Stand README", "community": 3, "community_name": "Holder & Industry Data", "source_file": "README.md", "file_type": "document", "degree": 2}, {"id": "img_a_frame", "label": "A-Frame Table Tent (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "A-Frame Table Tent (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/a-frame.jpg", "file_type": "image", "degree": 1}, {"id": "img_brass_pedestal", "label": "Brass Weighted Pedestal (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Brass Weighted Pedestal (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/brass-pedestal.jpg", "file_type": "image", "degree": 1}, {"id": "img_curved_frosted", "label": "Curved Frosted Acrylic Frame (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Curved Frosted Acrylic Frame (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/curved-frosted.jpg", "file_type": "image", "degree": 1}, {"id": "img_easel_back", "label": "Easel-Back Frame Stand (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Easel-Back Frame Stand (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/easel-back.jpg", "file_type": "image", "degree": 1}, {"id": "img_magnetic_block", "label": "Magnetic Acrylic Block Frame (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Magnetic Acrylic Block Frame (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/magnetic-block.jpg", "file_type": "image", "degree": 1}, {"id": "img_solid_block", "label": "Solid Walnut Block Card Holder (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Solid Walnut Block Card Holder (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/solid-block.jpg", "file_type": "image", "degree": 2}, {"id": "img_terrazzo", "label": "Terrazzo Cast Base Card Holder (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Terrazzo Cast Base Card Holder (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/terrazzo.jpg", "file_type": "image", "degree": 1}, {"id": "img_walnut_wedge", "label": "Walnut Wedge Desk Stand with Brass Accents (Reference Photo)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Walnut Wedge Desk Stand with Brass Accents (Reference Photo)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "img/walnut-wedge.jpg", "file_type": "image", "degree": 2}, {"id": "tap_stand_form_factors", "label": "Tap Stand Form Factors Diagram (12 Designs, Side Elevations)", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 40.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Tap Stand Form Factors Diagram (12 Designs, Side Elevations)", "community": 0, "community_name": "Freestanding Body Forms", "source_file": "tap-stand-form-factors.svg", "file_type": "image", "degree": 14}, {"id": "index_build_spec", "label": "Build Spec (4 Tag Assembly Instructions)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Build Spec (4 Tag Assembly Instructions)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_nfc_tags", "label": "NFC Tags (NTAG213 Variants)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "NFC Tags (NTAG213 Variants)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "index.html", "file_type": "concept", "degree": 3}, {"id": "sourcing_prompt_5x7_frame", "label": "5x7 Frame Sourcing (Holder Body)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "5x7 Frame Sourcing (Holder Body)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "concept", "degree": 3}, {"id": "sourcing_prompt_custom_acrylic_stack", "label": "Three-Layer Custom Acrylic Stack", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Three-Layer Custom Acrylic Stack", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "concept", "degree": 1}, {"id": "sourcing_prompt_hp_officejet_8720", "label": "HP OfficeJet Pro 8720 (Current Printer)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "HP OfficeJet Pro 8720 (Current Printer)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "concept", "degree": 2}, {"id": "sourcing_prompt_insert_print_path", "label": "Insert Print Path (Home vs. Volume)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Insert Print Path (Home vs. Volume)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "concept", "degree": 2}, {"id": "sourcing_prompt_seritag_order", "label": "Seritag NFC Tag Order (x49745)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Seritag NFC Tag Order (x49745)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "concept", "degree": 2}, {"id": "sourcing_prompt", "label": "Sourcing Prompt (Frame + Print Path)", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "Sourcing Prompt (Frame + Print Path)", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "document", "degree": 3}, {"id": "sourcing_prompt_same_day_turnaround", "label": "Same-Day Turnaround Promise", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Same-Day Turnaround Promise", "community": 1, "community_name": "NFC Sourcing & Build", "source_file": "SOURCING-PROMPT.md", "file_type": "rationale", "degree": 1}, {"id": "readme_no_google_logo_rule", "label": "No Google Logo Rule", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 10.0, "font": {"size": 0, "color": "#ffffff"}, "title": "No Google Logo Rule", "community": 10, "community_name": "Brand Compliance", "source_file": "README.md", "file_type": "rationale", "degree": 0}, {"id": "index_colour_engine", "label": "Colour Engine (Palette Derivation)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Colour Engine (Palette Derivation)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_copy_library", "label": "Copy Library (Compliance-Safe Headlines)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Copy Library (Compliance-Safe Headlines)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_formats", "label": "Trim Formats (7 Sizes)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Trim Formats (7 Sizes)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_insert_editor", "label": "Layered Insert Editor", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 29.3, "font": {"size": 12, "color": "#ffffff"}, "title": "Layered Insert Editor", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 9}, {"id": "index_layer_system", "label": "Layer System (Drag, Reorder, Lock, Hide)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Layer System (Drag, Reorder, Lock, Hide)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_presets", "label": "Industry Presets (8 Demo Businesses)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Industry Presets (8 Demo Businesses)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_procedural_graphics", "label": "Procedural Graphics (Patterns, Heroes, Motifs)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Procedural Graphics (Patterns, Heroes, Motifs)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_themes", "label": "Design Themes (Typeface + Frame + Texture)", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Design Themes (Typeface + Frame + Texture)", "community": 2, "community_name": "Insert Design System", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "readme_no_review_gating_rule", "label": "No Review Gating Rule", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "No Review Gating Rule", "community": 2, "community_name": "Insert Design System", "source_file": "README.md", "file_type": "rationale", "degree": 1}, {"id": "index_sourcing_section", "label": "Sourcing Section (89 Links, 20 Categories)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Sourcing Section (89 Links, 20 Categories)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "code", "degree": 2}, {"id": "index_store_marks_notes", "label": "Marks & Notes Store (localStorage)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Marks &amp; Notes Store (localStorage)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_supply_map", "label": "Supplier Map per Body", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Supplier Map per Body", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_svg_elevations", "label": "SVG Side Elevations (Material Drawings)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "SVG Side Elevations (Material Drawings)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "code", "degree": 1}, {"id": "index_holder_suite", "label": "Holder Suite (15 Bodies)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 22.9, "font": {"size": 12, "color": "#ffffff"}, "title": "Holder Suite (15 Bodies)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "concept", "degree": 6}, {"id": "index_industry_coverage_matrix", "label": "Industry Coverage Matrix (14 Verticals)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "Industry Coverage Matrix (14 Verticals)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "index.html", "file_type": "concept", "degree": 3}, {"id": "readme_tapcard_sibling", "label": "TapCard (Loyalty Pass Sibling Repo)", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "TapCard (Loyalty Pass Sibling Repo)", "community": 3, "community_name": "Holder & Industry Data", "source_file": "README.md", "file_type": "concept", "degree": 1}, {"id": "index_photo_auto_swap", "label": "Photo Auto-Swap (img/<slug>.jpg)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "Photo Auto-Swap (img/&lt;slug&gt;.jpg)", "community": 4, "community_name": "Photo Pipeline", "source_file": "index.html", "file_type": "code", "degree": 3}, {"id": "image_fetch_prompt", "label": "Image Fetch Prompt (Product Photos Task)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Image Fetch Prompt (Product Photos Task)", "community": 4, "community_name": "Photo Pipeline", "source_file": "IMAGE-FETCH-PROMPT.md", "file_type": "document", "degree": 2}, {"id": "img_readme_photo_manifest", "label": "Holder Photo Manifest & Licence Status", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "Holder Photo Manifest &amp; Licence Status", "community": 4, "community_name": "Photo Pipeline", "source_file": "img/README.md", "file_type": "document", "degree": 3}, {"id": "img_readme_unverified_licence", "label": "Unverified Licence Status (All 15 Photos)", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Unverified Licence Status (All 15 Photos)", "community": 4, "community_name": "Photo Pipeline", "source_file": "img/README.md", "file_type": "rationale", "degree": 1}, {"id": "nfc_tap_interaction", "label": "NFC Tap Interaction Paradigm", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 18.6, "font": {"size": 12, "color": "#ffffff"}, "title": "NFC Tap Interaction Paradigm", "community": 5, "community_name": "NFC Tap Interaction", "source_file": "tap-mark.png", "file_type": "concept", "degree": 4}, {"id": "img_adhesive_card", "label": "NFC Adhesive Tap Card (Reference Photo)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "NFC Adhesive Tap Card (Reference Photo)", "community": 5, "community_name": "NFC Tap Interaction", "source_file": "img/adhesive-card.jpg", "file_type": "image", "degree": 2}, {"id": "img_tap_card", "label": "Branded NFC Tap Cards Collection (Reference Photo)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Branded NFC Tap Cards Collection (Reference Photo)", "community": 5, "community_name": "NFC Tap Interaction", "source_file": "img/tap-card.jpg", "file_type": "image", "degree": 2}, {"id": "tap_mark", "label": "Tap Mark NFC Icon (Radio Waves + Phone)", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Tap Mark NFC Icon (Radio Waves + Phone)", "community": 5, "community_name": "NFC Tap Interaction", "source_file": "tap-mark.png", "file_type": "image", "degree": 1}, {"id": "ntag213_disc_cartridge", "label": "NTAG213 30mm Disc Cartridge (Universal Insert)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 16.4, "font": {"size": 12, "color": "#ffffff"}, "title": "NTAG213 30mm Disc Cartridge (Universal Insert)", "community": 6, "community_name": "NTAG213 Disc Hardware", "source_file": "tap-stand-form-factors.svg", "file_type": "concept", "degree": 3}, {"id": "img_bare_disc", "label": "Bare NFC Disc Sticker (Reference Photo)", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Bare NFC Disc Sticker (Reference Photo)", "community": 6, "community_name": "NTAG213 Disc Hardware", "source_file": "img/bare-disc.jpg", "file_type": "image", "degree": 2}, {"id": "img_compact_square", "label": "Compact Slant-Back Acrylic Holders (Reference Photo)", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Compact Slant-Back Acrylic Holders (Reference Photo)", "community": 7, "community_name": "Compact Form Factors", "source_file": "img/compact-square.jpg", "file_type": "image", "degree": 2}, {"id": "img_slant_back", "label": "Slant-Back Acrylic Sign Holder (Reference Photo)", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Slant-Back Acrylic Sign Holder (Reference Photo)", "community": 7, "community_name": "Compact Form Factors", "source_file": "img/slant-back.jpg", "file_type": "image", "degree": 2}, {"id": "img_table_wedge", "label": "Angled Table Wedge Sign Holder (Reference Photo)", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Angled Table Wedge Sign Holder (Reference Photo)", "community": 8, "community_name": "Wall & Table Mounts", "source_file": "img/table-wedge.jpg", "file_type": "image", "degree": 2}, {"id": "img_wall_plaque", "label": "Wall-Mounted Acrylic Plaque (Reference Photo)", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 14.3, "font": {"size": 0, "color": "#ffffff"}, "title": "Wall-Mounted Acrylic Plaque (Reference Photo)", "community": 8, "community_name": "Wall & Table Mounts", "source_file": "img/wall-plaque.jpg", "file_type": "image", "degree": 2}, {"id": "readme_nfc_tap_to_review_product", "label": "NFC Tap-to-Review Product Line", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "NFC Tap-to-Review Product Line", "community": 9, "community_name": "Product Architecture", "source_file": "README.md", "file_type": "concept", "degree": 1}, {"id": "readme_server_side_destination", "label": "Server-Side Destination Resolution", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 12.1, "font": {"size": 0, "color": "#ffffff"}, "title": "Server-Side Destination Resolution", "community": 9, "community_name": "Product Architecture", "source_file": "README.md", "file_type": "rationale", "degree": 1}];
+const RAW_EDGES = [{"from": "index_tapstand_app", "to": "index_holder_suite", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_tapstand_app", "to": "index_industry_coverage_matrix", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_tapstand_app", "to": "index_insert_editor", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_tapstand_app", "to": "index_sourcing_section", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_tapstand_app", "to": "readme_tapstand", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme_tapstand", "to": "readme_tapcard_sibling", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "img_a_frame", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_brass_pedestal", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_curved_frosted", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_easel_back", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_magnetic_block", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_solid_block", "to": "img_walnut_wedge", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_solid_block", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_terrazzo", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_walnut_wedge", "to": "tap_stand_form_factors", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "tap_stand_form_factors", "to": "ntag213_disc_cartridge", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tap_stand_form_factors", "to": "img_compact_square", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "tap_stand_form_factors", "to": "img_table_wedge", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "tap_stand_form_factors", "to": "img_bare_disc", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "tap_stand_form_factors", "to": "img_slant_back", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "tap_stand_form_factors", "to": "img_wall_plaque", "label": "references", "title": "references [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "index_build_spec", "to": "index_nfc_tags", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_nfc_tags", "to": "index_insert_editor", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_nfc_tags", "to": "sourcing_prompt_seritag_order", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "sourcing_prompt_5x7_frame", "to": "sourcing_prompt_custom_acrylic_stack", "label": "conceptually_related_to", "title": "conceptually_related_to [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sourcing_prompt_5x7_frame", "to": "sourcing_prompt", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sourcing_prompt_5x7_frame", "to": "index_holder_suite", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "sourcing_prompt_hp_officejet_8720", "to": "sourcing_prompt_same_day_turnaround", "label": "rationale_for", "title": "rationale_for [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sourcing_prompt_hp_officejet_8720", "to": "sourcing_prompt_insert_print_path", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sourcing_prompt_insert_print_path", "to": "sourcing_prompt", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "sourcing_prompt_seritag_order", "to": "sourcing_prompt", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_colour_engine", "to": "index_insert_editor", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_copy_library", "to": "index_insert_editor", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_copy_library", "to": "readme_no_review_gating_rule", "label": "rationale_for", "title": "rationale_for [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_formats", "to": "index_insert_editor", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_insert_editor", "to": "index_procedural_graphics", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_insert_editor", "to": "index_themes", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_insert_editor", "to": "index_layer_system", "label": "implements", "title": "implements [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_insert_editor", "to": "index_presets", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_presets", "to": "index_industry_coverage_matrix", "label": "shares_data_with", "title": "shares_data_with [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "index_sourcing_section", "to": "index_store_marks_notes", "label": "calls", "title": "calls [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_supply_map", "to": "index_holder_suite", "label": "shares_data_with", "title": "shares_data_with [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_svg_elevations", "to": "index_holder_suite", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_holder_suite", "to": "index_photo_auto_swap", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_holder_suite", "to": "index_industry_coverage_matrix", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_photo_auto_swap", "to": "image_fetch_prompt", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "index_photo_auto_swap", "to": "img_readme_photo_manifest", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "image_fetch_prompt", "to": "img_readme_photo_manifest", "label": "references", "title": "references [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "img_readme_photo_manifest", "to": "img_readme_unverified_licence", "label": "rationale_for", "title": "rationale_for [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "nfc_tap_interaction", "to": "img_adhesive_card", "label": "implements", "title": "implements [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "nfc_tap_interaction", "to": "img_tap_card", "label": "implements", "title": "implements [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "nfc_tap_interaction", "to": "ntag213_disc_cartridge", "label": "implements", "title": "implements [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "nfc_tap_interaction", "to": "tap_mark", "label": "implements", "title": "implements [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_adhesive_card", "to": "img_tap_card", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "ntag213_disc_cartridge", "to": "img_bare_disc", "label": "conceptually_related_to", "title": "conceptually_related_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_compact_square", "to": "img_slant_back", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "img_table_wedge", "to": "img_wall_plaque", "label": "semantically_similar_to", "title": "semantically_similar_to [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "readme_nfc_tap_to_review_product", "to": "readme_server_side_destination", "label": "rationale_for", "title": "rationale_for [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}];
+const LEGEND = [{"cid": 0, "color": "#4E79A7", "label": "Freestanding Body Forms", "count": 9}, {"cid": 1, "color": "#F28E2B", "label": "NFC Sourcing &amp; Build", "count": 9}, {"cid": 2, "color": "#E15759", "label": "Insert Design System", "count": 9}, {"cid": 3, "color": "#76B7B2", "label": "Holder &amp; Industry Data", "count": 9}, {"cid": 4, "color": "#59A14F", "label": "Photo Pipeline", "count": 4}, {"cid": 5, "color": "#EDC948", "label": "NFC Tap Interaction", "count": 4}, {"cid": 6, "color": "#B07AA1", "label": "NTAG213 Disc Hardware", "count": 2}, {"cid": 7, "color": "#FF9DA7", "label": "Compact Form Factors", "count": 2}, {"cid": 8, "color": "#9C755F", "label": "Wall &amp; Table Mounts", "count": 2}, {"cid": 9, "color": "#BAB0AC", "label": "Product Architecture", "count": 2}, {"cid": 10, "color": "#4E79A7", "label": "Brand Compliance", "count": 1}];
+
+// HTML-escape helper — prevents XSS when injecting graph data into innerHTML
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Build vis datasets
+const nodesDS = new vis.DataSet(RAW_NODES.map(n => ({
+  id: n.id, label: n.label, color: n.color, size: n.size,
+  font: n.font, title: n.title,
+  _community: n.community, _community_name: n.community_name,
+  _source_file: n.source_file, _file_type: n.file_type, _degree: n.degree,
+})));
+
+const edgesDS = new vis.DataSet(RAW_EDGES.map((e, i) => ({
+  id: i, from: e.from, to: e.to,
+  label: '',
+  title: e.title,
+  dashes: e.dashes,
+  width: e.width,
+  color: e.color,
+  arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+})));
+
+const container = document.getElementById('graph');
+const network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, {
+  physics: {
+    enabled: true,
+    solver: 'forceAtlas2Based',
+    forceAtlas2Based: {
+      gravitationalConstant: -60,
+      centralGravity: 0.005,
+      springLength: 120,
+      springConstant: 0.08,
+      damping: 0.4,
+      avoidOverlap: 0.8,
+    },
+    stabilization: { iterations: 200, fit: true },
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 100,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: false,
+  },
+  nodes: { shape: 'dot', borderWidth: 1.5 },
+  edges: { smooth: { type: 'continuous', roundness: 0.2 }, selectionWidth: 3 },
+});
+
+network.once('stabilizationIterationsDone', () => {
+  network.setOptions({ physics: { enabled: false } });
+});
+
+function showInfo(nodeId) {
+  const n = nodesDS.get(nodeId);
+  if (!n) return;
+  const neighborIds = network.getConnectedNodes(nodeId);
+  const neighborItems = neighborIds.map(nid => {
+    const nb = nodesDS.get(nid);
+    const color = nb ? nb.color.background : '#555';
+    return `<span class="neighbor-link" style="border-left-color:${esc(color)}" data-nid="${esc(nid)}">${esc(nb ? nb.label : nid)}</span>`;
+  }).join('');
+  document.getElementById('info-content').innerHTML = `
+    <div class="field"><b>${esc(n.label)}</b></div>
+    <div class="field">Type: ${esc(n._file_type || 'unknown')}</div>
+    <div class="field">Community: ${esc(n._community_name)}</div>
+    <div class="field">Source: ${esc(n._source_file || '-')}</div>
+    <div class="field">Degree: ${n._degree}</div>
+    ${neighborIds.length ? `<div class="field" style="margin-top:8px;color:#aaa;font-size:11px">Neighbors (${neighborIds.length})</div><div id="neighbors-list">${neighborItems}</div>` : ''}
+  `;
+}
+
+function focusNode(nodeId) {
+  network.focus(nodeId, { scale: 1.4, animation: true });
+  network.selectNodes([nodeId]);
+  showInfo(nodeId);
+}
+
+// Neighbor links use a data attribute + one delegated listener rather than an
+// inline onclick. A node id/label sourced from a document or a scraped URL
+// (graphify add) can contain a double-quote; dropping the stringified id
+// unescaped into a quoted onclick both broke every link and allowed a hostile
+// source to inject an event handler into the local report (stored XSS, #1838).
+// esc() on data-nid keeps the value inside the attribute; the listener reads it
+// back verbatim. Bound to document so it survives the innerHTML rebuild that
+// recreates #neighbors-list on each showInfo().
+document.addEventListener('click', e => {
+  const el = e.target.closest('.neighbor-link');
+  if (el && el.dataset.nid !== undefined) focusNode(el.dataset.nid);
+});
+
+// Track hovered node — hover detection is more reliable than click params
+let hoveredNodeId = null;
+network.on('hoverNode', params => {
+  hoveredNodeId = params.node;
+  container.style.cursor = 'pointer';
+});
+network.on('blurNode', () => {
+  hoveredNodeId = null;
+  container.style.cursor = 'default';
+});
+container.addEventListener('click', () => {
+  if (hoveredNodeId !== null) {
+    showInfo(hoveredNodeId);
+    network.selectNodes([hoveredNodeId]);
+  }
+});
+network.on('click', params => {
+  if (params.nodes.length > 0) {
+    showInfo(params.nodes[0]);
+  } else if (hoveredNodeId === null) {
+    document.getElementById('info-content').innerHTML = '<span class="empty">Click a node to inspect it</span>';
+  }
+});
+
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  if (!q) { searchResults.style.display = 'none'; return; }
+  const matches = RAW_NODES.filter(n => n.label.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) { searchResults.style.display = 'none'; return; }
+  searchResults.style.display = 'block';
+  matches.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'search-item';
+    el.textContent = n.label;
+    el.style.borderLeft = `3px solid ${n.color.background}`;
+    el.style.paddingLeft = '8px';
+    el.onclick = () => {
+      network.focus(n.id, { scale: 1.5, animation: true });
+      network.selectNodes([n.id]);
+      showInfo(n.id);
+      searchResults.style.display = 'none';
+      searchInput.value = '';
+    };
+    searchResults.appendChild(el);
+  });
+});
+document.addEventListener('click', e => {
+  if (!searchResults.contains(e.target) && e.target !== searchInput)
+    searchResults.style.display = 'none';
+});
+
+const hiddenCommunities = new Set();
+
+const selectAllCb = document.getElementById('select-all-cb');
+
+function updateSelectAllState() {
+  const total = LEGEND.length;
+  const hidden = hiddenCommunities.size;
+  selectAllCb.checked = hidden === 0;
+  selectAllCb.indeterminate = hidden > 0 && hidden < total;
+}
+
+function toggleAllCommunities(hide) {
+  document.querySelectorAll('.legend-item').forEach(item => {
+    hide ? item.classList.add('dimmed') : item.classList.remove('dimmed');
+  });
+  document.querySelectorAll('.legend-cb').forEach(cb => {
+    cb.checked = !hide;
+  });
+  LEGEND.forEach(c => {
+    if (hide) hiddenCommunities.add(c.cid); else hiddenCommunities.delete(c.cid);
+  });
+  const updates = RAW_NODES.map(n => ({ id: n.id, hidden: hide }));
+  nodesDS.update(updates);
+  updateSelectAllState();
+}
+
+const legendEl = document.getElementById('legend');
+LEGEND.forEach(c => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'legend-cb';
+  cb.checked = true;
+  cb.addEventListener('change', (e) => {
+    e.stopPropagation();
+    if (cb.checked) {
+      hiddenCommunities.delete(c.cid);
+      item.classList.remove('dimmed');
+    } else {
+      hiddenCommunities.add(c.cid);
+      item.classList.add('dimmed');
+    }
+    const updates = RAW_NODES
+      .filter(n => n.community === c.cid)
+      .map(n => ({ id: n.id, hidden: !cb.checked }));
+    nodesDS.update(updates);
+    updateSelectAllState();
+  });
+  item.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>
+    <span class="legend-label">${c.label}</span>
+    <span class="legend-count">${c.count}</span>`;
+  item.prepend(cb);
+  item.onclick = (e) => {
+    if (e.target === cb) return;
+    cb.checked = !cb.checked;
+    cb.dispatchEvent(new Event('change'));
+  };
+  legendEl.appendChild(item);
+});
+</script>
+<script>
+// Render hyperedges as shaded regions
+const hyperedges = [{"id": "adhesive_no_footprint_form_factors", "label": "Adhesive No-Footprint Form Factors", "nodes": ["img_a_frame", "img_wall_plaque", "img_table_wedge", "img_bare_disc"], "relation": "form", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "tap-stand-form-factors.svg"}, {"id": "freestanding_counter_form_factors", "label": "Freestanding Counter Form Factors", "nodes": ["img_slant_back", "img_curved_frosted", "img_magnetic_block", "img_easel_back"], "relation": "form", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "tap-stand-form-factors.svg"}, {"id": "insert_design_system", "label": "Insert Design System (Plates x Themes x Palettes)", "nodes": ["index_insert_editor", "index_colour_engine", "index_themes", "index_procedural_graphics", "index_copy_library", "index_layer_system"], "relation": "implement", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "index.html"}, {"id": "nfc_tag_lifecycle", "label": "NFC Tag Lifecycle (Sourcing \u2192 Build \u2192 Editor)", "nodes": ["index_nfc_tags", "sourcing_prompt_seritag_order", "index_build_spec", "index_insert_editor"], "relation": "participate_in", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "index.html"}, {"id": "photo_pipeline", "label": "Photo Pipeline (Fetch \u2192 img/ \u2192 Auto-Swap)", "nodes": ["image_fetch_prompt", "img_readme_photo_manifest", "index_photo_auto_swap"], "relation": "form", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "IMAGE-FETCH-PROMPT.md"}, {"id": "premium_table_form_factors", "label": "Premium and Table Form Factors", "nodes": ["img_walnut_wedge", "img_solid_block", "img_terrazzo", "img_brass_pedestal"], "relation": "form", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "tap-stand-form-factors.svg"}];
+// afterDrawing passes ctx already transformed to network coordinate space.
+// Draw node positions raw — no manual pan/zoom/DPR math needed.
+
+// Andrew's monotone chain. Returns the hull in counter-clockwise order, which
+// is what the perimeter must be traced in. Collinear and duplicate points
+// collapse to the extremes, so degenerate member sets render as a segment
+// rather than a zero-area crossed path.
+function convexHull(pts) {
+    const p = pts.slice().sort((a, b) => (a.x - b.x) || (a.y - b.y));
+    if (p.length < 3) return p;
+    const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+    const build = seq => {
+        const out = [];
+        for (const q of seq) {
+            while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], q) <= 0) out.pop();
+            out.push(q);
+        }
+        out.pop();
+        return out;
+    };
+    const hull = build(p).concat(build(p.slice().reverse()));
+    return hull.length >= 3 ? hull : p;
+}
+network.on('afterDrawing', function(ctx) {
+    hyperedges.forEach(h => {
+        const positions = h.nodes
+            .map(nid => network.getPositions([nid])[nid])
+            .filter(p => p !== undefined);
+        if (positions.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#6366f1';
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Centroid and expanded hull in network coordinates.
+        // The perimeter must follow hull order, not h.nodes order: tracing the
+        // raw member order self-intersects whenever the layout does not happen
+        // to place members in angular order, filling as crossed wedges.
+        const cx = positions.reduce((s, p) => s + p.x, 0) / positions.length;
+        const cy = positions.reduce((s, p) => s + p.y, 0) / positions.length;
+        const hull = convexHull(positions);
+        const expanded = hull.map(p => ({
+            x: cx + (p.x - cx) * 1.15,
+            y: cy + (p.y - cy) * 1.15
+        }));
+        ctx.moveTo(expanded[0].x, expanded[0].y);
+        expanded.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 0.4;
+        ctx.stroke();
+        // Label
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = '#4f46e5';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(h.label, cx, cy - 5);
+        ctx.restore();
+    });
+});
+</script>
+</body>
+</html>
