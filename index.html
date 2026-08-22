@@ -1843,6 +1843,13 @@ function DIR(){ return DIRECTIONS[S.dir||0] }
 
 // bottom → top, exactly like stripDesign.stack
 function defaults(fmt){
+  if(fmt===5) return [                                    // CR80 85.6×54 landscape
+   {t:"box",k:"logo", x:.14, y:.48,s:.58,lw:28,lh:10},
+   {t:"box",k:"name", x:.44, y:.26,s:.72,w:.40},
+   {t:"box",k:"stars",x:.44, y:.50,s:.58},
+   {t:"box",k:"head", x:.44, y:.74,s:.56,w:.40},
+   {t:"box",k:"qr",   x:.90, y:.50,s:.44},
+   {t:"box",k:"tap",  x:.72, y:.50,s:.68}];
   if(fmt===3) return [                                    // 3.5×2 landscape
    {t:"box",k:"logo", x:.155,y:.50,s:.62},
    {t:"box",k:"name", x:.46, y:.30,s:.80},
@@ -2512,10 +2519,9 @@ function drawInspector(){
   }
   h+='<span class="lbl">Scale · '+Math.round((L.s==null?1:L.s)*100)+'%</span>'+
      '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
-  if(L.w!=null){
-    h+='<span class="lbl">Width · '+Math.round(L.w*100)+'%</span>'+
-       '<input type="range" id="iW" min="15" max="100" value="'+Math.round(L.w*100)+'">';
-  }
+  var wv=L.w!=null?L.w:1;
+  h+='<span class="lbl">Width · '+Math.round(wv*100)+'%</span>'+
+     '<input type="range" id="iW" min="15" max="100" value="'+Math.round(wv*100)+'">';
   box.innerHTML=h;
   if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
   if(L.k==='tap'){
@@ -2531,7 +2537,7 @@ function drawInspector(){
     if($('iFf')) $('iFf').addEventListener('change',function(){L.fontFamily=this.value||'';paint(true)});
   }
   $('iS').addEventListener('input',function(){L.s=+this.value/100;paint(true)});
-  if($('iW')) $('iW').addEventListener('input',function(){L.w=+this.value/100;paint(true)});
+  $('iW').addEventListener('input',function(){L.w=+this.value/100;paint(true)});
 }
 
 /* ---- drag: pointer capture + pointercancel, same as the studio's armDrag ---- */
@@ -2549,7 +2555,7 @@ card.addEventListener('pointerdown',function(e){
   var p=norm(e);
   var mode = hnd ? (hnd.dataset.h==='w' ? 'width' : 'scale') : 'move';
   drag={L:L,mode:mode,ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
-        w0:(L.w||0), x0:p.x,
+        w0:(L.w!=null?L.w:1), x0:p.x,
         d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
   try{ card.setPointerCapture(e.pointerId); }catch(err){}
   e.preventDefault();
