@@ -229,6 +229,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #card.f4878{aspect-ratio:48/78;width:min(300px,68vw)}
 #card.fcr80{aspect-ratio:85.6/54;width:min(430px,86vw)}
 #card.f57{aspect-ratio:127/178;width:min(360px,78vw)}
+#card.f783wrap{aspect-ratio:95.6/64;width:min(430px,86vw)}
+/* Wrap-template guides: dashed fold lines at the 5 mm flap boundary and short
+   solid corner-snip lines pointing inward from each corner. Percentages resolve
+   against the 95.6 × 64 mm tile, so 5.23%/7.81% ARE 5 mm both on screen and
+   printed at trim. Selector is class-only, not #card-scoped, so it applies to
+   sheet-PDF tiles as well. */
+.f783wrap{position:relative}
+.f783wrap::after{content:"";position:absolute;top:7.81%;bottom:7.81%;
+  left:5.23%;right:5.23%;outline:0.5px dashed rgba(0,0,0,.4);
+  pointer-events:none;z-index:995}
 #card{font-family:var(--f-body,inherit)}
 .frame,.frame2{position:absolute;inset:0;pointer-events:none;z-index:900}
 .fr-solid    .frame{border:2.6cqw solid var(--b-brand)}
@@ -1335,7 +1345,13 @@ var FORMATS=[
  {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89,ar:.5714},
  {k:"ST820 48×78",cls:"f4878",d:"48 × 78 mm",mm:48,ar:1.625,tag:2},
  {k:"ST783 CR80",cls:"fcr80",d:"85.6 × 54 mm",mm:85.6,ar:.6308,tag:3},
- {k:"5×7 frame",cls:"f57",d:"127 × 178 mm",mm:127,ar:1.4016}
+ {k:"5×7 frame",cls:"f57",d:"127 × 178 mm",mm:127,ar:1.4016},
+ /* wrap template for the ST783: 85.6 × 54 front face + 5 mm flap all round,
+    so a printed vinyl label can wrap the card and grip the back. Design fills
+    the whole 95.6 × 64 bounding box — the flaps carry the same background so
+    the wrap reads continuous. Fold guides and corner-snip marks are added by
+    the .f783wrap CSS below. */
+ {k:"ST783 wrap",cls:"f783wrap",d:"95.6 × 64 mm — 85.6 × 54 face + 5 mm flap",mm:95.6,ar:0.6695,tag:3}
 ];
 /* ---- the tags actually delivered (Seritag order x49745, 10 of each) ----------
    Two of these ARE the printed surface, so they get their own trim sizes and you
@@ -3423,7 +3439,9 @@ function exportSheet(){
     // sizing hack — the tile is already an exact mm × mm box, so it does not need it.
     // What the tile DOES need is container-type:inline-size, so the design's cqw
     // units re-resolve at print size instead of pinning to the editor's pixel width.
-    t.className='tile';
+    // carry the format class so wrap templates get their fold guide overlay;
+    // the class's own #card-prefixed width/aspect-ratio rules do not match a .tile
+    t.className='tile '+card.className;
     t.style.cssText='container-type:inline-size;position:relative;overflow:hidden;'+
       'width:'+cw+'mm;height:'+ch+'mm;background:'+card.style.background+
       ';color:'+card.style.color;
