@@ -686,8 +686,19 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="grp" id="inspector"></div>
           <div class="grp"><span class="lbl">Preflight</span>
             <ul class="preflight" id="preflight"></ul></div>
-          <div class="row3">
-            <button class="btn solid" id="printBtn" type="button">Print / PDF</button>
+          <div class="row2">
+            <button class="btn solid" id="printBtn" type="button">Card PDF · trim size</button>
+            <button class="btn solid" id="sheetPdfBtn" type="button">Sheet PDF · N-up</button>
+          </div>
+          <div class="row2" style="align-items:center">
+            <select id="sheetPaper" class="btn" title="paper size for the sheet PDF"
+              style="padding:8px 10px">
+              <option value="letter">Letter · 8.5 × 11 in</option>
+              <option value="a4">A4 · 210 × 297 mm</option>
+            </select>
+            <span class="lbl" id="sheetFit" style="text-align:right">—</span>
+          </div>
+          <div class="row2">
             <button class="btn" id="saveDesign" type="button">Save</button>
             <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
               <input type="file" id="loadDesign" accept="application/json" hidden></label>
@@ -3353,6 +3364,126 @@ function exportPDF(){
   setTimeout(restore,1500);            // belt and braces if afterprint never fires
 }
 $('printBtn').addEventListener('click',exportPDF);
+
+/* ============ 11. Sheet PDF — N-up imposition ============
+   The card PDF is one design per page at exact trim. On a laser printer with a
+   letter or A4 sheet, that leaves most of the paper empty. This packs as many
+   copies of the current card as fit onto the sheet, with 6 mm outer margins and
+   3 mm gutters, and stamps crop marks at every card corner so a guillotine or
+   craft knife has something to line up on. */
+var PAPERS={letter:[215.9,279.4], a4:[210,297]};
+function packSheet(){
+  var f=FORMATS[S.fmt];
+  var cw=+f.mm.toFixed(2), ch=+(f.mm*(f.ar||1.5)).toFixed(2);
+  var p=PAPERS[$('sheetPaper').value]||PAPERS.letter;
+  var M=6, G=3;
+  function fit(pw,ph){
+    var cols=Math.floor((pw-2*M+G)/(cw+G));
+    var rows=Math.floor((ph-2*M+G)/(ch+G));
+    return {pw:pw,ph:ph,cols:Math.max(0,cols),rows:Math.max(0,rows),cw:cw,ch:ch,M:M,G:G};
+  }
+  var a=fit(p[0],p[1]), b=fit(p[1],p[0]);
+  var pick=(a.cols*a.rows>=b.cols*b.rows)?a:b;
+  pick.n=pick.cols*pick.rows;
+  return pick;
+}
+function updateSheetFit(){
+  var q=packSheet();
+  $('sheetFit').textContent = q.n<1
+    ? 'card larger than sheet'
+    : q.n+' up · '+q.cols+' × '+q.rows+' at '+q.pw+' × '+q.ph+' mm';
+}
+$('sheetPaper').addEventListener('change',updateSheetFit);
+$('formats').addEventListener('click',updateSheetFit);
+
+function exportSheet(){
+  var q=packSheet();
+  if(q.n<1){ alert('The '+FORMATS[S.fmt].k+' card is larger than the sheet — use Card PDF, or pick A4/Letter that fits.'); return; }
+  var pw=q.pw, ph=q.ph, cols=q.cols, rows=q.rows, cw=q.cw, ch=q.ch, M=q.M, G=q.G;
+  // center the block of tiles on the sheet, so the margin is even
+  var gridW=cols*cw+(cols-1)*G, gridH=rows*ch+(rows-1)*G;
+  var offX=(pw-gridW)/2, offY=(ph-gridH)/2;
+
+  var sheet=document.createElement('div');
+  sheet.id='sheetPrint';
+  sheet.style.cssText='position:relative;width:'+pw+'mm;height:'+ph+'mm;'+
+    'background:#fff;box-sizing:border-box;overflow:hidden';
+
+  var grid=document.createElement('div');
+  grid.style.cssText='position:absolute;left:'+offX+'mm;top:'+offY+'mm;'+
+    'width:'+gridW+'mm;height:'+gridH+'mm;display:grid;gap:'+G+'mm;'+
+    'grid-template-columns:repeat('+cols+','+cw+'mm);'+
+    'grid-template-rows:repeat('+rows+','+ch+'mm)';
+
+  var vars=['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'];
+  var html=card.innerHTML;
+  for(var i=0;i<cols*rows;i++){
+    var t=document.createElement('div');
+    // The card's format class (.f57 etc.) is only for the on-screen aspect-ratio
+    // sizing hack — the tile is already an exact mm × mm box, so it does not need it.
+    // What the tile DOES need is container-type:inline-size, so the design's cqw
+    // units re-resolve at print size instead of pinning to the editor's pixel width.
+    t.className='tile';
+    t.style.cssText='container-type:inline-size;position:relative;overflow:hidden;'+
+      'width:'+cw+'mm;height:'+ch+'mm;background:'+card.style.background+
+      ';color:'+card.style.color;
+    vars.forEach(function(v){t.style.setProperty(v,card.style.getPropertyValue(v))});
+    t.innerHTML=html;
+    grid.appendChild(t);
+  }
+  sheet.appendChild(grid);
+
+  // crop marks — one SVG overlay in mm, 0.15 mm hairlines, 3 mm ticks 0.6 mm off the corner
+  var NS='http://www.w3.org/2000/svg';
+  var svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','0 0 '+pw+' '+ph);
+  svg.setAttribute('style','position:absolute;inset:0;width:'+pw+'mm;height:'+ph+'mm;pointer-events:none');
+  function tk(x1,y1,x2,y2){
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#000'); l.setAttribute('stroke-width','0.15');
+    svg.appendChild(l);
+  }
+  var TK=3, GAP=0.6;
+  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+    var x=offX+c*(cw+G), y=offY+r*(ch+G);
+    [[x,y,-1,-1],[x+cw,y,1,-1],[x,y+ch,-1,1],[x+cw,y+ch,1,1]].forEach(function(k){
+      tk(k[0]+k[2]*GAP, k[1], k[0]+k[2]*(GAP+TK), k[1]);
+      tk(k[0], k[1]+k[3]*GAP, k[0], k[1]+k[3]*(GAP+TK));
+    });
+  }
+  sheet.appendChild(svg);
+
+  document.body.appendChild(sheet);
+  $('pageCSS').textContent =
+    '@page{size:'+pw+'mm '+ph+'mm;margin:0}'+
+    '@media print{'+
+      'html,body.sheetprinting{width:'+pw+'mm!important;height:'+ph+'mm!important;overflow:hidden!important}'+
+      'body.sheetprinting{font-size:0!important;line-height:0!important}'+
+      'body.sheetprinting>*{display:none!important}'+
+      'body.sheetprinting>#sheetPrint{display:block!important;position:relative!important;'+
+        'width:'+pw+'mm!important;height:'+ph+'mm!important;margin:0!important}'+
+      'body.sheetprinting>#sheetPrint,body.sheetprinting>#sheetPrint *{'+
+        '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}'+
+    '}';
+  document.body.classList.add('sheetprinting');
+  var keepTitle=document.title;
+  var slug=(elName.value||'tap card').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
+  document.title=slug+'_'+cols+'x'+rows+'-up_'+$('sheetPaper').value;
+  var restore=function(){
+    document.title=keepTitle;
+    document.body.classList.remove('sheetprinting');
+    if(sheet.parentNode) sheet.parentNode.removeChild(sheet);
+    window.removeEventListener('afterprint',restore);
+  };
+  window.addEventListener('afterprint',restore);
+  window.print();
+  setTimeout(restore,1500);
+}
+$('sheetPdfBtn').addEventListener('click',exportSheet);
+updateSheetFit();
+
 
 /* ============ contact sheet: the design across every industry ============ */
 $('sheetBtn').addEventListener('click',function(){
