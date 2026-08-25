@@ -94,6 +94,34 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
 .mx{position:absolute;top:8px;right:8px;z-index:2;background:var(--panel);border:1px solid var(--rule);
   width:30px;height:30px;border-radius:2px;cursor:pointer;color:var(--ink-2);font-size:17px;line-height:1}
 .mx:hover{border-color:var(--accent);color:var(--accent)}
+
+/* icon library — same dim + blur + corner × as the holder sheet, one column */
+.libbd{display:block;max-width:660px}
+.libhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:14px 48px 12px 14px;border-bottom:1px solid var(--rule)}
+.libhead h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;font-weight:600;
+  text-transform:uppercase;color:var(--ink-2);flex:none;margin:0}
+.libhead input{flex:1;min-width:120px}
+.libgrid{display:grid;gap:1px;background:var(--rule-2);padding:1px;
+  grid-template-columns:repeat(auto-fill,minmax(78px,1fr));
+  max-height:min(56vh,420px);overflow-y:auto}
+.libtile{background:var(--panel);border:0;padding:9px 5px;cursor:pointer;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit}
+.libtile:hover,.libtile:focus-visible{background:var(--paper-2);color:var(--accent);outline:none}
+.libtile[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent);color:var(--accent)}
+.libart{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.libart>*{max-width:100%;max-height:100%}
+.libname{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;line-height:1.35;word-break:break-word}
+.libtile:hover .libname,.libtile:focus-visible .libname,
+.libtile[aria-pressed="true"] .libname{color:var(--accent)}
+.libfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:11px 14px;border-top:1px solid var(--rule)}
+.libfoot .btn{flex:none;margin:0}
+.libnote{font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--ink-3);
+  line-height:1.5;flex:1;min-width:150px}
+.libempty{grid-column:1/-1;background:var(--panel);padding:26px 14px;text-align:center;
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;color:var(--ink-3);line-height:1.7}
 .hname{font-size:15.5px;font-weight:700;letter-spacing:-.01em;margin:0}
 .hspec{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
   letter-spacing:.03em;display:flex;flex-wrap:wrap;gap:3px 8px;margin:0}
@@ -171,7 +199,7 @@ td.pri{font-weight:650}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .chip .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;
   vertical-align:-1px;border:1px solid rgba(0,0,0,.22)}
-input[type=text],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--rule);
+input[type=text],input[type=search],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--rule);
   background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:13.5px;border-radius:2px}
 textarea{resize:vertical;min-height:52px;line-height:1.4}
 input[type=color]{width:100%;height:34px;padding:2px;border:1px solid var(--rule);
@@ -672,11 +700,10 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <div class="chips" id="dirs"></div></div>
               <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
               <details class="sub">
-                <summary class="sect-h">Refine — theme, palette, motif</summary>
+                <summary class="sect-h">Refine — theme &amp; palette</summary>
                 <div class="sect-b">
                   <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
                   <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
-                  <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
                 </div>
               </details>
               <details class="sub">
@@ -721,28 +748,27 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <button class="btn" id="dupBtn" type="button" title="⌘D">Duplicate</button>
               </div>
               <div class="grp" id="inspector"></div>
-              <details class="sub">
-                <summary class="sect-h">Add decoration &amp; align</summary>
-                <div class="sect-b">
-                  <!-- Fill-space quick-adds: for filling the ring between the frame border
-                       and the tap ring / central content, without hunting through the plate
-                       grid. Each drops a sensible layer at the top of the middle band. -->
-                  <div class="row3">
-                    <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
-                    <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
-                    <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
-                  </div>
-                  <div class="grp"><span class="lbl">Align selected</span>
-                    <div class="chips" id="alignRow">
-                      <button class="chip" type="button" data-al="l">Left</button>
-                      <button class="chip" type="button" data-al="c">Centre</button>
-                      <button class="chip" type="button" data-al="r">Right</button>
-                      <button class="chip" type="button" data-al="t">Top</button>
-                      <button class="chip" type="button" data-al="m">Middle</button>
-                      <button class="chip" type="button" data-al="b">Bottom</button>
-                    </div></div>
+              <!-- Decoration is the part you reach for most, so it is not buried in a
+                   second dropdown. + Graphic drops a layer and opens the library on it;
+                   the other two fill the ring between the frame and the tap target. -->
+              <div class="grp"><span class="lbl">Add decoration</span>
+                <div class="row3">
+                  <button class="btn solid" id="addDeco" type="button"
+                          title="a graphic from the library — 59 of them">+ Graphic</button>
+                  <button class="btn" id="addLine" type="button" title="thin divider rule">+ Rule</button>
+                  <button class="btn" id="addPatBand" type="button"
+                          title="decorative strip in the current pattern">+ Strip</button>
                 </div>
-              </details>
+                <span class="lbl" style="margin-top:2px">Align selected</span>
+                <div class="chips" id="alignRow">
+                  <button class="chip" type="button" data-al="l">Left</button>
+                  <button class="chip" type="button" data-al="c">Centre</button>
+                  <button class="chip" type="button" data-al="r">Right</button>
+                  <button class="chip" type="button" data-al="t">Top</button>
+                  <button class="chip" type="button" data-al="m">Middle</button>
+                  <button class="chip" type="button" data-al="b">Bottom</button>
+                </div>
+              </div>
             </div>
           </details>
 
@@ -843,6 +869,24 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
   <div class="mbd" role="dialog" aria-modal="true" aria-label="Holder detail">
     <button class="mx" id="mClose" aria-label="Close">×</button>
     <div id="mBody"></div>
+  </div>
+</div>
+
+<!-- The icon library. Its own sheet rather than a second mode on #modal above,
+     which is the holder detail and has its own open/close logic. -->
+<div class="modal" id="libModal" hidden>
+  <div class="mbd libbd" role="dialog" aria-modal="true" aria-labelledby="libTitle">
+    <button class="mx" id="libClose" aria-label="Close">×</button>
+    <div class="libhead">
+      <h3 id="libTitle">Library</h3>
+      <input type="search" id="libSearch" placeholder="Search" aria-label="Search this set">
+    </div>
+    <div class="libgrid" id="libGrid"></div>
+    <div class="libfoot">
+      <label class="btn" style="cursor:pointer">Add a file
+        <input type="file" id="libFile" accept="image/*" hidden></label>
+      <span class="libnote" id="libNote"></span>
+    </div>
   </div>
 </div>
 
@@ -1562,26 +1606,8 @@ var HEROES={
    r+='<circle cx="100" cy="100" r="'+(i*13)+'" fill="none" stroke="'+(i%2?c.brand:c.accent)+'" stroke-width="4"/>';
    return _svg(200,200,r)}
 };
-var MOTIFS={
- none:null,
- coffee:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
-   '<path d="M44 76h94v50a34 34 0 0 1-34 34H78a34 34 0 0 1-34-34z"/><path d="M138 90h20a20 20 0 0 1 0 40h-20"/>'+
-   '<path d="M70 52c0-10 8-12 8-22M96 52c0-10 8-12 8-22M122 52c0-10 8-12 8-22"/><path d="M34 176h132"/></g>')},
- scissors:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round">'+
-   '<circle cx="58" cy="150" r="20"/><circle cx="142" cy="150" r="20"/>'+
-   '<path d="M72 136 148 44M128 136 52 44"/></g>')},
- tooth:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linejoin="round">'+
-   '<path d="M62 40c-20 0-30 18-28 40 3 30 12 44 16 66 3 16 8 22 16 22s12-10 14-26 4-24 20-24 18 8 20 24 6 26 14 26 13-6 16-22c4-22 13-36 16-66 2-22-8-40-28-40-14 0-18 8-38 8s-24-8-38-8z"/></g>')},
- dumbbell:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round">'+
-   '<path d="M70 100h60"/><rect x="40" y="72" width="24" height="56" rx="6"/><rect x="136" y="72" width="24" height="56" rx="6"/>'+
-   '<path d="M24 86v28M176 86v28"/></g>')},
- wine:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
-   '<path d="M64 34h72l-6 46a30 30 0 0 1-60 0z"/><path d="M100 110v52M74 168h52"/></g>')},
- wrench:function(c){return _svg(200,200,'<g fill="none" stroke="'+c.brand+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">'+
-   '<path d="M148 36a34 34 0 0 0-44 44L60 124a16 16 0 0 0 0 22l4 4a16 16 0 0 0 22 0l44-44a34 34 0 0 0 44-44l-24 24-20-6-6-20z"/></g>')},
- flower:function(c){var r='',i;for(i=0;i<6;i++)r+='<ellipse cx="100" cy="58" rx="17" ry="34" fill="none" stroke="'+c.brand+'" stroke-width="6" transform="rotate('+(i*60)+' 100 100)"/>';
-   return _svg(200,200,r+'<circle cx="100" cy="100" r="13" fill="'+c.accent+'"/>')}
-};
+/* The trade glyphs that used to live here are now icons/motif/*.svg — every one of
+   them, plus fifty more, reachable from the decoration layer’s Choose from library. */
 
 /* ---- copy library ----------------------------------------------------------
    Every line here is compliance-safe by construction: none asks for five stars,
@@ -1671,7 +1697,8 @@ function TH(){ return THEMES[S.theme||0] }
 
 var KIND_LABEL={band:"Colour band",fill:"Full bleed",split:"Diagonal split",rail:"Side rail",
                 blob:"Disc",rule:"Rule",logo:"Logo",lockup:"Logo lockup",name:"Business name",
-                stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block"};
+                stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block",
+                motif:"Decoration",pattern:"Pattern",hero:"Hero shape"};
 
 /* The banded "review card" plate — the layout every seller in this market ships,
    done properly: the band carries the client's brand colour instead of Google's blue,
@@ -2009,7 +2036,7 @@ function defaults(fmt){
 
 var curPreset=0;
 var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
-       userFonts:[],dispFont:'',bodyFont:''};
+       userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,tapImg:null};
 
 /* ---- custom fonts --------------------------------------------------------
    Uploaded font files, held as base64 data URLs and registered through the
@@ -2177,35 +2204,141 @@ function initials(s){
 }
 var STAR='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 '+
  '1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
-var TAP_ICONS={
- // the bare contactless mark
- waves:'<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 26c14 12 14 36 0 48"/>'+
-   '<path d="M48 18c20 17 20 47 0 64"/><path d="M66 10c26 22 26 58 0 80"/></svg>',
- // device + waves. Wider viewBox so the arcs get room instead of stacking on the
- // handset, and a size multiplier so it fills the ring like the bare mark does.
- phone:'<svg viewBox="0 0 124 100" aria-hidden="true">'+
-   '<rect x="74" y="14" width="38" height="72" rx="8"/>'+
-   '<path d="M86 25h14"/>'+
-   '<path d="M52 36c8 8 8 20 0 28"/>'+
-   '<path d="M36 27c15 14 15 32 0 46"/>'+
-   '<path d="M20 18c22 19 22 45 0 64"/></svg>',
- // hand holding a phone with NFC arcs radiating from the top
- hand:'<svg viewBox="0 0 100 120" aria-hidden="true">'+
-   '<path d="M38 22c6 5 6 14 0 20"/>'+
-   '<path d="M44 14c10 9 10 24 0 34"/>'+
-   '<path d="M50 6c15 13 15 34 0 48"/>'+
-   '<rect x="30" y="36" width="30" height="54" rx="5"/>'+
-   '<line x1="40" y1="42" x2="54" y2="42"/>'+
-   '<path d="M30 60 C26 58 20 56 18 62 C16 68 14 72 14 78"/>'+
-   '<path d="M60 52 C64 50 68 50 70 54 C72 58 72 62 70 68"/>'+
-   '<path d="M70 68 C68 72 68 76 66 80"/>'+
-   '<path d="M60 60 C64 62 68 66 68 72"/>'+
-   '<path d="M60 68 C62 70 64 74 64 78"/>'+
-   '<path d="M14 78 C14 84 16 92 22 96 C26 98 30 96 30 90"/></svg>'
-};
-// the bare mark fills a square; the device mark is wider; hand mark is taller
-var ICON_W={waves:1, phone:1.55, hand:.88};
-var WAVE=TAP_ICONS.waves;
+/* ---- the icon library ------------------------------------------------------
+   The marks the card can wear: tap gestures, review-platform logos, and the
+   little trade glyphs. icons/ is the source of truth and this block is written
+   from it by `node tools/build-icons.js` — inlined rather than fetched because
+   this page has to work opened as a file://, where Chrome blocks fetch() of a
+   sibling JSON, and where a CSS mask will not load a sibling image either.
+
+   A vector entry carries its own viewBox, its inner markup, and the stroke
+   weight that makes it read at the same optical weight as every other icon
+   whatever box it was drawn in. A raster entry carries a data URI and is used
+   as a MASK, so only its alpha matters and it takes the brand colour — which
+   is why a file with a white background is useless here: it masks as a solid
+   brand-coloured rectangle. */
+/* === ICON LIBRARY: GENERATED — do not edit by hand === */
+/* Regenerate with: node tools/build-icons.js   (source of truth: icons/) */
+var ICON_LIB={"tap":[
+{"id":"hand-phone","n":"Hand holding phone","vb":"0 0 100 120","sw":8.33,"ar":0.833,"p":"<path d=\"M38 22c6 5 6 14 0 20\"/><path d=\"M44 14c10 9 10 24 0 34\"/><path d=\"M50 6c15 13 15 34 0 48\"/><rect x=\"30\" y=\"36\" width=\"30\" height=\"54\" rx=\"5\"/><line x1=\"40\" y1=\"42\" x2=\"54\" y2=\"42\"/><path d=\"M30 60C26 58 20 56 18 62 16 68 14 72 14 78\"/><path d=\"M60 52C64 50 68 50 70 54 72 58 72 62 70 68\"/><path d=\"M70 68C68 72 68 76 66 80\"/><path d=\"M60 60C64 62 68 66 68 72\"/><path d=\"M60 68C62 70 64 74 64 78\"/><path d=\"M14 78C14 84 16 92 22 96 26 98 30 96 30 90\"/>","from":"Tap Stand","lic":"own"},
+{"id":"phone-waves","n":"Phone and waves","vb":"0 0 124 100","sw":8.33,"ar":1.24,"p":"<rect x=\"74\" y=\"14\" width=\"38\" height=\"72\" rx=\"8\"/><path d=\"M86 25h14\"/><path d=\"M52 36c8 8 8 20 0 28\"/><path d=\"M36 27c15 14 15 32 0 46\"/><path d=\"M20 18c22 19 22 45 0 64\"/>","from":"Tap Stand","lic":"own"},
+{"id":"waves","n":"Contactless waves","vb":"0 0 100 100","sw":8.33,"ar":1,"p":"<path d=\"M30 26c14 12 14 36 0 48\"/><path d=\"M48 18c20 17 20 47 0 64\"/><path d=\"M66 10c26 22 26 58 0 80\"/>","from":"Tap Stand","lic":"own"},
+{"id":"contactless","n":"Contactless mark","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M15 21.5C19 16 19 8 15 2.5\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M11.5 20C15 15 15 9 11.5 4\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M8.5 18C11.1667 14.25 11.1667 9.75 8.5 6\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M5.5 16C7 13.5 7 10.5 5.5 8\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","from":"Iconoir","lic":"MIT"},
+{"id":"nfc-arcs","n":"NFC arcs","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M6 8.32a7.43 7.43 0 0 1 0 7.36\" /> <path d=\"M9.46 6.21a11.76 11.76 0 0 1 0 11.58\" /> <path d=\"M12.91 4.1a15.91 15.91 0 0 1 .01 15.8\" /> <path d=\"M16.37 2a20.16 20.16 0 0 1 0 20\" />","from":"Lucide","lic":"ISC"},
+{"id":"phone-nfc","n":"Phone with NFC","vb":"0 0 24 24","sw":2,"ar":1,"p":"<rect width=\"7\" height=\"12\" x=\"2\" y=\"6\" rx=\"1\" /> <path d=\"M13 8.32a7.43 7.43 0 0 1 0 7.36\" /> <path d=\"M16.46 6.21a11.76 11.76 0 0 1 0 11.58\" /> <path d=\"M19.91 4.1a15.91 15.91 0 0 1 .01 15.8\" />","from":"Lucide","lic":"ISC"},
+{"id":"nfc-mark","n":"NFC mark","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M11 20a3 3 0 0 1 -3 -3v-11l5 5\" /> <path d=\"M13 4a3 3 0 0 1 3 3v11l-5 -5\" /> <path d=\"M4 7a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3l0 -10\" />","from":"Tabler","lic":"MIT"},
+{"id":"finger-tap","n":"Finger tapping","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5\" /> <path d=\"M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5\" /> <path d=\"M14 10.5a1.5 1.5 0 0 1 3 0v1.5\" /> <path d=\"M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47\" /> <path d=\"M5 3l-1 -1\" /> <path d=\"M4 7h-1\" /> <path d=\"M14 3l1 -1\" /> <path d=\"M15 6h1\" />","from":"Tabler","lic":"MIT"},
+{"id":"finger-point","n":"Pointing finger","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M22 14a8 8 0 0 1-8 8\" /> <path d=\"M18 11v-1a2 2 0 0 0-2-2a2 2 0 0 0-2 2\" /> <path d=\"M14 10V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1\" /> <path d=\"M10 9.5V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v10\" /> <path d=\"M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\" />","from":"Lucide","lic":"ISC"},
+{"id":"card-tap","n":"Tapping a card","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M2 11L4.80662 7.84255C5.5657 6.98859 6.65372 6.5 7.79627 6.5L8 6.5\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M2 19.5003L7.5 19.5L11.5 16.5003C11.5 16.5003 12.3091 15.9528 13.5 15.0001C16 13.0002 13.5 9.83352 11 11.4997C8.96409 12.8565 7 14.0003 7 14.0003\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M8 13.5V7C8 5.89543 8.89543 5 10 5H20C21.1046 5 22 5.89543 22 7V13C22 14.1046 21.1046 15 20 15H13.5\" stroke=\"currentColor\"/> <path d=\"M18.25 12C18.75 10.5 18.75 9.5 18.25 8\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M16 9C16.2266 9.5 16.2266 10.5 16 11\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","from":"Iconoir","lic":"MIT"},
+{"id":"tap-target","n":"Tap target","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 20.5C15.866 20.5 19 17.366 19 13.5C19 9.63401 15.866 6.5 12 6.5C8.13401 6.5 5 9.63401 5 13.5C5 17.366 8.13401 20.5 12 20.5Z\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/> <path d=\"M4 7.28995C5.49623 5.03879 8.51707 3.5 12 3.5C15.4829 3.5 18.5038 5.03879 20 7.28995\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>","from":"Iconoir","lic":"MIT"},
+{"id":"open-hand","n":"Open hand","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2\" /> <path d=\"M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\" /> <path d=\"M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8\" /> <path d=\"M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15\" />","from":"Lucide","lic":"ISC"},
+{"id":"tap-mark","n":"Solid phone and waves","ar":1.192,"u":"data:image/png;base64,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","from":"Tap Stand","lic":"own"}],
+"platform":[
+],
+"motif":[
+{"id":"coffee","n":"Coffee","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M10 2v2\" /> <path d=\"M14 2v2\" /> <path d=\"M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1\" /> <path d=\"M6 2v2\" />","from":"Lucide","lic":"ISC"},
+{"id":"cup","n":"Cold drink","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.54a2 2 0 0 0 2-1.72L18 8\" /> <path d=\"M5 8h14\" /> <path d=\"M7 15a6.47 6.47 0 0 1 5 0 6.47 6.47 0 0 0 5 0\" /> <path d=\"m12 8 1-6h2\" />","from":"Lucide","lic":"ISC"},
+{"id":"utensils","n":"Cutlery","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2\" /> <path d=\"M7 2v20\" /> <path d=\"M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7\" />","from":"Lucide","lic":"ISC"},
+{"id":"pizza","n":"Pizza","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m12 14-1 1\" /> <path d=\"m13.75 18.25-1.25 1.42\" /> <path d=\"M17.775 5.654a15.68 15.68 0 0 0-12.121 12.12\" /> <path d=\"M18.8 9.3a1 1 0 0 0 2.1 7.7\" /> <path d=\"M21.964 20.732a1 1 0 0 1-1.232 1.232l-18-5a1 1 0 0 1-.695-1.232A19.68 19.68 0 0 1 15.732 2.037a1 1 0 0 1 1.232.695z\" />","from":"Lucide","lic":"ISC"},
+{"id":"sandwich","n":"Sandwich","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m2.37 11.223 8.372-6.777a2 2 0 0 1 2.516 0l8.371 6.777\" /> <path d=\"M21 15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-5.25\" /> <path d=\"M3 15a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h9\" /> <path d=\"m6.67 15 6.13 4.6a2 2 0 0 0 2.8-.4l3.15-4.2\" /> <rect width=\"20\" height=\"4\" x=\"2\" y=\"11\" rx=\"1\" />","from":"Lucide","lic":"ISC"},
+{"id":"soup","n":"Soup","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z\" /> <path d=\"M7 21h10\" /> <path d=\"M19.5 12 22 6\" /> <path d=\"M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62\" /> <path d=\"M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62\" /> <path d=\"M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62\" />","from":"Lucide","lic":"ISC"},
+{"id":"drumstick","n":"Chicken","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M15.4 15.63a7.875 6 135 1 1 6.23-6.23 4.5 3.43 135 0 0-6.23 6.23\" /> <path d=\"m8.29 12.71-2.6 2.6a2.5 2.5 0 1 0-1.65 4.65A2.5 2.5 0 1 0 8.7 18.3l2.59-2.59\" />","from":"Lucide","lic":"ISC"},
+{"id":"chef-hat","n":"Chef hat","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z\" /> <path d=\"M6 17h12\" />","from":"Lucide","lic":"ISC"},
+{"id":"croissant","n":"Bakery","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M10.2 18H4.774a1.5 1.5 0 0 1-1.352-.97 11 11 0 0 1 .132-6.487\" /> <path d=\"M18 10.2V4.774a1.5 1.5 0 0 0-.97-1.352 11 11 0 0 0-6.486.132\" /> <path d=\"M18 5a4 3 0 0 1 4 3 2 2 0 0 1-2 2 10 10 0 0 0-5.139 1.42\" /> <path d=\"M5 18a3 4 0 0 0 3 4 2 2 0 0 0 2-2 10 10 0 0 1 1.42-5.14\" /> <path d=\"M8.709 2.554a10 10 0 0 0-6.155 6.155 1.5 1.5 0 0 0 .676 1.626l9.807 5.42a2 2 0 0 0 2.718-2.718l-5.42-9.807a1.5 1.5 0 0 0-1.626-.676\" />","from":"Lucide","lic":"ISC"},
+{"id":"cake","n":"Cake","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M16 13H3\" /> <path d=\"M16 17H3\" /> <path d=\"m7.2 7.9-3.388 2.5A2 2 0 0 0 3 12.01V20a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-8.654c0-2-2.44-6.026-6.44-8.026a1 1 0 0 0-1.082.057L10.4 5.6\" /> <circle cx=\"9\" cy=\"7\" r=\"2\" />","from":"Lucide","lic":"ISC"},
+{"id":"cookie","n":"Cookie","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5\" /> <path d=\"M8.5 8.5v.01\" /> <path d=\"M16 15.5v.01\" /> <path d=\"M12 12v.01\" /> <path d=\"M11 17v.01\" /> <path d=\"M7 14v.01\" />","from":"Lucide","lic":"ISC"},
+{"id":"ice-cream","n":"Ice cream","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m7 11 4.08 10.35a1 1 0 0 0 1.84 0L17 11\" /> <path d=\"M17 7A5 5 0 0 0 7 7\" /> <path d=\"M17 7a2 2 0 0 1 0 4H7a2 2 0 0 1 0-4\" />","from":"Lucide","lic":"ISC"},
+{"id":"wine","n":"Wine","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M8 22h8\" /> <path d=\"M7 10h10\" /> <path d=\"M12 15v7\" /> <path d=\"M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z\" />","from":"Lucide","lic":"ISC"},
+{"id":"beer","n":"Beer","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M17 11h1a3 3 0 0 1 0 6h-1\" /> <path d=\"M9 12v6\" /> <path d=\"M13 12v6\" /> <path d=\"M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z\" /> <path d=\"M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8\" />","from":"Lucide","lic":"ISC"},
+{"id":"wheat","n":"Grain","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M2 22 16 8\" /> <path d=\"M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z\" /> <path d=\"M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" />","from":"Lucide","lic":"ISC"},
+{"id":"scissors","n":"Scissors","vb":"0 0 24 24","sw":2,"ar":1,"p":"<circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M8.12 8.12 12 12\" /> <path d=\"M20 4 8.12 15.88\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <path d=\"M14.8 14.8 20 20\" />","from":"Lucide","lic":"ISC"},
+{"id":"razor","n":"Razor","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M7 3h10v4h-10l0 -4\" /> <path d=\"M12 7v4\" /> <path d=\"M12 11a2 2 0 0 1 2 2v6a2 2 0 1 1 -4 0v-6a2 2 0 0 1 2 -2\" />","from":"Tabler","lic":"MIT"},
+{"id":"sparkles","n":"Sparkle","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />","from":"Lucide","lic":"ISC"},
+{"id":"perfume","n":"Perfume","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M10 6v3\" /> <path d=\"M14 6v3\" /> <path d=\"M5 11a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -8\" /> <path d=\"M10 15a2 2 0 1 0 4 0a2 2 0 1 0 -4 0\" /> <path d=\"M9 3h6v3h-6l0 -3\" />","from":"Tabler","lic":"MIT"},
+{"id":"massage","n":"Massage","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M3 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\" /> <path d=\"M8 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\" /> <path d=\"M4 22l4 -2v-3h12\" /> <path d=\"M11 20h9\" /> <path d=\"M8 14l3 -2l1 -4c3 1 3 4 3 6\" />","from":"Tabler","lic":"MIT"},
+{"id":"yoga","n":"Yoga","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M4 20h4l1.5 -3\" /> <path d=\"M17 20l-1 -5h-5l1 -7\" /> <path d=\"M4 10l4 -1l4 -1l4 1.5l4 1.5\" /> <path d=\"M10.007 5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0\" />","from":"Tabler","lic":"MIT"},
+{"id":"flower","n":"Flower","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1\" /> <circle cx=\"12\" cy=\"8\" r=\"2\" /> <path d=\"M12 10v12\" /> <path d=\"M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z\" /> <path d=\"M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z\" />","from":"Lucide","lic":"ISC"},
+{"id":"gem","n":"Gem","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M10.5 3 8 9l4 13 4-13-2.5-6\" /> <path d=\"M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z\" /> <path d=\"M2 9h20\" />","from":"Lucide","lic":"ISC"},
+{"id":"brush","n":"Brush","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m14.622 17.897-10.68-2.913\" /> <path d=\"M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z\" /> <path d=\"M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15\" />","from":"Lucide","lic":"ISC"},
+{"id":"tooth","n":"Tooth","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" /> <path d=\"M12 5.5c-1.074 -.586 -2.583 -1.5 -4 -1.5c-2.1 0 -4 1.247 -4 5c0 4.899 1.056 8.41 2.671 10.537c.573 .756 1.97 .521 2.567 -.236c.398 -.505 .819 -1.439 1.262 -2.801c.292 -.771 .892 -1.504 1.5 -1.5c.602 0 1.21 .737 1.5 1.5c.443 1.362 .864 2.295 1.262 2.8c.597 .759 2 .993 2.567 .237c1.615 -2.127 2.671 -5.637 2.671 -10.537c0 -3.74 -1.908 -5 -4 -5c-1.423 0 -2.92 .911 -4 1.5\" /> <path d=\"M12 5.5l3 1.5\" />","from":"Tabler","lic":"MIT"},
+{"id":"stethoscope","n":"Stethoscope","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M11 2v2\" /> <path d=\"M5 2v2\" /> <path d=\"M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1\" /> <path d=\"M8 15a6 6 0 0 0 12 0v-3\" /> <circle cx=\"20\" cy=\"10\" r=\"2\" />","from":"Lucide","lic":"ISC"},
+{"id":"heart-pulse","n":"Heartbeat","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\" /> <path d=\"M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27\" />","from":"Lucide","lic":"ISC"},
+{"id":"pill","n":"Pill","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z\" /> <path d=\"m8.5 8.5 7 7\" />","from":"Lucide","lic":"ISC"},
+{"id":"glasses","n":"Glasses","vb":"0 0 24 24","sw":2,"ar":1,"p":"<circle cx=\"6\" cy=\"15\" r=\"4\" /> <circle cx=\"18\" cy=\"15\" r=\"4\" /> <path d=\"M14 15a2 2 0 0 0-2-2 2 2 0 0 0-2 2\" /> <path d=\"M2.5 13 5 7c.7-1.3 1.4-2 3-2\" /> <path d=\"M21.5 13 19 7c-.7-1.3-1.5-2-3-2\" />","from":"Lucide","lic":"ISC"},
+{"id":"car","n":"Car","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\" /> <circle cx=\"7\" cy=\"17\" r=\"2\" /> <path d=\"M9 17h6\" /> <circle cx=\"17\" cy=\"17\" r=\"2\" />","from":"Lucide","lic":"ISC"},
+{"id":"fuel","n":"Fuel","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5\" /> <path d=\"M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16\" /> <path d=\"M2 21h13\" /> <path d=\"M3 9h11\" />","from":"Lucide","lic":"ISC"},
+{"id":"spray","n":"Spray can","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M3 3h.01\" /> <path d=\"M7 5h.01\" /> <path d=\"M11 7h.01\" /> <path d=\"M3 7h.01\" /> <path d=\"M7 9h.01\" /> <path d=\"M3 11h.01\" /> <rect width=\"4\" height=\"4\" x=\"15\" y=\"5\" /> <path d=\"m19 9 2 2v10c0 .6-.4 1-1 1h-6c-.6 0-1-.4-1-1V11l2-2\" /> <path d=\"m13 14 8-2\" /> <path d=\"m13 19 8-2\" />","from":"Lucide","lic":"ISC"},
+{"id":"wrench","n":"Wrench","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z\" />","from":"Lucide","lic":"ISC"},
+{"id":"hammer","n":"Hammer","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"m15 12-9.373 9.373a1 1 0 0 1-3.001-3L12 9\" /> <path d=\"m18 15 4-4\" /> <path d=\"m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172v-.344a2 2 0 0 0-.586-1.414l-1.657-1.657A6 6 0 0 0 12.516 3H9l1.243 1.243A6 6 0 0 1 12 8.485V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5\" />","from":"Lucide","lic":"ISC"},
+{"id":"roller","n":"Paint roller","vb":"0 0 24 24","sw":2,"ar":1,"p":"<rect width=\"16\" height=\"6\" x=\"2\" y=\"2\" rx=\"2\" /> <path d=\"M10 16v-2a2 2 0 0 1 2-2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\" /> <rect width=\"4\" height=\"6\" x=\"8\" y=\"16\" rx=\"1\" />","from":"Lucide","lic":"ISC"},
+{"id":"plug","n":"Electrical","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z\" /> <path d=\"m2 22 3-3\" /> <path d=\"M7.5 13.5 10 11\" /> <path d=\"M10.5 16.5 13 14\" /> <path d=\"m18 3-4 4h6l-4 4\" />","from":"Lucide","lic":"ISC"},
+{"id":"droplets","n":"Plumbing","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\" /> <path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\" />","from":"Lucide","lic":"ISC"},
+{"id":"hard-hat","n":"Hard hat","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5\" /> <path d=\"M14 6a6 6 0 0 1 6 6v3\" /> <path d=\"M4 15v-3a6 6 0 0 1 6-6\" /> <rect x=\"2\" y=\"15\" width=\"20\" height=\"4\" rx=\"1\" />","from":"Lucide","lic":"ISC"},
+{"id":"washer","n":"Laundry","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M3 6h3\" /> <path d=\"M17 6h.01\" /> <rect width=\"18\" height=\"20\" x=\"3\" y=\"2\" rx=\"2\" /> <circle cx=\"12\" cy=\"13\" r=\"5\" /> <path d=\"M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5\" />","from":"Lucide","lic":"ISC"},
+{"id":"dumbbell","n":"Dumbbell","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z\" /> <path d=\"m2.5 21.5 1.4-1.4\" /> <path d=\"m20.1 3.9 1.4-1.4\" /> <path d=\"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z\" /> <path d=\"m9.6 14.4 4.8-4.8\" />","from":"Lucide","lic":"ISC"},
+{"id":"bike","n":"Bicycle","vb":"0 0 24 24","sw":2,"ar":1,"p":"<circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\" /> <circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\" /> <circle cx=\"15\" cy=\"5\" r=\"1\" /> <path d=\"M12 17.5V14l-3-3 4-3 2 3h2\" />","from":"Lucide","lic":"ISC"},
+{"id":"paw","n":"Paw print","vb":"0 0 24 24","sw":2,"ar":1,"p":"<circle cx=\"11\" cy=\"4\" r=\"2\" /> <circle cx=\"18\" cy=\"8\" r=\"2\" /> <circle cx=\"20\" cy=\"16\" r=\"2\" /> <path d=\"M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z\" />","from":"Lucide","lic":"ISC"},
+{"id":"dog","n":"Dog","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M11.25 16.25h1.5L12 17z\" /> <path d=\"M16 14v.5\" /> <path d=\"M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309\" /> <path d=\"M8 14v.5\" /> <path d=\"M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5\" />","from":"Lucide","lic":"ISC"},
+{"id":"cat","n":"Cat","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z\" /> <path d=\"M8 14v.5\" /> <path d=\"M16 14v.5\" /> <path d=\"M11.25 16.25h1.5L12 17l-.75-.75Z\" />","from":"Lucide","lic":"ISC"},
+{"id":"bag","n":"Shopping bag","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M16 10a4 4 0 0 1-8 0\" /> <path d=\"M3.103 6.034h17.794\" /> <path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\" />","from":"Lucide","lic":"ISC"},
+{"id":"shirt","n":"Shirt","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\" />","from":"Lucide","lic":"ISC"},
+{"id":"gift","n":"Gift","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M12 7v14\" /> <path d=\"M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8\" /> <path d=\"M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5\" /> <rect x=\"3\" y=\"7\" width=\"18\" height=\"4\" rx=\"1\" />","from":"Lucide","lic":"ISC"},
+{"id":"store","n":"Storefront","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5\" /> <path d=\"M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244\" /> <path d=\"M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05\" />","from":"Lucide","lic":"ISC"},
+{"id":"house","n":"House","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />","from":"Lucide","lic":"ISC"},
+{"id":"key","n":"Key","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z\" /> <circle cx=\"16.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\" />","from":"Lucide","lic":"ISC"},
+{"id":"bed","n":"Room","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8\" /> <path d=\"M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4\" /> <path d=\"M12 4v6\" /> <path d=\"M2 18h20\" />","from":"Lucide","lic":"ISC"},
+{"id":"leaf","n":"Leaf","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z\" /> <path d=\"M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12\" />","from":"Lucide","lic":"ISC"},
+{"id":"sprout","n":"Sprout","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\" /> <path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\" /> <path d=\"M5 21h14\" />","from":"Lucide","lic":"ISC"},
+{"id":"palm","n":"Palm","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4\" /> <path d=\"M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3\" /> <path d=\"M5.89 9.71c-2.15 2.15-2.3 5.47-.35 7.43l4.24-4.25.7-.7.71-.71 2.12-2.12c-1.95-1.96-5.27-1.8-7.42.35\" /> <path d=\"M11 15.5c.5 2.5-.17 4.5-1 6.5h4c2-5.5-.5-12-1-14\" />","from":"Lucide","lic":"ISC"},
+{"id":"camera","n":"Camera","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />","from":"Lucide","lic":"ISC"},
+{"id":"music","n":"Music","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M9 18V5l12-2v13\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" />","from":"Lucide","lic":"ISC"},
+{"id":"graduation","n":"Graduation","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />","from":"Lucide","lic":"ISC"},
+{"id":"truck","n":"Truck","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2\" /> <path d=\"M15 18H9\" /> <path d=\"M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14\" /> <circle cx=\"17\" cy=\"18\" r=\"2\" /> <circle cx=\"7\" cy=\"18\" r=\"2\" />","from":"Lucide","lic":"ISC"},
+{"id":"baby","n":"Baby","vb":"0 0 24 24","sw":2,"ar":1,"p":"<path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\" /> <path d=\"M15 12h.01\" /> <path d=\"M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\" /> <path d=\"M9 12h.01\" />","from":"Lucide","lic":"ISC"}]};
+/* === END ICON LIBRARY === */
+
+/* A file dropped into the library stays a tile for the rest of the session, and
+   rides along in the saved .tapcard.json so a card that uses one still opens. */
+var libUser={tap:[],platform:[],motif:[]};
+function libSet(cat){ return (ICON_LIB[cat]||[]).concat(libUser[cat]||[]) }
+function libGet(cat,id){
+  var a=libSet(cat),i;
+  for(i=0;i<a.length;i++) if(a[i].id===id) return a[i];
+  return null;
+}
+// ids these layers used before there was a library, so old saves still open
+var LIB_ALIAS={phone:'phone-waves', hand:'hand-phone'};
+function libRef(v,cat){
+  if(typeof v!=='string' || !v) return null;
+  var id = v.slice(0,4)==='lib:' ? v.slice(4) : v;
+  return libGet(cat, id) || libGet(cat, LIB_ALIAS[id]||'');
+}
+function libBox(w,h){ return 'width:'+w+'cqw;height:'+h+'cqw' }
+/* One renderer for the whole library. Tinted, an entry takes the colour it is
+   handed — a vector by having its stroke set, a raster by being a mask. As-is,
+   it keeps whatever colours the file has, which is what a platform logo wants. */
+function libArt(e,col,box,asis){
+  if(!e) return '';
+  if(asis==null) asis=!!e.asis;
+  if(e.p) return '<svg viewBox="'+e.vb+'" aria-hidden="true" style="'+box+';display:block'+
+    (asis?'':';color:'+col+';fill:none;stroke:currentColor;stroke-width:'+e.sw+
+     ';stroke-linecap:round;stroke-linejoin:round')+'">'+e.p+'</svg>';
+  if(asis) return '<img src="'+e.u+'" alt="" style="'+box+';object-fit:contain;display:block">';
+  return '<div style="'+box+';background:'+col+';-webkit-mask:url(\''+e.u+
+    '\') center/contain no-repeat;mask:url(\''+e.u+'\') center/contain no-repeat"></div>';
+}
+/* What a tap layer is actually wearing. No icon means the first entry in the
+   library — put the mark you want everyone to get first in icons/manifest.json.
+   'custom' is the one-shot file in the Tap mark well, which is deliberately not
+   a library tile: it belongs to this card, not to the set. */
+function tapEntry(L){
+  var e=libRef(L.icon,'tap');
+  if(!e && L.icon==='custom' && S.tapImg)
+    return {u:S.tapImg, asis:(S.tapImgMode==='asis'), ar:1};
+  return e || libSet('tap')[0] || null;
+}
+// the ring gives the mark a fixed height, so width follows its own aspect
+function tapAR(L){ var e=tapEntry(L); return (e&&e.ar)||1 }
 
 // scanning floor: a QR under about 25 mm gets unreliable at arm's length, so the
 // per-plate scale can shrink the block around it but not the code itself
@@ -2274,9 +2407,12 @@ function bodyHTML(L,ctx){
     case 'hero':
       var hf=HEROES[L.g||'concentric']; if(!hf) return '';
       return '<img src="'+hf(gc)+'" alt="" style="width:'+(60*s)+'cqw;height:'+(60*s)+'cqw;display:block">';
+    // A decoration: any library glyph, at any size, in brand / accent / ground.
+    // Opacity is the layer's own, applied by paint() on the wrapper.
     case 'motif':
-      var mf=MOTIFS[L.g||'coffee']; if(!mf) return '';
-      return '<img src="'+mf(gc)+'" alt="" style="width:'+(30*s)+'cqw;height:'+(30*s)+'cqw;display:block">';
+      var me=libRef(L.g,'motif'); if(!me) return '';
+      var mfc = L.c==='accent' ? gc.accent : L.c==='ground' ? gc.ground : gc.brand;
+      return libArt(me,mfc,libBox(30*s*(me.ar||1),30*s));
     case 'fill':
       return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:240*s)+
         'cqw;background:'+(L.c==='accent'?ctx.pal.accent:ctx.brand)+';opacity:'+(L.op==null?1:L.op)+'"></div>';
@@ -2299,9 +2435,16 @@ function bodyHTML(L,ctx){
           'cqw dashed '+mc+';border-radius:'+(.8*s)+'cqw;display:flex;align-items:center;'+
           'justify-content:center;font-family:var(--f-disp);font-weight:750;font-size:'+
           (3.2*s)+'cqw;letter-spacing:.14em;color:'+mc+';opacity:.8">LOGO</div>';
-      var platSide = S.platImg
+      // A platform logo is a trademark, so it keeps its own colours by default.
+      // 'Tint' knocks it to a single tone the same way an uploaded file is knocked.
+      var pKnock = S.platImgMode==='asis' ? '' : ';filter:brightness(0) saturate(0)';
+      var pe = S.platLib ? libGet('platform',S.platLib) : null;
+      var platSide = pe
+        ? '<div style="height:'+(11*s)+'cqw;max-width:'+(30*s)+'cqw'+pKnock+'">'+
+          libArt(pe,mc,'height:100%;width:'+(11*s*(pe.ar||1))+'cqw',true)+'</div>'
+        : S.platImg
         ? '<img src="'+S.platImg+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(30*s)+
-          'cqw;object-fit:contain;display:block'+(S.platImgMode==='asis'?'':';filter:brightness(0) saturate(0)')+'">'
+          'cqw;object-fit:contain;display:block'+pKnock+'">'
         : '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
           esc(L.word||'Google')+'</span>';
       return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
@@ -2365,22 +2508,12 @@ function bodyHTML(L,ctx){
           (.9*s)+'cqw solid '+mc+';padding-bottom:'+(1.6*s)+'cqw;color:'+mc+'">'+
           tapArt(11*s,8*s)+'<b style="font-family:var(--f-disp);'+
           'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em">'+esc(L.cap||'TAP')+'</b></div>';
-      // A supplied mark is used as a MASK by default, so a transparent PNG or SVG
-      // takes the brand colour like the drawn ones do. 'As-is' keeps its own colours.
+      // Whatever the mark is, it is tinted: a library vector by having its stroke
+      // set, an uploaded file by being used as a MASK. 'As-is' keeps its own
+      // colours. An empty icon means the first entry in the library, which is the
+      // mark this editor ships with.
       function tapArt(w,h){
-        var src=null, asis=false;
-        if(L.icon==='custom' && S.tapImg){ src=S.tapImg; asis=(S.tapImgMode==='asis'); }
-        else if(!L.icon && defaultTapOK){ src=DEFAULT_TAP; }      // the shipped default
-        if(src){
-          return asis
-            ? '<img src="'+src+'" alt="" style="width:'+w+'cqw;height:'+h+
-              'cqw;object-fit:contain;display:block">'
-            : '<div style="width:'+w+'cqw;height:'+h+'cqw;background:'+mc+
-              ';-webkit-mask:url(\''+src+'\') center/contain no-repeat;'+
-              'mask:url(\''+src+'\') center/contain no-repeat"></div>';
-        }
-        return (TAP_ICONS[L.icon]||TAP_ICONS.waves).replace('<svg','<svg style="width:'+w+
-          'cqw;height:'+h+'cqw;stroke:'+mc+'"');
+        return libArt(tapEntry(L),mc,libBox(w,h));
       }
       var rg=ctx.th.ring, rs='';
       if(rg==='none')   rs='border:none;';
@@ -2389,7 +2522,7 @@ function bodyHTML(L,ctx){
       if(rg==='dashed') rs='border-style:dashed;';
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
-        tapArt(11*s*(ICON_W[L.icon]||1), 11*s)+
+        tapArt(11*s*tapAR(L), 11*s)+
         '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
@@ -2518,21 +2651,9 @@ function paint(quiet){
    Backgrounds are exempt — they are meant to sit under things. So is any layer you
    have dragged yourself: once you move something by hand it stays exactly there. */
 var autoFit=true, showQR=false;
-/* The shipped tap mark: a transparent PNG, embedded so it works from a file:// page
-   too — Chromium refuses to load a sibling file as a CSS mask from one. It is used as
-   a MASK, so only its alpha matters and it takes each client's brand colour.
-   To change it for everyone: replace tap-mark.png in this repo. When the page is
-   served (Pages, or any local server) that file wins over the embedded copy. */
-var TAP_PNG='data:image/png;base64,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';
-var DEFAULT_TAP=TAP_PNG, defaultTapOK=true;
-(function(){   // a served tap-mark.png overrides the embedded default
-  // Only over http(s): an <img> will happily load a file:// sibling, but a CSS mask
-  // will not, so probing with an Image on file:// swaps in a path that then fails.
-  if(!/^https?:/.test(location.protocol)) return;
-  var im=new Image();
-  im.onload=function(){ DEFAULT_TAP='tap-mark.png'; paint(); };
-  im.src='tap-mark.png';
-})();
+/* The mark every card gets when its tap layer has no icon of its own is simply the
+   FIRST entry in the tap category of icons/manifest.json. Reorder that file, run
+   node tools/build-icons.js, and the default changes for everyone. */
 var BG_KINDS={fill:1,pattern:1,band:1,split:1,rail:1,hero:1,blob:1,rule:1};
 function resolveLayout(){
   var r=card.getBoundingClientRect(); if(!r.height) return;
@@ -2642,20 +2763,58 @@ function drawInspector(){
     '<p style="margin:0;font-size:12.5px;color:var(--ink-3)">Tap a layer on the card — its controls appear here.</p>';
     return; }
   var h='<span class="lbl">'+esc(layerLabel(L))+'</span>';
+  /* For a layer that wears a mark, the library is the first thing in the panel —
+     it is what you actually came here for, not something under the sliders. */
+  var cat=LIB_FOR[L.k];
+  if(cat){
+    var cur=libRef(L.k==='motif'?L.g:L.k==='lockup'?('lib:'+(S.platLib||'')):L.icon,cat);
+    h+='<button class="btn solid" id="iLib" type="button" style="margin-bottom:2px">'+
+       'Choose from library</button>'+
+       '<span class="libnote" style="flex:none">'+
+       (cur?esc(cur.n)+(cur.from?' &middot; '+esc(cur.from):'')
+           :(L.k==='lockup'&&S.platImg)?'YOUR OWN FILE'
+           :(L.k==='tap'&&L.icon==='custom')?'YOUR OWN FILE'
+           :libSet(cat).length?'DEFAULT':'NOTHING IN THIS SET YET')+'</span>';
+  }
   if(L.k==='lockup'){
     h+='<span class="lbl">Word beside the logo</span>'+
        '<input type="text" id="iWord" value="'+esc(L.word||'Google')+'">';
   }
   if(L.k==='tap'){
     h+='<span class="lbl">Ring caption</span>'+
-       '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">'+
-       '<span class="lbl">Tap mark</span>'+
-       '<select id="iIcon">'+
-       (defaultTapOK?'<option value="">Default mark (tap-mark.png)</option>':'')+
-       '<option value="waves">Contactless waves</option>'+
-       '<option value="phone">Phone + waves</option>'+
-       '<option value="hand">Hand holding phone</option>'+
-       (S.tapImg?'<option value="custom">Your own mark</option>':'')+'</select>';
+       '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
+  }
+  if(L.k==='motif'){
+    h+='<span class="lbl">Colour</span>'+
+       '<div class="chips" id="iMc">'+
+       ['brand','accent','ground'].map(function(k){
+         return '<button class="chip" type="button" data-c="'+k+'" aria-pressed="'+
+           ((L.c||'brand')===k)+'">'+k+'</button>' }).join('')+'</div>'+
+       '<span class="lbl">Opacity &middot; '+Math.round((L.op==null?1:L.op)*100)+'%</span>'+
+       '<input type="range" id="iOp" min="5" max="100" value="'+
+       Math.round((L.op==null?1:L.op)*100)+'">'+
+       '<span class="lbl">Rotation &middot; '+(L.rotd||0)+'&deg;</span>'+
+       '<input type="range" id="iRot" min="-180" max="180" value="'+(L.rotd||0)+'">';
+  }
+  /* Patterns and hero shapes used to be locked to whatever the Direction preset
+     picked, with no way to change one. They are per-layer here like everything else. */
+  if(L.k==='pattern' || L.k==='hero'){
+    var bank=L.k==='pattern'?PATTERNS:HEROES, def=L.k==='pattern'?'terrazzo':'concentric';
+    h+='<span class="lbl">'+(L.k==='pattern'?'Pattern':'Shape')+'</span>'+
+       '<div class="chips" id="iG">'+Object.keys(bank).map(function(k){
+         return '<button class="chip" type="button" data-g="'+k+'" aria-pressed="'+
+           ((L.g||def)===k)+'">'+k+'</button>' }).join('')+'</div>'+
+       '<span class="lbl">Opacity &middot; '+Math.round((L.op==null?(L.k==='pattern'?.9:1):L.op)*100)+'%</span>'+
+       '<input type="range" id="iOp" min="5" max="100" value="'+
+       Math.round((L.op==null?(L.k==='pattern'?.9:1):L.op)*100)+'">';
+    if(L.k==='pattern')
+      h+='<span class="lbl">Band height &middot; '+Math.round((L.hf!=null?L.hf:.2)*100)+'% of card</span>'+
+         '<input type="range" id="iHf" min="5" max="100" value="'+
+         Math.round((L.hf!=null?L.hf:.2)*100)+'">';
+  }
+  if(L.k==='rule'){
+    h+='<label class="tog"><input type="checkbox" id="iDash"'+(L.dash?' checked':'')+
+       '> Dashed</label>';
   }
   if(L.t==='text'){
     var fFams=userFontFamilies();
@@ -2673,12 +2832,26 @@ function drawInspector(){
   h+='<span class="lbl">Width · '+Math.round(wv*100)+'%</span>'+
      '<input type="range" id="iW" min="15" max="100" value="'+Math.round(wv*100)+'">';
   box.innerHTML=h;
+  if(cat) $('iLib').addEventListener('click',function(){ openLib(cat,L,this) });
   if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
-  if(L.k==='tap'){
-    $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
-    $('iIcon').value=L.icon||(defaultTapOK?'':'waves');
-    $('iIcon').addEventListener('change',function(){L.icon=this.value;paint(true)});
+  if(L.k==='tap') $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
+  if(L.k==='motif'){
+    $('iMc').addEventListener('click',function(e){
+      var b=e.target.closest('button[data-c]'); if(!b)return;
+      L.c=b.dataset.c; drawInspector(); paint(true);
+    });
+    $('iOp').addEventListener('input',function(){L.op=+this.value/100;paint(true)});
+    $('iRot').addEventListener('input',function(){L.rotd=+this.value;paint(true)});
   }
+  if(L.k==='pattern' || L.k==='hero'){
+    $('iG').addEventListener('click',function(e){
+      var b=e.target.closest('button[data-g]'); if(!b)return;
+      L.g=b.dataset.g; drawInspector(); paint(true);
+    });
+    $('iOp').addEventListener('input',function(){L.op=+this.value/100;paint(true)});
+    if($('iHf')) $('iHf').addEventListener('input',function(){L.hf=+this.value/100;paint(true)});
+  }
+  if(L.k==='rule') $('iDash').addEventListener('change',function(){L.dash=this.checked;paint(true)});
   if(L.t==='text'){
     $('iFw').value=String(L.fw||600);
     $('iTxt').addEventListener('input',function(){L.text=this.value;paint(true)});
@@ -2763,10 +2936,6 @@ function drawAxes(){
   drawRow($('plates'),PLATES,function(x){return x[0]},S.plate,d.pl,'p');
   drawRow($('themes'),THEMES,function(x){return x.k},S.theme,d.th,'t');
   drawRow($('pals'),PALETTES,function(x){return x.k},S.pal,d.pal,'a');
-  var mk=Object.keys(MOTIFS);
-  $('motifs').innerHTML=mk.map(function(k){
-    return '<button class="chip" type="button" data-m="'+k+'" aria-pressed="'+
-      (k===(S.motif||d.g.motif))+'">'+k+'</button>'}).join('');
 }
 var dirsEl=$('dirs');
 dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
@@ -2774,7 +2943,7 @@ dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
 dirsEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-d]'); if(!b)return;
   S.dir=+b.dataset.d; var d=DIR();
-  if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2]; S.motif=d.g.motif;
+  if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
              S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; }
   Array.prototype.forEach.call(dirsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
@@ -2788,12 +2957,142 @@ $('pals').addEventListener('click',function(e){
   var b=e.target.closest('button[data-a]'); if(!b)return;
   S.pal=+b.dataset.a; drawAxes(); paint();
 });
-$('motifs').addEventListener('click',function(e){
-  var b=e.target.closest('button[data-m]'); if(!b)return;
-  S.motif=b.dataset.m;
-  S.stack.forEach(function(L){ if(L.k==='motif') L.g=S.motif; });
-  drawAxes(); paint();
+/* ============ the icon library sheet ============
+   One grid, opened against whichever layer asked for it, showing only that
+   layer's category — a tap layer never has to scroll past Yelp to find a hand.
+   Same dim-and-blur backdrop and corner × as the holder sheet, its own element
+   so neither one has to know about the other. */
+var LIB_FOR={tap:'tap', lockup:'platform', motif:'motif'};
+var LIB_TITLE={tap:'Tap marks', platform:'Platform logos', motif:'Decorations'};
+var LIB_HINT={
+  tap:'Tinted with the brand colour, so a file you add has to be genuinely transparent — '+
+      'a white background prints as a solid brand-coloured block.',
+  platform:'Platform logos keep their own colours. They are trademarks: check each '+
+      'platform’s brand terms before you sell a card carrying one.',
+  motif:'Drop it anywhere on the card, size it, recolour it. Files you add live in this '+
+      'browser tab and travel inside the saved .tapcard.json.'};
+
+var libModal=$('libModal'), libGrid=$('libGrid'), libSearch=$('libSearch');
+var libCat='tap', libLayer=null, libOpener=null;
+
+function libTiles(){
+  var q=(libSearch.value||'').trim().toLowerCase();
+  var rows=libSet(libCat).filter(function(e){
+    return !q || e.n.toLowerCase().indexOf(q)>=0 || e.id.indexOf(q)>=0 ||
+           (e.from||'').toLowerCase().indexOf(q)>=0;
+  });
+  if(!rows.length){
+    libGrid.innerHTML='<div class="libempty">'+
+      (libSet(libCat).length?'NOTHING MATCHES &ldquo;'+esc(q)+'&rdquo;'
+        :'THIS SET IS EMPTY<br>ADD A FILE BELOW')+'</div>';
+    return;
+  }
+  var cur=libCurrentId();
+  libGrid.innerHTML=rows.map(function(e){
+    return '<button class="libtile" type="button" data-id="'+esc(e.id)+'" aria-pressed="'+
+      (e.id===cur)+'" title="'+esc(e.n+(e.from?' — '+e.from:'')+(e.lic&&e.lic!=='own'?' ('+e.lic+')':''))+'">'+
+      '<span class="libart">'+libArt(e,'currentColor','width:100%;height:100%')+'</span>'+
+      '<span class="libname">'+esc(e.n)+'</span></button>';
+  }).join('');
+}
+function libCurrentId(){
+  if(!libLayer) return '';
+  if(libCat==='platform') return S.platLib||'';
+  var v=libCat==='motif'?libLayer.g:libLayer.icon;
+  var e=libRef(v,libCat);
+  return e?e.id:'';
+}
+function openLib(cat,L,opener){
+  libCat=cat; libLayer=L; libOpener=opener||null;
+  $('libTitle').textContent=LIB_TITLE[cat]||'Library';
+  $('libNote').textContent=LIB_HINT[cat]||'';
+  libSearch.value='';
+  libModal.hidden=false;
+  libTiles();
+  libSearch.focus();
+}
+function closeLib(){
+  if(libModal.hidden) return;
+  libModal.hidden=true;
+  var o=libOpener; libOpener=null; libLayer=null;
+  if(o && document.contains(o)) o.focus();
+}
+function libApply(id){
+  if(typeof pushUndo==='function') pushUndo();
+  if(libCat==='platform'){ setPlatLib(id); }
+  else if(libLayer){
+    if(libCat==='motif') libLayer.g='lib:'+id; else libLayer.icon='lib:'+id;
+  }
+  closeLib(); paint();
+}
+libGrid.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-id]'); if(b) libApply(b.dataset.id);
 });
+libSearch.addEventListener('input',libTiles);
+$('libClose').addEventListener('click',closeLib);
+libModal.addEventListener('click',function(e){ if(e.target===libModal) closeLib(); });
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && !libModal.hidden){ e.stopPropagation(); closeLib(); }
+},true);
+
+/* A file dropped in becomes a permanent tile in this set for the session. SVG
+   is kept as source so it can still be tinted and weighted like the rest; every
+   other format rides in as a data URI and is masked. */
+function libAdd(cat,name,payload){
+  var id='u'+(++S.uid)+'-'+String(name||'file').toLowerCase()
+          .replace(/\.[^.]+$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24);
+  var e={id:id, n:(name||'Added file').replace(/\.[^.]+$/,'').slice(0,28), from:'Yours', lic:'yours'};
+  if(payload.p){ e.vb=payload.vb; e.sw=payload.sw; e.ar=payload.ar; e.p=payload.p; }
+  else { e.u=payload.u; e.ar=payload.ar||1; }
+  if(cat==='platform') e.asis=1;
+  libUser[cat].push(e);
+  return e;
+}
+// the same house treatment tools/build-icons.js gives a committed file
+function libParseSVG(text){
+  var vb=(text.match(/viewBox="([^"]+)"/)||[])[1]; if(!vb) return null;
+  var n=vb.trim().split(/[\s,]+/).map(Number); if(n.length!==4||n.some(isNaN)) return null;
+  var body=text.replace(/<!--[\s\S]*?-->/g,'')
+               .replace(/^[\s\S]*?<svg[^>]*>/,'').replace(/<\/svg>[\s\S]*$/,'')
+               .replace(/\s+/g,' ').trim();
+  if(!body) return null;
+  return {vb:vb, ar:+(n[2]/n[3]).toFixed(3),
+          sw:+(2*Math.min(n[2],n[3])/24).toFixed(2), p:body};
+}
+function libRead(file){
+  if(!file || file.type.indexOf('image')!==0) return;
+  var cat=libCat, r=new FileReader();
+  if(/svg/.test(file.type)){
+    r.onload=function(){
+      var v=libParseSVG(String(r.result));
+      var e=v ? libAdd(cat,file.name,v)
+              : libAdd(cat,file.name,{u:'data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(String(r.result))))});
+      libTiles(); libApply(e.id);
+    };
+    r.readAsText(file);
+  }else{
+    r.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var e=libAdd(cat,file.name,{u:String(r.result),ar:+(im.width/im.height).toFixed(3)});
+        libTiles(); libApply(e.id);
+      };
+      im.onerror=function(){
+        var e=libAdd(cat,file.name,{u:String(r.result)});
+        libTiles(); libApply(e.id);
+      };
+      im.src=String(r.result);
+    };
+    r.readAsDataURL(file);
+  }
+}
+$('libFile').addEventListener('change',function(e){
+  libRead(e.target.files&&e.target.files[0]); e.target.value='';
+});
+['dragenter','dragover'].forEach(function(t){
+  libModal.addEventListener(t,function(e){ e.preventDefault(); }); });
+libModal.addEventListener('drop',function(e){
+  e.preventDefault(); libRead(e.dataTransfer.files&&e.dataTransfer.files[0]); });
 
 var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draft",draftPlate],
   ["Wedge",splitPlate],["Ticket",ticketPlate],["Knockout",discPlate],
@@ -2826,15 +3125,18 @@ $('addLine').addEventListener('click',function(){
   var L={t:'box',k:'rule',x:.5,y:.44+n*.06,s:1,w:.62};
   layerId(L); S.stack.push(L); S.sel=L.id; paint();
 });
-$('addMotif').addEventListener('click',function(){
+/* + Graphic: drop a decoration in the next empty corner and open the library on it
+   straight away, so picking the artwork is the same gesture as adding it. */
+$('addDeco').addEventListener('click',function(){
   if(typeof pushUndo==='function') pushUndo();
   var n=_stackCount(function(L){return L.k==='motif'});
-  var g=(typeof DIR==='function'?DIR().g.motif:'coffee');
   // corners first, then centre — so a click cycle fills obvious empty spots
   var slots=[[.14,.14],[.86,.14],[.14,.86],[.86,.86],[.5,.14],[.5,.86]];
   var pos=slots[n%slots.length];
-  var L={t:'box',k:'motif',x:pos[0],y:pos[1],s:.6,g:g,op:.85};
+  var g=(typeof DIR==='function'?DIR().g.motif:'coffee');
+  var L={t:'box',k:'motif',x:pos[0],y:pos[1],s:.6,g:g,op:.85,_man:true};
   layerId(L); S.stack.push(L); S.sel=L.id; paint();
+  openLib('motif',L,this);
 });
 $('addPatBand').addEventListener('click',function(){
   if(typeof pushUndo==='function') pushUndo();
@@ -2944,14 +3246,20 @@ $('logoClr').addEventListener('click',function(){ setLogo(null); });
 /* ---- your own tap mark ------------------------------------------------------
    Masked by default so a transparent PNG or SVG recolours with the brand exactly
    like the drawn marks. A full-colour mark can keep its own colours instead. */
+function tapPreview(){
+  var pv=$('tapPrev');
+  pv.innerHTML = S.tapImg ? '<img src="'+S.tapImg+'" alt="">' : '';
+  pv.classList.toggle('has',!!S.tapImg);
+  $('tapHint').textContent = S.tapImg ? 'REPLACE: PASTE · DROP · CLICK'
+                                      : 'PASTE · DROP · CLICK · SVG OR PNG';
+}
 function setTapImg(src){
   S.tapImg=src;
-  var pv=$('tapPrev');
-  pv.innerHTML = src ? '<img src="'+src+'" alt="">' : '';
-  pv.classList.toggle('has',!!src);
-  $('tapHint').textContent = src ? 'REPLACE: PASTE · DROP · CLICK' : 'PASTE · DROP · CLICK · SVG OR PNG';
+  tapPreview();
+  // dropping a file here is a decision about every tap ring on the card; losing it
+  // sends them back to the library default rather than to a dead 'custom'
   if(src) S.stack.forEach(function(L){ if(L.k==='tap') L.icon='custom'; });
-  else    S.stack.forEach(function(L){ if(L.k==='tap'&&L.icon==='custom') L.icon='phone'; });
+  else    S.stack.forEach(function(L){ if(L.k==='tap'&&L.icon==='custom') L.icon=''; });
   paint();
 }
 function readTap(file){
@@ -2971,14 +3279,29 @@ tapDrop.addEventListener('drop',function(e){ readTap(e.dataTransfer.files&&e.dat
 $('tapClr').addEventListener('click',function(){ setTapImg(null); });
 $('tapAsIs').addEventListener('change',function(){ S.tapImgMode=this.checked?'asis':'tint'; paint(); });
 
-/* ---- platform mark — the right-hand side of the lockup ---- */
+/* ---- platform mark — the right-hand side of the lockup ----
+   Two ways in, and the last one wins: a logo picked out of the library (kept as
+   an id so it survives a save/load without carrying a copy of the artwork), or a
+   file dropped into the well below. */
 function setPlatImg(src){
   S.platImg=src;
-  var pv=$('platPrev');
-  pv.innerHTML = src ? '<img src="'+src+'" alt="">' : '';
-  pv.classList.toggle('has',!!src);
-  $('platHint').textContent = src ? 'REPLACE: PASTE · DROP · CLICK' : 'DROP A GOOGLE / YELP / PLATFORM LOGO';
+  if(src) S.platLib=null;
+  platPreview();
   paint();
+}
+function setPlatLib(id){
+  S.platLib=id||null;
+  if(id) S.platImg=null;
+  platPreview();
+}
+function platPreview(){
+  var e=S.platLib?libGet('platform',S.platLib):null;
+  var pv=$('platPrev');
+  pv.innerHTML = e ? libArt(e,'currentColor','max-width:92%;max-height:88%',true)
+                   : S.platImg ? '<img src="'+S.platImg+'" alt="">' : '';
+  pv.classList.toggle('has',!!(e||S.platImg));
+  $('platHint').textContent = (e||S.platImg) ? 'REPLACE: PASTE · DROP · CLICK'
+                                             : 'DROP A GOOGLE / YELP / PLATFORM LOGO';
 }
 function readPlat(file){
   if(!file || file.type.indexOf('image')!==0) return false;
@@ -2994,7 +3317,7 @@ platDrop.addEventListener('focus',function(){ pasteTarget='plat'; });
 ['dragleave','drop'].forEach(function(t){ platDrop.addEventListener(t,function(e){
   e.preventDefault(); platDrop.classList.remove('over'); }); });
 platDrop.addEventListener('drop',function(e){ readPlat(e.dataTransfer.files&&e.dataTransfer.files[0]); });
-$('platClr').addEventListener('click',function(){ setPlatImg(null); });
+$('platClr').addEventListener('click',function(){ S.platLib=null; setPlatImg(null); });
 $('platAsIs').addEventListener('change',function(){ S.platImgMode=this.checked?'asis':'tint'; paint(); });
 
 /* star colour: when synced, the picker follows the brand; when unsynced it's independent */
@@ -3461,7 +3784,12 @@ $('saveDesign').addEventListener('click',function(){
   var d={v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
     name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo,
     userFonts:S.userFonts,dispFont:S.dispFont,bodyFont:S.bodyFont,
-    platImg:S.platImg||null,platImgMode:S.platImgMode||'asis',
+    platImg:S.platImg||null,platImgMode:S.platImgMode||'asis',platLib:S.platLib||null,
+    tapImg:S.tapImg||null,tapImgMode:S.tapImgMode||'tint',
+    /* Layers reference library icons by id, so a card that uses one you ADDED
+       would open to a blank mark without the icon itself. Ship the added tiles
+       with the design; the built-in set is already in the page. */
+    iconLib:libUser,
     starCol:$('starSync').checked?null:$('starCol').value};
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
@@ -3481,10 +3809,26 @@ $('loadDesign').addEventListener('change',function(e){
       S.userFonts=(d.userFonts&&d.userFonts.length)?d.userFonts:[];
       S.dispFont=d.dispFont||''; S.bodyFont=d.bodyFont||'';
       registerAllFaces(S.userFonts).then(function(){ refreshFontsUI(); paint(); });
+      /* restore added library tiles FIRST — the layers below reference them by id */
+      if(d.iconLib) ['tap','platform','motif'].forEach(function(c){
+        libUser[c]=(d.iconLib[c]||[]).slice();
+        // added ids look like u7-my-mark; keep the counter past them so nothing collides
+        libUser[c].forEach(function(e){
+          var n=parseInt(String(e.id).slice(1),10);
+          if(n>S.uid) S.uid=n;
+        });
+      });
       /* restore platform mark */
+      S.platLib=null;
       setPlatImg(d.platImg||null);
+      if(d.platLib) setPlatLib(d.platLib);
       S.platImgMode=d.platImgMode||'asis';
       if($('platAsIs')) $('platAsIs').checked=(S.platImgMode==='asis');
+      /* restore the one-shot tap mark — set, not applied, so the per-layer icon
+         choices that came back with d.stack survive */
+      S.tapImgMode=d.tapImgMode||'tint';
+      if($('tapAsIs')) $('tapAsIs').checked=(S.tapImgMode==='asis');
+      S.tapImg=d.tapImg||null; tapPreview();
       /* restore star colour */
       if(d.starCol){ $('starCol').value=d.starCol; $('starSync').checked=false; }
       else { $('starSync').checked=true; $('starCol').value=d.brand||'#B4577A'; }

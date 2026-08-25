@@ -1,0 +1,439 @@
+{
+  "tap": [
+    {
+      "file": "hand-phone.svg",
+      "name": "Hand holding phone",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "phone-waves.svg",
+      "name": "Phone and waves",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "waves.svg",
+      "name": "Contactless waves",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "contactless.svg",
+      "name": "Contactless mark",
+      "src": "Iconoir",
+      "lic": "MIT"
+    },
+    {
+      "file": "nfc-arcs.svg",
+      "name": "NFC arcs",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "phone-nfc.svg",
+      "name": "Phone with NFC",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "nfc-mark.svg",
+      "name": "NFC mark",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "finger-tap.svg",
+      "name": "Finger tapping",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "finger-point.svg",
+      "name": "Pointing finger",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "card-tap.svg",
+      "name": "Tapping a card",
+      "src": "Iconoir",
+      "lic": "MIT"
+    },
+    {
+      "file": "tap-target.svg",
+      "name": "Tap target",
+      "src": "Iconoir",
+      "lic": "MIT"
+    },
+    {
+      "file": "open-hand.svg",
+      "name": "Open hand",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "tap-mark.png",
+      "name": "Solid phone and waves",
+      "src": "Tap Stand",
+      "lic": "own"
+    }
+  ],
+  "platform": [],
+  "motif": [
+    {
+      "file": "coffee.svg",
+      "name": "Coffee",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "cup.svg",
+      "name": "Cold drink",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "utensils.svg",
+      "name": "Cutlery",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "pizza.svg",
+      "name": "Pizza",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "sandwich.svg",
+      "name": "Sandwich",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "soup.svg",
+      "name": "Soup",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "drumstick.svg",
+      "name": "Chicken",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "chef-hat.svg",
+      "name": "Chef hat",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "croissant.svg",
+      "name": "Bakery",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "cake.svg",
+      "name": "Cake",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "cookie.svg",
+      "name": "Cookie",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "ice-cream.svg",
+      "name": "Ice cream",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "wine.svg",
+      "name": "Wine",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "beer.svg",
+      "name": "Beer",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "wheat.svg",
+      "name": "Grain",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "scissors.svg",
+      "name": "Scissors",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "razor.svg",
+      "name": "Razor",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "sparkles.svg",
+      "name": "Sparkle",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "perfume.svg",
+      "name": "Perfume",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "massage.svg",
+      "name": "Massage",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "yoga.svg",
+      "name": "Yoga",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "flower.svg",
+      "name": "Flower",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "gem.svg",
+      "name": "Gem",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "brush.svg",
+      "name": "Brush",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "tooth.svg",
+      "name": "Tooth",
+      "src": "Tabler",
+      "lic": "MIT"
+    },
+    {
+      "file": "stethoscope.svg",
+      "name": "Stethoscope",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "heart-pulse.svg",
+      "name": "Heartbeat",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "pill.svg",
+      "name": "Pill",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "glasses.svg",
+      "name": "Glasses",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "car.svg",
+      "name": "Car",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "fuel.svg",
+      "name": "Fuel",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "spray.svg",
+      "name": "Spray can",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "wrench.svg",
+      "name": "Wrench",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "hammer.svg",
+      "name": "Hammer",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "roller.svg",
+      "name": "Paint roller",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "plug.svg",
+      "name": "Electrical",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "droplets.svg",
+      "name": "Plumbing",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "hard-hat.svg",
+      "name": "Hard hat",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "washer.svg",
+      "name": "Laundry",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "dumbbell.svg",
+      "name": "Dumbbell",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "bike.svg",
+      "name": "Bicycle",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "paw.svg",
+      "name": "Paw print",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "dog.svg",
+      "name": "Dog",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "cat.svg",
+      "name": "Cat",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "bag.svg",
+      "name": "Shopping bag",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "shirt.svg",
+      "name": "Shirt",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "gift.svg",
+      "name": "Gift",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "store.svg",
+      "name": "Storefront",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "house.svg",
+      "name": "House",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "key.svg",
+      "name": "Key",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "bed.svg",
+      "name": "Room",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "leaf.svg",
+      "name": "Leaf",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "sprout.svg",
+      "name": "Sprout",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "palm.svg",
+      "name": "Palm",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "camera.svg",
+      "name": "Camera",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "music.svg",
+      "name": "Music",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "graduation.svg",
+      "name": "Graduation",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "truck.svg",
+      "name": "Truck",
+      "src": "Lucide",
+      "lic": "ISC"
+    },
+    {
+      "file": "baby.svg",
+      "name": "Baby",
+      "src": "Lucide",
+      "lic": "ISC"
+    }
+  ]
+}
