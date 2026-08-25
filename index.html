@@ -546,9 +546,9 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
   <div class="wrap">
     <p class="eyebrow">Product system · v2</p>
     <h1>Tap stand holder suite<br>&amp; the insert that goes in it</h1>
-    <p>Nine bodies covering counter, table, wall and pocket across every vertical worth selling to —
-      drawn in their real materials — plus a layered insert editor built on the same stack model as
-      the TapCard strip designer.</p>
+    <p>A layered insert editor built on the same stack model as the TapCard strip designer —
+      design the card, export it at true trim size or ganged up on a laser sheet. Below it: nine
+      holder bodies covering counter, table, wall and pocket, drawn in their real materials.</p>
     <div class="meta">
       <span>TRIM 4×6 IN · A6</span><span>NTAG213 — 30 MM ON-METAL DISC</span>
       <span>DEST. RESOLVED SERVER-SIDE</span><span>INSERT SWAPPABLE</span>
@@ -556,40 +556,9 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
   </div>
 </header>
 
-<section id="suite">
-  <div class="wrap">
-    <div class="shead"><span class="snum">01</span><h2>The holder suite</h2></div>
-    <p class="slede">Side elevations in material — the profile decides how a phone meets the face.
-      <strong>Click any body</strong> for its full spec and every supplier that carries it. Each one
-      shows a photo instead of the drawing as soon as <code>img/&lt;name&gt;.jpg</code> exists next to
-      this page.</p>
-    <div class="holders" id="holders"></div>
-    <div class="notesall" id="notesAll" hidden></div>
-  </div>
-</section>
-
-<div class="modal" id="modal" hidden>
-  <div class="mbd" role="dialog" aria-modal="true" aria-label="Holder detail">
-    <button class="mx" id="mClose" aria-label="Close">×</button>
-    <div id="mBody"></div>
-  </div>
-</div>
-
-<section id="matrix">
-  <div class="wrap">
-    <div class="shead"><span class="snum">02</span><h2>Industry coverage</h2></div>
-    <p class="slede">Which body to reach for, and where it lives in that business. The volume column
-      is the commercial one — a café buys two, a hotel buys forty.</p>
-    <div class="scroller"><table>
-      <thead><tr><th>Industry</th><th>Placement</th><th>Primary body</th><th>Add-on</th><th>Vol.</th></tr></thead>
-      <tbody id="matrixBody"></tbody>
-    </table></div>
-  </div>
-</section>
-
 <section id="studio">
   <div class="wrap">
-    <div class="shead"><span class="snum">03</span><h2>Insert editor</h2></div>
+    <div class="shead"><span class="snum">01</span><h2>Insert editor</h2></div>
     <p class="slede">Every element on the card is a layer. Click one to select it, drag it anywhere,
       add text layers wherever you want. The Layers panel lists front of card first — hide, lock,
       reorder or delete — and a locked layer still draws but never catches a drag, so a background
@@ -630,11 +599,6 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                   <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
                   <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
                 </div></div>
-              <div class="grp"><span class="lbl">Star colour</span>
-                <div class="row2">
-                  <input type="color" id="starCol" value="#B4577A" aria-label="Star colour">
-                  <label class="tog"><input type="checkbox" id="starSync" checked> Sync with brand</label>
-                </div></div>
               <div class="grp"><span class="lbl">Logo</span>
                 <div class="logodrop" id="logoDrop" tabindex="0" role="button"
                      aria-label="Add a logo: paste, drop a file, or click">
@@ -649,8 +613,13 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <label class="tog"><input type="checkbox" id="logoHideName" checked> Hide business name when a logo is set</label>
               </div>
               <details class="sub">
-                <summary class="sect-h">More marks — tap icon, platform lockup</summary>
+                <summary class="sect-h">Star colour, tap icon, platform lockup</summary>
                 <div class="sect-b">
+                  <div class="grp"><span class="lbl">Star colour</span>
+                    <div class="row2">
+                      <input type="color" id="starCol" value="#B4577A" aria-label="Star colour">
+                      <label class="tog"><input type="checkbox" id="starSync" checked> Sync with brand</label>
+                    </div></div>
                   <div class="grp"><span class="lbl">Tap mark — your own</span>
                     <div class="logodrop" id="tapDrop" tabindex="0" role="button"
                          aria-label="Add your own tap mark: paste, drop a file, or click">
@@ -683,12 +652,16 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           </details>
 
           <details class="sect" open>
-            <summary class="sect-h"><span class="sect-n">03</span>Hardware &amp; size</summary>
+            <summary class="sect-h"><span class="sect-n">03</span>Format</summary>
             <div class="sect-b">
-              <div class="grp"><span class="lbl">NFC tag — what you actually have</span>
-                <div class="chips" id="tags"></div>
-                <span class="taghint" id="tagHint"></span></div>
-              <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
+              <div class="grp"><div class="chips" id="formats"></div></div>
+              <details class="sub">
+                <summary class="sect-h">NFC tag — what you actually have</summary>
+                <div class="sect-b">
+                  <div class="chips" id="tags"></div>
+                  <span class="taghint" id="tagHint"></span>
+                </div>
+              </details>
             </div>
           </details>
 
@@ -698,9 +671,14 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
               <div class="grp"><span class="lbl">Direction — pick this first</span>
                 <div class="chips" id="dirs"></div></div>
               <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
-              <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
-              <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
-              <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
+              <details class="sub">
+                <summary class="sect-h">Refine — theme, palette, motif</summary>
+                <div class="sect-b">
+                  <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
+                  <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
+                  <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
+                </div>
+              </details>
               <details class="sub">
                 <summary class="sect-h">Custom type — upload a font</summary>
                 <div class="sect-b">
@@ -737,34 +715,39 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <button class="btn solid" id="addText" type="button">+ Text</button>
                 <button class="btn" id="resetLay" type="button">Reset</button>
               </div>
-              <!-- Fill-space quick-adds: for filling the ring between the frame border
-                   and the tap ring / central content, without hunting through the plate
-                   grid. Each drops a sensible layer at the top of the middle band. -->
-              <div class="row3">
-                <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
-                <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
-                <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
-              </div>
               <div class="row3">
                 <button class="btn" id="undoBtn" type="button" title="⌘Z">Undo</button>
                 <button class="btn" id="redoBtn" type="button" title="⇧⌘Z">Redo</button>
                 <button class="btn" id="dupBtn" type="button" title="⌘D">Duplicate</button>
               </div>
-              <div class="grp"><span class="lbl">Align selected</span>
-                <div class="chips" id="alignRow">
-                  <button class="chip" type="button" data-al="l">Left</button>
-                  <button class="chip" type="button" data-al="c">Centre</button>
-                  <button class="chip" type="button" data-al="r">Right</button>
-                  <button class="chip" type="button" data-al="t">Top</button>
-                  <button class="chip" type="button" data-al="m">Middle</button>
-                  <button class="chip" type="button" data-al="b">Bottom</button>
-                </div></div>
               <div class="grp" id="inspector"></div>
+              <details class="sub">
+                <summary class="sect-h">Add decoration &amp; align</summary>
+                <div class="sect-b">
+                  <!-- Fill-space quick-adds: for filling the ring between the frame border
+                       and the tap ring / central content, without hunting through the plate
+                       grid. Each drops a sensible layer at the top of the middle band. -->
+                  <div class="row3">
+                    <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
+                    <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
+                    <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
+                  </div>
+                  <div class="grp"><span class="lbl">Align selected</span>
+                    <div class="chips" id="alignRow">
+                      <button class="chip" type="button" data-al="l">Left</button>
+                      <button class="chip" type="button" data-al="c">Centre</button>
+                      <button class="chip" type="button" data-al="r">Right</button>
+                      <button class="chip" type="button" data-al="t">Top</button>
+                      <button class="chip" type="button" data-al="m">Middle</button>
+                      <button class="chip" type="button" data-al="b">Bottom</button>
+                    </div></div>
+                </div>
+              </details>
             </div>
           </details>
 
           <details class="sect" open>
-            <summary class="sect-h"><span class="sect-n">06</span>Checks &amp; export</summary>
+            <summary class="sect-h"><span class="sect-n">06</span>Export</summary>
             <div class="sect-b">
               <div class="grp"><span class="lbl">Preflight</span>
                 <ul class="preflight" id="preflight"></ul></div>
@@ -780,17 +763,22 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 </select>
                 <span class="lbl" id="sheetFit" style="text-align:right">—</span>
               </div>
-              <div class="row2">
-                <button class="btn" id="saveDesign" type="button">Save</button>
-                <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
-                  <input type="file" id="loadDesign" accept="application/json" hidden></label>
-              </div>
-              <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
+              <details class="sub">
+                <summary class="sect-h">Save, load &amp; contact sheet</summary>
+                <div class="sect-b">
+                  <div class="row2">
+                    <button class="btn" id="saveDesign" type="button">Save</button>
+                    <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
+                      <input type="file" id="loadDesign" accept="application/json" hidden></label>
+                  </div>
+                  <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
+                </div>
+              </details>
             </div>
           </details>
 
           <details class="sect">
-            <summary class="sect-h"><span class="sect-n">07</span>Overlays</summary>
+            <summary class="sect-h"><span class="sect-n">07</span>Overlays &amp; guides</summary>
             <div class="sect-b">
               <div class="grp">
                 <label class="tog"><input type="checkbox" id="qrOn"> Add a QR code (off = tap only)</label>
@@ -839,6 +827,37 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
   </div>
 </section>
 
+<section id="suite">
+  <div class="wrap">
+    <div class="shead"><span class="snum">02</span><h2>The holder suite</h2></div>
+    <p class="slede">Side elevations in material — the profile decides how a phone meets the face.
+      <strong>Click any body</strong> for its full spec and every supplier that carries it. Each one
+      shows a photo instead of the drawing as soon as <code>img/&lt;name&gt;.jpg</code> exists next to
+      this page.</p>
+    <div class="holders" id="holders"></div>
+    <div class="notesall" id="notesAll" hidden></div>
+  </div>
+</section>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbd" role="dialog" aria-modal="true" aria-label="Holder detail">
+    <button class="mx" id="mClose" aria-label="Close">×</button>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<section id="matrix">
+  <div class="wrap">
+    <div class="shead"><span class="snum">03</span><h2>Industry coverage</h2></div>
+    <p class="slede">Which body to reach for, and where it lives in that business. The volume column
+      is the commercial one — a café buys two, a hotel buys forty.</p>
+    <div class="scroller"><table>
+      <thead><tr><th>Industry</th><th>Placement</th><th>Primary body</th><th>Add-on</th><th>Vol.</th></tr></thead>
+      <tbody id="matrixBody"></tbody>
+    </table></div>
+  </div>
+</section>
+
 <section id="spec">
   <div class="wrap">
     <div class="shead"><span class="snum">04</span><h2>What changes per business</h2></div>
@@ -865,7 +884,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
 
 <section id="build">
   <div class="wrap">
-    <div class="shead"><span class="snum">06</span><h2>Your four tags — build spec</h2></div>
+    <div class="shead"><span class="snum">05</span><h2>Your four tags — build spec</h2></div>
     <p class="slede">Seritag order <code>x49745</code>, 10 of each. Two of these are the printed
       surface and two hide behind one, which is the whole difference in how you build them.
       Dimensions below are the delivery note's, not estimates.</p>
@@ -875,7 +894,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
 
 <section id="sourcing">
   <div class="wrap">
-    <div class="shead"><span class="snum">05</span><h2>Sourcing</h2></div>
+    <div class="shead"><span class="snum">06</span><h2>Sourcing</h2></div>
     <p class="slede">Items marked <span class="pick">PICK</span> are the first-order shortlist —
       around $60 all in, covering every mounting type so you decide with the things in your hand
       rather than from listing photos. <span class="gap">NO SUPPLIER</span> marks a rule or a gap
@@ -894,7 +913,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
 
 <section id="nfc">
   <div class="wrap">
-    <div class="shead"><span class="snum">06</span><h2>NFC Tags & Holders</h2></div>
+    <div class="shead"><span class="snum">07</span><h2>NFC Tags & Holders</h2></div>
     <p class="slede">Drag to reorder by preference. Links open to suppliers; notes stay local.</p>
     <div class="nfclist" id="nfclist" style="display:grid;gap:1px;margin-top:24px;background:var(--rule);border:1px solid var(--rule)">
       <!-- NFC items rendered here -->
