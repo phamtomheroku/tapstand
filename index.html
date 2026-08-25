@@ -139,8 +139,28 @@ td.pri{font-weight:650}
 @media(min-width:980px){.studio{grid-template-columns:312px 1fr;align-items:start}
   .stage{position:sticky;top:16px;align-self:start}}
 .controls{display:flex;flex-direction:column;gap:14px}
-.pane{background:var(--panel);border:1px solid var(--rule);padding:15px;
-  display:flex;flex-direction:column;gap:13px}
+.pane{display:flex;flex-direction:column;gap:10px}
+/* sidebar sections: each a bordered card with a clickable header, native <details>
+   so it needs no JS. Previously every field — from business name to font upload —
+   sat as an equal-weight sibling in one undifferentiated 17-deep stack; grouping
+   into named, collapsible cards is what actually fixes "looks disorganized" rather
+   than just restyling the same flat list. */
+.sect{background:var(--panel);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.sect-h{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink);list-style:none;user-select:none;background:var(--paper-2)}
+.sect-h::-webkit-details-marker{display:none}
+.sect-h::after{content:"";margin-left:auto;width:6px;height:6px;flex:none;
+  border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);
+  transform:rotate(45deg);transition:transform .15s}
+.sect[open]>.sect-h::after{transform:rotate(-135deg)}
+.sect-n{font-weight:700;color:var(--accent)}
+.sect-b{display:flex;flex-direction:column;gap:13px;padding:14px 13px}
+/* nested sub-section: advanced / rarely-touched controls, closed by default so they
+   don't compete with the fields someone edits every time */
+.sub{border:1px solid var(--rule-2);border-radius:2px;background:var(--paper)}
+.sub .sect-h{padding:8px 10px;font-size:10px;background:transparent;color:var(--ink-2)}
+.sub .sect-b{padding:11px 10px;gap:11px}
 .grp{display:flex;flex-direction:column;gap:7px}
 .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--ink-3)}
@@ -578,162 +598,210 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
     <div class="studio">
       <div class="controls">
         <div class="pane">
-          <div class="grp"><span class="lbl">Industry preset</span><div class="chips" id="presets"></div></div>
-          <div class="grp"><span class="lbl">Business name</span>
-            <input type="text" id="bname" value="Moka Beauty Bar" autocomplete="off"></div>
-          <div class="grp"><span class="lbl">Tone</span><div class="chips" id="tones"></div></div>
-          <div class="grp"><span class="lbl">Headline</span>
-            <select id="copy">
-              <option>We'd greatly appreciate your Google review</option>
-              <option>How did we do?</option>
-              <option>Loved your visit? Tell Google.</option>
-              <option>Leave us a review — it takes 20 seconds</option>
-              <option>Your review helps our small business grow</option>
-            </select>
-            <div class="row2">
-              <button class="btn" id="copyShuffle" type="button">Shuffle</button>
-              <button class="btn" id="copyTrade" type="button">Trade line</button>
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">01</span>Content</summary>
+            <div class="sect-b">
+              <div class="grp"><span class="lbl">Industry preset</span><div class="chips" id="presets"></div></div>
+              <div class="grp"><span class="lbl">Business name</span>
+                <input type="text" id="bname" value="Moka Beauty Bar" autocomplete="off"></div>
+              <div class="grp"><span class="lbl">Tone</span><div class="chips" id="tones"></div></div>
+              <div class="grp"><span class="lbl">Headline</span>
+                <select id="copy">
+                  <option>We'd greatly appreciate your Google review</option>
+                  <option>How did we do?</option>
+                  <option>Loved your visit? Tell Google.</option>
+                  <option>Leave us a review — it takes 20 seconds</option>
+                  <option>Your review helps our small business grow</option>
+                </select>
+                <div class="row2">
+                  <button class="btn" id="copyShuffle" type="button">Shuffle</button>
+                  <button class="btn" id="copyTrade" type="button">Trade line</button>
+                </div>
+                <span class="lenhint" id="lenHint"></span></div>
+              <div class="grp"><span class="lbl">Call to action</span><select id="ctaSel"></select></div>
             </div>
-            <span class="lenhint" id="lenHint"></span></div>
-          <div class="grp"><span class="lbl">Call to action</span><select id="ctaSel"></select></div>
-          <div class="grp"><span class="lbl">Brand colour · card ground</span>
-            <div class="row2">
-              <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
-              <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
-            </div></div>
-          <div class="grp"><span class="lbl">Star colour</span>
-            <div class="row2">
-              <input type="color" id="starCol" value="#B4577A" aria-label="Star colour">
-              <label class="tog"><input type="checkbox" id="starSync" checked> Sync with brand</label>
-            </div></div>
-          <div class="grp"><span class="lbl">Logo</span>
-            <div class="logodrop" id="logoDrop" tabindex="0" role="button"
-                 aria-label="Add a logo: paste, drop a file, or click">
-              <div class="logoprev" id="logoPrev"></div>
-              <span class="logohint" id="logoHint">PASTE (⌘V) · DROP A FILE · CLICK</span>
-              <input type="file" id="logo" accept="image/*" hidden>
+          </details>
+
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">02</span>Brand</summary>
+            <div class="sect-b">
+              <div class="grp"><span class="lbl">Brand colour · card ground</span>
+                <div class="row2">
+                  <input type="color" id="brand" value="#B4577A" aria-label="Brand colour">
+                  <input type="color" id="bg" value="#FBF8F6" aria-label="Card ground">
+                </div></div>
+              <div class="grp"><span class="lbl">Star colour</span>
+                <div class="row2">
+                  <input type="color" id="starCol" value="#B4577A" aria-label="Star colour">
+                  <label class="tog"><input type="checkbox" id="starSync" checked> Sync with brand</label>
+                </div></div>
+              <div class="grp"><span class="lbl">Logo</span>
+                <div class="logodrop" id="logoDrop" tabindex="0" role="button"
+                     aria-label="Add a logo: paste, drop a file, or click">
+                  <div class="logoprev" id="logoPrev"></div>
+                  <span class="logohint" id="logoHint">PASTE (⌘V) · DROP A FILE · CLICK</span>
+                  <input type="file" id="logo" accept="image/*" hidden>
+                </div>
+                <div class="row2">
+                  <label class="tog"><input type="checkbox" id="logoInv"> Invert (white marks)</label>
+                  <button class="btn" id="logoClr" type="button">Clear</button>
+                </div>
+                <label class="tog"><input type="checkbox" id="logoHideName" checked> Hide business name when a logo is set</label>
+              </div>
+              <details class="sub">
+                <summary class="sect-h">More marks — tap icon, platform lockup</summary>
+                <div class="sect-b">
+                  <div class="grp"><span class="lbl">Tap mark — your own</span>
+                    <div class="logodrop" id="tapDrop" tabindex="0" role="button"
+                         aria-label="Add your own tap mark: paste, drop a file, or click">
+                      <div class="logoprev" id="tapPrev"></div>
+                      <span class="logohint" id="tapHint">PASTE · DROP · CLICK · SVG OR PNG</span>
+                      <input type="file" id="tapFile" accept="image/*" hidden>
+                    </div>
+                    <div class="row2">
+                      <label class="tog"><input type="checkbox" id="tapAsIs"> Keep its own colours</label>
+                      <button class="btn" id="tapClr" type="button">Clear</button>
+                    </div>
+                  </div>
+                  <div class="grp"><span class="lbl">Platform mark — for the lockup</span>
+                    <div class="logodrop" id="platDrop" tabindex="0" role="button"
+                         aria-label="Add a platform mark for the lockup: paste, drop, or click">
+                      <div class="logoprev" id="platPrev"></div>
+                      <span class="logohint" id="platHint">DROP A GOOGLE / YELP / PLATFORM LOGO</span>
+                      <input type="file" id="platFile" accept="image/*" hidden>
+                    </div>
+                    <div class="row2">
+                      <label class="tog"><input type="checkbox" id="platAsIs" checked> Keep its own colours</label>
+                      <button class="btn" id="platClr" type="button">Clear</button>
+                    </div>
+                    <p class="fnthint">Replaces the text word in the lockup layer (<code>LOGO × Google</code>)
+                      with an actual image. Both images sit side by side at the same height.</p>
+                  </div>
+                </div>
+              </details>
             </div>
-            <div class="row2">
-              <label class="tog"><input type="checkbox" id="logoInv"> Invert (white marks)</label>
-              <button class="btn" id="logoClr" type="button">Clear</button>
+          </details>
+
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">03</span>Hardware &amp; size</summary>
+            <div class="sect-b">
+              <div class="grp"><span class="lbl">NFC tag — what you actually have</span>
+                <div class="chips" id="tags"></div>
+                <span class="taghint" id="tagHint"></span></div>
+              <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
             </div>
-            <label class="tog"><input type="checkbox" id="logoHideName" checked> Hide business name when a logo is set</label>
-          </div>
-          <div class="grp"><span class="lbl">Tap mark — your own</span>
-            <div class="logodrop" id="tapDrop" tabindex="0" role="button"
-                 aria-label="Add your own tap mark: paste, drop a file, or click">
-              <div class="logoprev" id="tapPrev"></div>
-              <span class="logohint" id="tapHint">PASTE · DROP · CLICK · SVG OR PNG</span>
-              <input type="file" id="tapFile" accept="image/*" hidden>
+          </details>
+
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">04</span>Look</summary>
+            <div class="sect-b">
+              <div class="grp"><span class="lbl">Direction — pick this first</span>
+                <div class="chips" id="dirs"></div></div>
+              <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
+              <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
+              <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
+              <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
+              <details class="sub">
+                <summary class="sect-h">Custom type — upload a font</summary>
+                <div class="sect-b">
+                  <label class="logodrop" id="fontDrop" tabindex="0" role="button"
+                         aria-label="Add a font: drop .ttf / .otf / .woff / .woff2 files or click">
+                    <span class="logohint">DROP .TTF · .OTF · .WOFF · .WOFF2 · OR CLICK</span>
+                    <input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" multiple hidden>
+                  </label>
+                  <div class="fntsel">
+                    <div class="col"><label for="dispFontSel">Display</label>
+                      <select id="dispFontSel"><option value="">Theme default</option></select></div>
+                    <div class="col"><label for="bodyFontSel">Body</label>
+                      <select id="bodyFontSel"><option value="">Theme default</option></select></div>
+                  </div>
+                  <div id="fontList"></div>
+                  <p class="fnthint">Faces of one family group together — drop Regular <em>and</em> Bold and the
+                    card gets real weights instead of a synthesised bold. Fonts bake into the printed insert
+                    and are saved inside your <code>.tapcard.json</code>.</p>
+                </div>
+              </details>
             </div>
-            <div class="row2">
-              <label class="tog"><input type="checkbox" id="tapAsIs"> Keep its own colours</label>
-              <button class="btn" id="tapClr" type="button">Clear</button>
-            </div>
-          </div>
-          <div class="grp"><span class="lbl">Platform mark — for the lockup</span>
-            <div class="logodrop" id="platDrop" tabindex="0" role="button"
-                 aria-label="Add a platform mark for the lockup: paste, drop, or click">
-              <div class="logoprev" id="platPrev"></div>
-              <span class="logohint" id="platHint">DROP A GOOGLE / YELP / PLATFORM LOGO</span>
-              <input type="file" id="platFile" accept="image/*" hidden>
-            </div>
-            <div class="row2">
-              <label class="tog"><input type="checkbox" id="platAsIs" checked> Keep its own colours</label>
-              <button class="btn" id="platClr" type="button">Clear</button>
-            </div>
-            <p class="fnthint">Replaces the text word in the lockup layer (<code>LOGO × Google</code>)
-              with an actual image. Both images sit side by side at the same height.</p>
-          </div>
-          <div class="grp"><span class="lbl">NFC tag — what you actually have</span>
-            <div class="chips" id="tags"></div>
-            <span class="taghint" id="tagHint"></span></div>
-          <div class="grp"><span class="lbl">Format</span><div class="chips" id="formats"></div></div>
-          <div class="grp"><span class="lbl">Direction — pick this first</span>
-            <div class="chips" id="dirs"></div></div>
-          <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
-          <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
-          <div class="grp"><span class="lbl">Custom type — upload a font</span>
-            <label class="logodrop" id="fontDrop" tabindex="0" role="button"
-                   aria-label="Add a font: drop .ttf / .otf / .woff / .woff2 files or click">
-              <span class="logohint">DROP .TTF · .OTF · .WOFF · .WOFF2 · OR CLICK</span>
-              <input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2" multiple hidden>
-            </label>
-            <div class="fntsel">
-              <div class="col"><label for="dispFontSel">Display</label>
-                <select id="dispFontSel"><option value="">Theme default</option></select></div>
-              <div class="col"><label for="bodyFontSel">Body</label>
-                <select id="bodyFontSel"><option value="">Theme default</option></select></div>
-            </div>
-            <div id="fontList"></div>
-            <p class="fnthint">Faces of one family group together — drop Regular <em>and</em> Bold and the
-              card gets real weights instead of a synthesised bold. Fonts bake into the printed insert
-              and are saved inside your <code>.tapcard.json</code>.</p>
-          </div>
-          <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
-          <div class="grp"><span class="lbl">Motif</span><div class="chips" id="motifs"></div></div>
+          </details>
         </div>
 
         <div class="pane">
-          <div class="grp">
-            <span class="lbl">Layers — front first</span>
-            <div class="layers" id="layers"></div>
-          </div>
-          <div class="row2">
-            <button class="btn solid" id="addText" type="button">+ Text</button>
-            <button class="btn" id="resetLay" type="button">Reset</button>
-          </div>
-          <!-- Fill-space quick-adds: for filling the ring between the frame border
-               and the tap ring / central content, without hunting through the plate
-               grid. Each drops a sensible layer at the top of the middle band. -->
-          <div class="row3">
-            <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
-            <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
-            <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
-          </div>
-          <div class="row3">
-            <button class="btn" id="undoBtn" type="button" title="⌘Z">Undo</button>
-            <button class="btn" id="redoBtn" type="button" title="⇧⌘Z">Redo</button>
-            <button class="btn" id="dupBtn" type="button" title="⌘D">Duplicate</button>
-          </div>
-          <div class="grp"><span class="lbl">Align selected</span>
-            <div class="chips" id="alignRow">
-              <button class="chip" type="button" data-al="l">Left</button>
-              <button class="chip" type="button" data-al="c">Centre</button>
-              <button class="chip" type="button" data-al="r">Right</button>
-              <button class="chip" type="button" data-al="t">Top</button>
-              <button class="chip" type="button" data-al="m">Middle</button>
-              <button class="chip" type="button" data-al="b">Bottom</button>
-            </div></div>
-          <div class="grp" id="inspector"></div>
-          <div class="grp"><span class="lbl">Preflight</span>
-            <ul class="preflight" id="preflight"></ul></div>
-          <div class="row2">
-            <button class="btn solid" id="printBtn" type="button">Card PDF · trim size</button>
-            <button class="btn solid" id="sheetPdfBtn" type="button">Sheet PDF · N-up</button>
-          </div>
-          <div class="row2" style="align-items:center">
-            <select id="sheetPaper" class="btn" title="paper size for the sheet PDF"
-              style="padding:8px 10px">
-              <option value="letter">Letter · 8.5 × 11 in</option>
-              <option value="a4">A4 · 210 × 297 mm</option>
-            </select>
-            <span class="lbl" id="sheetFit" style="text-align:right">—</span>
-          </div>
-          <div class="row2">
-            <button class="btn" id="saveDesign" type="button">Save</button>
-            <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
-              <input type="file" id="loadDesign" accept="application/json" hidden></label>
-          </div>
-          <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
-          <div class="grp"><span class="lbl">Overlays</span>
-            <label class="tog"><input type="checkbox" id="qrOn"> Add a QR code (off = tap only)</label>
-            <label class="tog"><input type="checkbox" id="autoFit" checked> Auto-fit (stop elements colliding)</label>
-            <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
-            <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
-            <label class="tog"><input type="checkbox" id="ovTag"> 30 mm disc position</label>
-            <label class="tog"><input type="checkbox" id="ovHold"> Seat in acrylic holder</label>
-          </div>
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">05</span>Layers</summary>
+            <div class="sect-b">
+              <div class="grp">
+                <span class="lbl">Layers — front first</span>
+                <div class="layers" id="layers"></div>
+              </div>
+              <div class="row2">
+                <button class="btn solid" id="addText" type="button">+ Text</button>
+                <button class="btn" id="resetLay" type="button">Reset</button>
+              </div>
+              <!-- Fill-space quick-adds: for filling the ring between the frame border
+                   and the tap ring / central content, without hunting through the plate
+                   grid. Each drops a sensible layer at the top of the middle band. -->
+              <div class="row3">
+                <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
+                <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
+                <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
+              </div>
+              <div class="row3">
+                <button class="btn" id="undoBtn" type="button" title="⌘Z">Undo</button>
+                <button class="btn" id="redoBtn" type="button" title="⇧⌘Z">Redo</button>
+                <button class="btn" id="dupBtn" type="button" title="⌘D">Duplicate</button>
+              </div>
+              <div class="grp"><span class="lbl">Align selected</span>
+                <div class="chips" id="alignRow">
+                  <button class="chip" type="button" data-al="l">Left</button>
+                  <button class="chip" type="button" data-al="c">Centre</button>
+                  <button class="chip" type="button" data-al="r">Right</button>
+                  <button class="chip" type="button" data-al="t">Top</button>
+                  <button class="chip" type="button" data-al="m">Middle</button>
+                  <button class="chip" type="button" data-al="b">Bottom</button>
+                </div></div>
+              <div class="grp" id="inspector"></div>
+            </div>
+          </details>
+
+          <details class="sect" open>
+            <summary class="sect-h"><span class="sect-n">06</span>Checks &amp; export</summary>
+            <div class="sect-b">
+              <div class="grp"><span class="lbl">Preflight</span>
+                <ul class="preflight" id="preflight"></ul></div>
+              <div class="row2">
+                <button class="btn solid" id="printBtn" type="button">Card PDF · trim size</button>
+                <button class="btn solid" id="sheetPdfBtn" type="button">Sheet PDF · N-up</button>
+              </div>
+              <div class="row2" style="align-items:center">
+                <select id="sheetPaper" class="btn" title="paper size for the sheet PDF"
+                  style="padding:8px 10px">
+                  <option value="letter">Letter · 8.5 × 11 in</option>
+                  <option value="a4">A4 · 210 × 297 mm</option>
+                </select>
+                <span class="lbl" id="sheetFit" style="text-align:right">—</span>
+              </div>
+              <div class="row2">
+                <button class="btn" id="saveDesign" type="button">Save</button>
+                <label class="btn" style="cursor:pointer;margin:0;text-align:center">Load
+                  <input type="file" id="loadDesign" accept="application/json" hidden></label>
+              </div>
+              <button class="btn" id="sheetBtn" type="button">Contact sheet — all industries</button>
+            </div>
+          </details>
+
+          <details class="sect">
+            <summary class="sect-h"><span class="sect-n">07</span>Overlays</summary>
+            <div class="sect-b">
+              <div class="grp">
+                <label class="tog"><input type="checkbox" id="qrOn"> Add a QR code (off = tap only)</label>
+                <label class="tog"><input type="checkbox" id="autoFit" checked> Auto-fit (stop elements colliding)</label>
+                <label class="tog"><input type="checkbox" id="ovGrid"> Grid</label>
+                <label class="tog"><input type="checkbox" id="ovSafe"> Safe area &amp; holder lip</label>
+                <label class="tog"><input type="checkbox" id="ovTag"> 30 mm disc position</label>
+                <label class="tog"><input type="checkbox" id="ovHold"> Seat in acrylic holder</label>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
