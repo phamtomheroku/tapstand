@@ -239,6 +239,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .f783wrap::after{content:"";position:absolute;top:7.81%;bottom:7.81%;
   left:5.23%;right:5.23%;outline:0.5px dashed rgba(0,0,0,.4);
   pointer-events:none;z-index:995}
+/* On the wrap, the frame border belongs at the FOLD, not the trim edge — the
+   flaps stay unbordered so they read as continuous colour when wrapped. */
+#card.f783wrap .frame,.f783wrap .frame,
+#card.f783wrap .frame2,.f783wrap .frame2{inset:7.81% 5.23%!important}
 #card{font-family:var(--f-body,inherit)}
 .frame,.frame2{position:absolute;inset:0;pointer-events:none;z-index:900}
 .fr-solid    .frame{border:2.6cqw solid var(--b-brand)}
@@ -678,6 +682,14 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <div class="row2">
             <button class="btn solid" id="addText" type="button">+ Text</button>
             <button class="btn" id="resetLay" type="button">Reset</button>
+          </div>
+          <!-- Fill-space quick-adds: for filling the ring between the frame border
+               and the tap ring / central content, without hunting through the plate
+               grid. Each drops a sensible layer at the top of the middle band. -->
+          <div class="row3">
+            <button class="btn" id="addLine" type="button" title="thin divider rule">+ Line</button>
+            <button class="btn" id="addMotif" type="button" title="small graphic — uses the current direction's motif">+ Motif</button>
+            <button class="btn" id="addPatBand" type="button" title="decorative strip in the current pattern">+ Strip</button>
           </div>
           <div class="row3">
             <button class="btn" id="undoBtn" type="button" title="⌘Z">Undo</button>
@@ -1351,7 +1363,7 @@ var FORMATS=[
     the whole 95.6 × 64 bounding box — the flaps carry the same background so
     the wrap reads continuous. Fold guides and corner-snip marks are added by
     the .f783wrap CSS below. */
- {k:"ST783 wrap",cls:"f783wrap",d:"95.6 × 64 mm — 85.6 × 54 face + 5 mm flap",mm:95.6,ar:0.6695,tag:3}
+ {k:"ST783 wrap",cls:"f783wrap",d:"95.6 × 64 mm — 85.6 × 54 face + 5 mm flap",mm:95.6,ar:0.6695,tag:3,face:{x:0.0523,y:0.0781,w:0.8954,h:0.8438}}
 ];
 /* ---- the tags actually delivered (Seritag order x49745, 10 of each) ----------
    Two of these ARE the printed surface, so they get their own trim sizes and you
@@ -1875,7 +1887,10 @@ function DIR(){ return DIRECTIONS[S.dir||0] }
 
 // bottom → top, exactly like stripDesign.stack
 function defaults(fmt){
-  if(fmt===5) return [                                    // CR80 85.6×54 landscape
+  // The ST783 wrap borrows the CR80 layout verbatim — face-mapping in paint()
+  // takes care of shifting positions into the front face and scaling sizes to
+  // match CR80 physical dimensions, so no separate coordinate table is needed.
+  if(fmt===7 || fmt===5) return [                                    // CR80 85.6×54 landscape
    {t:"box",k:"logo", x:.14, y:.48,s:.58,lw:28,lh:10},
    {t:"box",k:"name", x:.44, y:.26,s:.72,w:.40},
    {t:"box",k:"stars",x:.44, y:.50,s:.58},
@@ -2133,7 +2148,7 @@ function layerLabel(L){
 function layerId(L){ if(!L.id) L.id='l'+(++S.uid); return L.id }
 
 function bodyHTML(L,ctx){
-  var s=L.s==null?1:L.s;
+  var s=(L.s==null?1:L.s)*(ctx.sMul||1);
   var mc = L.onBand ? contrast(ctx.brand) : ctx.brand;   // mark colour
   var gc = L.onBand ? {brand:mc,accent:mc,ground:ctx.brand} : ctx.pal;  // graphic colours
   if(L.t==='text'){
@@ -2323,7 +2338,19 @@ function paint(quiet){
 
   var logoFx = $('logoInv').checked ? ';filter:invert(1) hue-rotate(180deg)' : '';
   var hasName = S.stack.some(function(L){ return L.k==='name' && !L.hidden; });
-  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,hasName:hasName,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,
+  // A format may declare a `face` rectangle — the printable front area, expressed
+  // as fractions of the full card. Content layers map through it so they render at
+  // the SAME physical size and position that they would on the face-only format
+  // (e.g. an ST783 wrap borrows a CR80 layout unchanged). Background layers ignore
+  // the face so they still bleed into the flaps.
+  var face = fmt.face || {x:0,y:0,w:1,h:1};
+  var GROUND = {pattern:1,fill:1,hero:1,motif:1,band:1,split:1,rail:1,blob:1};
+  function fmap(L){
+    if(GROUND[L.k]) return {x:L.x,y:L.y,w:L.w,sMul:1};
+    return {x:face.x+L.x*face.w, y:face.y+L.y*face.h,
+            w:(L.w!=null?L.w*face.w:null), sMul:face.w};
+  }
+  var ctx={th:th,pal:pal,cardH:100*(fmt.ar||1.5),logoFx:logoFx,hasName:hasName,name:name,brand:brand,bg:pal.ground,fg:fg,copy:elCopy.value,logo:S.logo,face:face,sMul:1,
     qr:qrSVG(name+brand,fg,bg),host:'tap.moka.beauty/t/'+
       (name.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,6)||'0481')};
 
@@ -2339,8 +2366,10 @@ function paint(quiet){
     var d=document.createElement('div');
     d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(S.sel===L.id?' sel':'');
     d.dataset.id=L.id; d.dataset.k=L.k||L.t;
-    d.style.left=(L.x*100)+'%'; d.style.top=(L.y*100)+'%'; d.style.zIndex=100+i;
-    if(L.w) d.style.width=(L.w*100)+'%';
+    var M=fmap(L);
+    d.style.left=(M.x*100)+'%'; d.style.top=(M.y*100)+'%'; d.style.zIndex=100+i;
+    if(M.w!=null) d.style.width=(M.w*100)+'%';
+    ctx.sMul = M.sMul;                          // bodyHTML reads this to keep physical size
     // Anything sitting on the colour band flips to whatever reads against the brand,
     // resolved at paint time so it keeps up when the brand colour changes.
     if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
@@ -2364,7 +2393,8 @@ function paint(quiet){
   // Pin the disc overlay to the tap ring — at true scale for this format's trim width.
   var tap=null;
   S.stack.forEach(function(L){ if(L.t==='box'&&L.k==='tap') tap=L; });
-  var TG=TAG(), dPct=(TG.w/fmt.mm)*100, dhPct=(TG.h/fmt.mm)*100, anchor=tap||{x:.5,y:.5};
+  var TG=TAG(), dPct=(TG.w/fmt.mm)*100, dhPct=(TG.h/fmt.mm)*100;
+  var anchor = tap ? {x:face.x+tap.x*face.w, y:face.y+tap.y*face.h} : {x:face.x+.5*face.w, y:face.y+.5*face.h};
   var d=$('discEl'),dl=$('discLab');
   d.style.width=dPct+'%'; d.style.height=dhPct+'cqw';
   d.style.borderRadius = TG.shape==='disc' ? '50%' : '1.5cqw';
@@ -2576,7 +2606,14 @@ function drawInspector(){
 /* ---- drag: pointer capture + pointercancel, same as the studio's armDrag ---- */
 var drag=null;
 function rectOf(){return card.getBoundingClientRect()}
-function norm(e){var r=rectOf();return {x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
+// norm returns FACE-RELATIVE coords, so L.x/L.y written by drag match the
+// face-relative coord space paint() reads from. On formats without a face
+// (face = identity) it collapses to plain container-relative fractions.
+function norm(e){
+  var r=rectOf(), fmt=FORMATS[S.fmt], f=fmt&&fmt.face||{x:0,y:0,w:1,h:1};
+  var cx=(e.clientX-r.left)/r.width, cy=(e.clientY-r.top)/r.height;
+  return {x:(cx-f.x)/f.w, y:(cy-f.y)/f.h};
+}
 
 card.addEventListener('pointerdown',function(e){
   var hnd=e.target.closest('.hnd'),node=e.target.closest('.lay');
@@ -2690,6 +2727,34 @@ $('addText').addEventListener('click',function(){
   if(typeof pushUndo==='function') pushUndo();
   var n=S.stack.filter(function(o){return o.t==='text'}).length;
   var L={t:'text',text:'New text',x:.5,y:Math.min(.08+n*.07,.9),s:1,fw:700,w:.8};
+  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+});
+
+// Fill-space adds — each drops a face-relative layer users can then drag / restyle.
+// Y positions stagger by count so repeated clicks don't stack on the same pixel.
+function _stackCount(pred){ return S.stack.filter(pred).length }
+$('addLine').addEventListener('click',function(){
+  if(typeof pushUndo==='function') pushUndo();
+  var n=_stackCount(function(L){return L.k==='rule'});
+  var L={t:'box',k:'rule',x:.5,y:.44+n*.06,s:1,w:.62};
+  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+});
+$('addMotif').addEventListener('click',function(){
+  if(typeof pushUndo==='function') pushUndo();
+  var n=_stackCount(function(L){return L.k==='motif'});
+  var g=(typeof DIR==='function'?DIR().g.motif:'coffee');
+  // corners first, then centre — so a click cycle fills obvious empty spots
+  var slots=[[.14,.14],[.86,.14],[.14,.86],[.86,.86],[.5,.14],[.5,.86]];
+  var pos=slots[n%slots.length];
+  var L={t:'box',k:'motif',x:pos[0],y:pos[1],s:.6,g:g,op:.85};
+  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+});
+$('addPatBand').addEventListener('click',function(){
+  if(typeof pushUndo==='function') pushUndo();
+  var n=_stackCount(function(L){return L.k==='pattern'});
+  var g=(typeof DIR==='function'?DIR().g.pat:'terrazzo');
+  // alternate top and bottom bands, cover the width
+  var L={t:'box',k:'pattern',x:.5,y:n%2?.9:.1,s:.7,w:1,hf:.2,g:g,op:.35};
   layerId(L); S.stack.push(L); S.sel=L.id; paint();
 });
 $('resetLay').addEventListener('click',function(){ if(typeof pushUndo==='function') pushUndo();
