@@ -540,7 +540,34 @@ console.log('\n== every composition builds at every trim ==');
   C.S.fmt = 0;
   ok(C.PLATES.length + ' compositions, ' + stacks + ' stacks, all sound', bad.length === 0,
      bad.slice(0, 4).join(' | '));
-  ok('the twelve new ones are all there', C.PLATES.length === 28, C.PLATES.length);
+  ok('all of them are registered', C.PLATES.length === 38, C.PLATES.length);
+  const wide = C.PLATES.filter(p => p[2] === 'wide');
+  ok('ten are drawn for the card trim', wide.length === 10, wide.length);
+}
+
+console.log('\n== the credit card is no longer four layouts wearing 28 names ==');
+{
+  function shapes(fmt) {
+    const set = new Set();
+    for (let p = 0; p < C.PLATES.length; p++) {
+      if (!C.plateFitsTrimAt(p, fmt)) continue;
+      set.add(C.PLATES[p][1](fmt).map(L => (L.k || L.t) + '@' + L.x + ',' + L.y).join('|'));
+    }
+    return set.size;
+  }
+  // 5 is 85.6 x 54 mm, 0 is the tall 4x6
+  ok('the card trim now has ten distinct arrangements', shapes(5) === 10, shapes(5));
+  ok('the tall trim still has all twenty-eight', shapes(0) === 28, shapes(0));
+
+  C.S.fmt = 5;
+  const offered = C.PLATES.map((_, i) => i).filter(C.plateFitsTrim);
+  ok('only card compositions are offered on the card',
+     offered.length === 10 && offered.every(i => C.PLATES[i][2] === 'wide'), offered.length);
+  ok('the dock agrees', C.dockStyleItems('plate').length === 10);
+  C.S.fmt = 0;
+  const offeredTall = C.PLATES.map((_, i) => i).filter(C.plateFitsTrim);
+  ok('and only tall ones on a 4x6',
+     offeredTall.length === 28 && offeredTall.every(i => C.PLATES[i][2] !== 'wide'), offeredTall.length);
 }
 
 console.log('\n== every composition renders, and so does its miniature ==');
@@ -736,3 +763,21 @@ console.log('\n== a decoration can wear an asset from any folder ==');
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;
+
+console.log('== switching trim lands on a composition that belongs there ==');
+{
+  const tallIdx = C.PLATES.findIndex(p => p[2] !== 'wide');
+  const wideIdx = C.PLATES.findIndex(p => p[2] === 'wide');
+  ok('there is a tall-only and a card-only composition to move between',
+     tallIdx >= 0 && wideIdx >= 0);
+  C.S.fmt = 0; C.S.plate = tallIdx;
+  ok('the tall one does not belong on the card', !C.plateFitsTrimAt(tallIdx, 5));
+  C.S.fmt = 5; C.keepPlateInTrim();
+  ok('switching to the card moves you off it', C.plateFitsTrim(C.S.plate), C.S.plate);
+  ok('and onto one of the card set', C.PLATES[C.S.plate][2] === 'wide', C.PLATES[C.S.plate][0]);
+  C.S.fmt = 0; C.keepPlateInTrim();
+  ok('and switching back moves you off that one',
+     C.plateFitsTrim(C.S.plate) && C.PLATES[C.S.plate][2] !== 'wide');
+  C.S.plate = 0;
+  console.log('\n' + pass + ' passed, ' + fail + ' failed  (final)');
+}
