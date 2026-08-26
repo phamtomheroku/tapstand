@@ -122,6 +122,27 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
   line-height:1.5;flex:1;min-width:150px}
 .libempty{grid-column:1/-1;background:var(--panel);padding:26px 14px;text-align:center;
   font-family:var(--mono);font-size:10px;letter-spacing:.07em;color:var(--ink-3);line-height:1.7}
+
+/* upload staging — see it, size it, place it, THEN add it. The chequerboard is
+   there to make a missing alpha channel obvious before it reaches a card. */
+.libstage{padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.libstage[hidden]{display:none}
+.libframe{position:relative;width:240px;height:240px;flex:none;overflow:hidden;cursor:grab;
+  touch-action:none;border:1px solid var(--rule);background-color:var(--panel);
+  background-image:
+    linear-gradient(45deg,var(--rule-2) 25%,transparent 25%,transparent 75%,var(--rule-2) 75%),
+    linear-gradient(45deg,var(--rule-2) 25%,transparent 25%,transparent 75%,var(--rule-2) 75%);
+  background-size:16px 16px;background-position:0 0,8px 8px}
+.libframe.drag{cursor:grabbing}
+.libframe img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;
+  -webkit-user-drag:none;user-select:none;pointer-events:none}
+.libframe::after{content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 0 1px var(--accent);opacity:.4}
+.libctl{width:100%;max-width:300px;display:flex;flex-direction:column;gap:6px}
+.libctl .lbl{margin:0}
+.libwarn{font-family:var(--mono);font-size:9px;letter-spacing:.05em;line-height:1.6;
+  color:var(--accent);text-align:center}
+.libwarn:empty{display:none}
 .hname{font-size:15.5px;font-weight:700;letter-spacing:-.01em;margin:0}
 .hspec{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
   letter-spacing:.03em;display:flex;flex-wrap:wrap;gap:3px 8px;margin:0}
@@ -882,9 +903,20 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
       <input type="search" id="libSearch" placeholder="Search" aria-label="Search this set">
     </div>
     <div class="libgrid" id="libGrid"></div>
+    <div class="libstage" id="libStage" hidden>
+      <div class="libframe" id="libFrame"><img id="libPrev" alt=""></div>
+      <div class="libctl">
+        <span class="lbl">Size &middot; <span id="libZoomV">100%</span></span>
+        <input type="range" id="libZoom" min="20" max="400" value="100">
+        <span class="libwarn" id="libWarn"></span>
+      </div>
+    </div>
     <div class="libfoot">
-      <label class="btn" style="cursor:pointer">Add a file
+      <label class="btn" id="libPick" style="cursor:pointer">Add a file
         <input type="file" id="libFile" accept="image/*" hidden></label>
+      <button class="btn" id="libStageFit" type="button" hidden>Reset</button>
+      <button class="btn" id="libStageCancel" type="button" hidden>Cancel</button>
+      <button class="btn solid" id="libStageAdd" type="button" hidden>Add to library</button>
       <span class="libnote" id="libNote"></span>
     </div>
   </div>
@@ -2494,6 +2526,10 @@ function bodyHTML(L,ctx){
         'display:block;text-wrap:balance">'+esc(ctx.copy)+'</span>';
     case 'tap':
       if(!showQR) s*=1.08;              // sole call to action, so give it the room
+      // The mark sizes independently of the ring around it: Scale grows the whole
+      // target, Mark size decides how much of it the artwork fills. Every mark is
+      // cropped differently, so this is per-layer rather than baked per icon.
+      var mk = L.mk==null?1:L.mk;
       if(L.style==='bar')
         return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
@@ -2513,7 +2549,7 @@ function bodyHTML(L,ctx){
       // colours. An empty icon means the first entry in the library, which is the
       // mark this editor ships with.
       function tapArt(w,h){
-        return libArt(tapEntry(L),mc,libBox(w,h));
+        return libArt(tapEntry(L),mc,libBox(w*mk,h*mk));
       }
       var rg=ctx.th.ring, rs='';
       if(rg==='none')   rs='border:none;';
@@ -2781,8 +2817,19 @@ function drawInspector(){
        '<input type="text" id="iWord" value="'+esc(L.word||'Google')+'">';
   }
   if(L.k==='tap'){
-    h+='<span class="lbl">Ring caption</span>'+
+    var mkv=Math.round((L.mk==null?1:L.mk)*100);
+    h+='<span class="lbl">Mark size &middot; '+mkv+'% of the ring</span>'+
+       '<input type="range" id="iMk" min="30" max="200" value="'+mkv+'">'+
+       '<span class="lbl">Ring caption</span>'+
        '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
+  }
+  // the logo slot is a 2.8:1 box by default and always has been — but nothing
+  // in the UI could change it, so a square or a tall logo just letterboxed
+  if(L.k==='logo'){
+    h+='<span class="lbl">Logo box width &middot; '+Math.round(L.lw||42)+'% of card</span>'+
+       '<input type="range" id="iLw" min="10" max="90" value="'+Math.round(L.lw||42)+'">'+
+       '<span class="lbl">Logo box height &middot; '+Math.round(L.lh||15)+'% of card</span>'+
+       '<input type="range" id="iLh" min="5" max="70" value="'+Math.round(L.lh||15)+'">';
   }
   if(L.k==='motif'){
     h+='<span class="lbl">Colour</span>'+
@@ -2834,7 +2881,14 @@ function drawInspector(){
   box.innerHTML=h;
   if(cat) $('iLib').addEventListener('click',function(){ openLib(cat,L,this) });
   if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
-  if(L.k==='tap') $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
+  if(L.k==='tap'){
+    $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
+    $('iMk').addEventListener('input',function(){L.mk=+this.value/100;paint(true)});
+  }
+  if(L.k==='logo'){
+    $('iLw').addEventListener('input',function(){L.lw=+this.value;paint(true)});
+    $('iLh').addEventListener('input',function(){L.lh=+this.value;paint(true)});
+  }
   if(L.k==='motif'){
     $('iMc').addEventListener('click',function(e){
       var b=e.target.closest('button[data-c]'); if(!b)return;
@@ -3005,8 +3059,10 @@ function libCurrentId(){
 }
 function openLib(cat,L,opener){
   libCat=cat; libLayer=L; libOpener=opener||null;
+  if(stage) stageClose();            // always open on the grid, never mid-placement
   $('libTitle').textContent=LIB_TITLE[cat]||'Library';
   $('libNote').textContent=LIB_HINT[cat]||'';
+  libGrid.hidden=false; $('libStage').hidden=true;
   libSearch.value='';
   libModal.hidden=false;
   libTiles();
@@ -3014,6 +3070,7 @@ function openLib(cat,L,opener){
 }
 function closeLib(){
   if(libModal.hidden) return;
+  if(typeof stageClose==='function') stageClose();
   libModal.hidden=true;
   var o=libOpener; libOpener=null; libLayer=null;
   if(o && document.contains(o)) o.focus();
@@ -3032,8 +3089,12 @@ libGrid.addEventListener('click',function(e){
 libSearch.addEventListener('input',libTiles);
 $('libClose').addEventListener('click',closeLib);
 libModal.addEventListener('click',function(e){ if(e.target===libModal) closeLib(); });
+// Escape backs out one step at a time: out of a file you are placing, then out
+// of the sheet — so a mis-drop does not also throw away the layer you were on.
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape' && !libModal.hidden){ e.stopPropagation(); closeLib(); }
+  if(e.key!=='Escape' || libModal.hidden) return;
+  e.stopPropagation();
+  if(stage) stageClose(); else closeLib();
 },true);
 
 /* A file dropped in becomes a permanent tile in this set for the session. SVG
@@ -3060,33 +3121,148 @@ function libParseSVG(text){
   return {vb:vb, ar:+(n[2]/n[3]).toFixed(3),
           sw:+(2*Math.min(n[2],n[3])/24).toFixed(2), p:body};
 }
+/* ---- upload staging -------------------------------------------------------
+   A dropped file does not go straight into the set. It lands in a square frame
+   you can zoom and drag, and what the frame shows is exactly what gets stored —
+   so a mark that was drawn with half a page of padding around it can be cropped
+   in before it is ever on a card. The frame sits on a chequerboard because the
+   one thing that ruins a tap mark is a background you thought was transparent. */
+var FRAME=240;                          // the preview frame, in CSS px
+var stage=null;
+
+function stageOpen(cat,name,kind,payload,natW,natH){
+  stage={cat:cat, name:name, kind:kind, payload:payload, img:null,
+         natW:natW||1, natH:natH||1,
+         fit:Math.min(FRAME/(natW||1), FRAME/(natH||1)), z:1, ox:0, oy:0};
+  $('libPrev').src=payload.disp;
+  $('libZoom').value=100;
+  $('libWarn').textContent='';
+  libGrid.hidden=true; $('libStage').hidden=false;
+  $('libPick').hidden=true;
+  ['libStageFit','libStageCancel','libStageAdd'].forEach(function(i){ $(i).hidden=false });
+  $('libNote').textContent='Drag to move it, the slider to size it. What sits inside the frame is what gets added.';
+  stageDraw();
+}
+function stageDraw(){
+  if(!stage) return;
+  var d=stage, w=d.natW*d.fit*d.z, h=d.natH*d.fit*d.z;
+  var im=$('libPrev');
+  im.style.width=w+'px'; im.style.height=h+'px';
+  im.style.transform='translate('+((FRAME-w)/2+d.ox)+'px,'+((FRAME-h)/2+d.oy)+'px)';
+  $('libZoomV').textContent=Math.round(d.z*100)+'%';
+}
+function stageClose(){
+  stage=null;
+  libGrid.hidden=false; $('libStage').hidden=true;
+  $('libPick').hidden=false;
+  ['libStageFit','libStageCancel','libStageAdd'].forEach(function(i){ $(i).hidden=true });
+  $('libWarn').textContent='';
+  $('libPrev').removeAttribute('src');
+  $('libNote').textContent=LIB_HINT[libCat]||'';
+}
+/* What the frame shows is what gets stored. A vector keeps its vector-ness by
+   having the frame written out as a new viewBox; a raster is redrawn through a
+   canvas at the crop, so the tile carries the picture you actually placed. */
+function stageCommit(){
+  if(!stage) return;
+  var d=stage, w=d.natW*d.fit*d.z, h=d.natH*d.fit*d.z;
+  var x=(FRAME-w)/2+d.ox, y=(FRAME-h)/2+d.oy, e;
+  if(d.kind==='svg'){
+    var vb=d.payload.vb.trim().split(/[\s,]+/).map(Number);
+    var ux=vb[2]/w, uy=vb[3]/h;                      // user units per stage px
+    var nvb=[-x*ux+vb[0], -y*uy+vb[1], FRAME*ux, FRAME*uy]
+              .map(function(v){ return +v.toFixed(3) }).join(' ');
+    e=libAdd(d.cat,d.name,{vb:nvb, sw:d.payload.sw, ar:1, p:d.payload.p});
+  }else{
+    var N=512, k=N/FRAME, c=document.createElement('canvas');
+    c.width=c.height=N;
+    var g=c.getContext('2d');
+    g.imageSmoothingQuality='high';
+    g.drawImage(d.img, x*k, y*k, w*k, h*k);
+    e=libAdd(d.cat,d.name,{u:c.toDataURL('image/png'), ar:1});
+  }
+  stageClose(); libTiles(); libApply(e.id);
+}
+/* Roughly what share of the picture is see-through. Cheap, and it catches the
+   white-rectangle trap while the file is still in the frame. */
+function alphaLook(img){
+  try{
+    var N=64, c=document.createElement('canvas'); c.width=c.height=N;
+    var g=c.getContext('2d'); g.drawImage(img,0,0,N,N);
+    var px=g.getImageData(0,0,N,N).data, clear=0, i;
+    for(i=3;i<px.length;i+=4) if(px[i]<8) clear++;
+    return clear/(px.length/4);
+  }catch(err){ return null }              // a tainted canvas is not worth a crash
+}
+function stageRaster(cat,name,src,img){
+  stageOpen(cat,name,'raster',{disp:src}, img.naturalWidth||img.width||1,
+                                          img.naturalHeight||img.height||1);
+  stage.img=img;
+  var clear=alphaLook(img);
+  if(clear!=null && clear<.02 && cat!=='platform')
+    $('libWarn').textContent='NOTHING IN THIS FILE IS TRANSPARENT. TINTED, IT WILL '+
+      'PRINT AS A SOLID BRAND-COLOURED BLOCK — USE A CUT-OUT PNG OR AN SVG.';
+}
 function libRead(file){
   if(!file || file.type.indexOf('image')!==0) return;
   var cat=libCat, r=new FileReader();
   if(/svg/.test(file.type)){
     r.onload=function(){
-      var v=libParseSVG(String(r.result));
-      var e=v ? libAdd(cat,file.name,v)
-              : libAdd(cat,file.name,{u:'data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(String(r.result))))});
-      libTiles(); libApply(e.id);
+      var txt=String(r.result), v=libParseSVG(txt);
+      var disp='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt)));
+      if(v){
+        var n=v.vb.trim().split(/[\s,]+/).map(Number);
+        stageOpen(cat,file.name,'svg',{vb:v.vb, sw:v.sw, p:v.p, disp:disp}, n[2], n[3]);
+      }else{                              // no usable viewBox — treat it as a picture
+        var im=new Image();
+        im.onload=function(){ stageRaster(cat,file.name,disp,im) };
+        im.onerror=function(){ alert('That SVG would not open.') };
+        im.src=disp;
+      }
     };
     r.readAsText(file);
   }else{
     r.onload=function(){
       var im=new Image();
-      im.onload=function(){
-        var e=libAdd(cat,file.name,{u:String(r.result),ar:+(im.width/im.height).toFixed(3)});
-        libTiles(); libApply(e.id);
-      };
-      im.onerror=function(){
-        var e=libAdd(cat,file.name,{u:String(r.result)});
-        libTiles(); libApply(e.id);
-      };
+      im.onload=function(){ stageRaster(cat,file.name,String(r.result),im) };
+      im.onerror=function(){ alert('That file would not open as an image.') };
       im.src=String(r.result);
     };
     r.readAsDataURL(file);
   }
 }
+$('libZoom').addEventListener('input',function(){
+  if(!stage) return; stage.z=+this.value/100; stageDraw();
+});
+$('libStageFit').addEventListener('click',function(){
+  if(!stage) return; stage.z=1; stage.ox=0; stage.oy=0; $('libZoom').value=100; stageDraw();
+});
+$('libStageCancel').addEventListener('click',stageClose);
+$('libStageAdd').addEventListener('click',stageCommit);
+(function(){                              // drag to place, wheel to size
+  var f=$('libFrame'), d0=null;
+  f.addEventListener('pointerdown',function(e){
+    if(!stage) return;
+    d0={x:e.clientX, y:e.clientY, ox:stage.ox, oy:stage.oy};
+    f.classList.add('drag');
+    try{ f.setPointerCapture(e.pointerId) }catch(err){}
+    e.preventDefault();
+  });
+  f.addEventListener('pointermove',function(e){
+    if(!d0||!stage) return;
+    stage.ox=d0.ox+(e.clientX-d0.x); stage.oy=d0.oy+(e.clientY-d0.y); stageDraw();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){
+    f.addEventListener(t,function(){ d0=null; f.classList.remove('drag') });
+  });
+  f.addEventListener('wheel',function(e){
+    if(!stage) return;
+    e.preventDefault();
+    stage.z=Math.max(.2, Math.min(4, stage.z*(e.deltaY<0?1.1:1/1.1)));
+    $('libZoom').value=Math.round(stage.z*100);
+    stageDraw();
+  },{passive:false});
+})();
 $('libFile').addEventListener('change',function(e){
   libRead(e.target.files&&e.target.files[0]); e.target.value='';
 });

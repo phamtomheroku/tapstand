@@ -204,5 +204,85 @@ html2 = card.children.map(c => c.innerHTML).join('');
 ok('legacy tap icon still draws', /viewBox="0 0 100 100"/.test(html2));
 ok('legacy motif still draws', html2.indexOf('M10 2v2') > 0);
 
+console.log('\n== mark size inside the ring ==');
+function ringOf(h) { const m = h.match(/class="tapring" style="width:([\d.]+)cqw/); return m && +m[1] }
+function markOf(h) { const m = h.match(/viewBox="0 0 100 100"[\s\S]*?width:([\d.]+)cqw/); return m && +m[1] }
+const tapL2 = { t: 'box', k: 'tap', x: .5, y: .5, s: 1, cap: 'TAP', icon: 'lib:waves' };
+C.layerId(tapL2); C.S.stack = [tapL2]; C.S.sel = null;
+card.children.length = 0; C.paint();
+const base = card.children.map(c => c.innerHTML).join('');
+ok('the mark renders inside the ring', markOf(base) > 0 && ringOf(base) > 0);
+tapL2.mk = 1.6;
+card.children.length = 0; C.paint();
+const big = card.children.map(c => c.innerHTML).join('');
+ok('mark size scales the mark', Math.abs(markOf(big) / markOf(base) - 1.6) < 0.01,
+   markOf(big) + ' vs ' + markOf(base));
+ok('the ring itself is untouched by it', ringOf(big) === ringOf(base));
+tapL2.mk = null;
+card.children.length = 0; C.paint();
+ok('no mark size behaves as 100%', markOf(card.children.map(c => c.innerHTML).join('')) === markOf(base));
+
+console.log('\n== logo box ==');
+const logoL = { t: 'box', k: 'logo', x: .5, y: .3, s: 1 };
+C.layerId(logoL); C.S.stack = [logoL]; C.S.sel = null;
+card.children.length = 0; C.paint();
+ok('logo box falls back to the 2.8:1 slot',
+   /width:42cqw;height:15cqw/.test(card.children.map(c => c.innerHTML).join('')));
+logoL.lw = 60; logoL.lh = 40;
+card.children.length = 0; C.paint();
+ok('logo box follows its own width and height',
+   /width:60cqw;height:40cqw/.test(card.children.map(c => c.innerHTML).join('')));
+
+console.log('\n== upload staging ==');
+const deco2 = { t: 'box', k: 'motif', x: .5, y: .5, s: 1, g: 'lib:coffee' };
+C.layerId(deco2); C.S.stack.push(deco2); C.S.sel = deco2.id;
+C.openLib('motif', deco2, null);
+ok('the sheet opens on the grid, not the stage',
+   byId('libStage').hidden === true && byId('libGrid').hidden === false);
+
+const SVG = { vb: '0 0 24 24', sw: 2, p: '<path d="M4 4h16v16H4z"/>', disp: 'data:,' };
+C.stageOpen('motif', 'my-mark.svg', 'svg', SVG, 24, 24);
+ok('a dropped file takes over the sheet',
+   byId('libStage').hidden === false && byId('libGrid').hidden === true);
+ok('"Add a file" hides while one is being placed', byId('libPick').hidden === true);
+ok('Cancel and Add appear', byId('libStageAdd').hidden === false && byId('libStageCancel').hidden === false);
+
+const beforeCancel = C.libUser.motif.length;
+C.stageClose();
+ok('Cancel adds nothing and leaves the sheet open',
+   C.libUser.motif.length === beforeCancel && byId('libStage').hidden === true &&
+   byId('libGrid').hidden === false);
+
+C.stageOpen('motif', 'my-mark.svg', 'svg', SVG, 24, 24);
+C.stageCommit();
+let made = C.libUser.motif[C.libUser.motif.length - 1];
+ok('an untouched placement round-trips the viewBox', made.vb === '0 0 24 24', made.vb);
+ok('it is stored as a vector, not flattened', !!made.p && !made.u);
+ok('the layer it was opened on gets it', deco2.g === 'lib:' + made.id, deco2.g);
+ok('the stage closes itself after adding', byId('libStage').hidden === true);
+
+C.stageOpen('motif', 'zoomed.svg', 'svg', SVG, 24, 24);
+C.stage.z = 2; C.stageCommit();
+made = C.libUser.motif[C.libUser.motif.length - 1];
+ok('zooming to 200% crops the viewBox to the middle half', made.vb === '6 6 12 12', made.vb);
+
+C.stageOpen('motif', 'panned.svg', 'svg', SVG, 24, 24);
+C.stage.ox = -24; C.stageCommit();
+made = C.libUser.motif[C.libUser.motif.length - 1];
+ok('dragging shifts the crop by the right number of user units',
+   made.vb === '2.4 0 24 24', made.vb);
+
+C.stageOpen('motif', 'wide.svg', 'svg', { vb: '0 0 48 24', sw: 2, p: '<path d="M0 0h48v24H0z"/>', disp: 'data:,' }, 48, 24);
+C.stageCommit();
+made = C.libUser.motif[C.libUser.motif.length - 1];
+ok('a wide file is cropped square, not squashed', made.ar === 1);
+ok('and the crop is centred on it', made.vb === '0 -12 48 48', made.vb);
+
+console.log('\n== staged tiles still survive a save ==');
+const blob2 = JSON.parse(JSON.stringify({ stack: C.S.stack, iconLib: C.libUser }));
+ok('a staged tile is in the saved blob',
+   blob2.iconLib.motif.some(e => e.id === made.id));
+ok('and the layer still points at one', /^lib:/.test(blob2.stack.filter(L => L.k === 'motif')[0].g));
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;
