@@ -134,8 +134,13 @@ ok('100-unit mark keeps its own weight', /stroke-width:8.33[;"]/.test(heavy));
 const raster = C.libArt(C.libGet('tap', 'tap-mark'), '#B4577A', 'width:11cqw;height:11cqw');
 ok('raster is masked, not an img', raster.indexOf('mask:url(') > 0 && raster.indexOf('<img') < 0);
 ok('raster mask takes the brand colour', raster.indexOf('background:#B4577A') > 0);
+// asking line art to render as-is is refused — bare paths default to solid black
 const asis = C.libArt(C.libGet('tap', 'nfc-arcs'), '#B4577A', 'width:1cqw', true);
-ok('as-is leaves paint alone', asis.indexOf('stroke:currentColor') < 0);
+ok('as-is is ignored for line art, which has no paint of its own',
+   asis.indexOf('stroke:currentColor') > 0);
+const asisR = C.libArt({ u: 'data:image/png;base64,AAA', ar: 1 }, '#B4577A', 'width:1cqw', true);
+ok('but a raster as-is is an img, not a mask',
+   asisR.indexOf('<img') === 0 && asisR.indexOf('mask') < 0);
 
 console.log('\n== every shipped icon is mask-safe and tintable ==');
 let opaque = 0, untinted = 0;
@@ -395,13 +400,34 @@ tapL3.lay = 'inline'; tapL3.mk = 1.8;
 ok('mark size still applies side by side', markOf(draw()) > markOf((tapL3.mk = 1, draw())));
 tapL3.lay = null; tapL3.mk = null;
 
-console.log('\n== a decoration can keep its own colours ==');
+console.log('\n== a decoration can keep its own colours — when it has any ==');
 const wm = { t: 'box', k: 'motif', x: .5, y: .5, s: 3, g: 'lib:coffee' };
 C.layerId(wm); C.S.stack = [wm];
 ok('tinted by default', /stroke:currentColor/.test(draw()));
+ok('the shipped set is line art, so it has no own paint',
+   !C.libOwnPaint(C.libGet('motif', 'coffee')));
 wm.asis = true;
-ok('as-is leaves the file\'s own paint alone', !/stroke:currentColor/.test(draw()));
+ok('asking line art to keep its colours is ignored, not obeyed into a black blob',
+   /stroke:currentColor/.test(draw()));
 wm.asis = null;
+
+// a colour SVG, the kind you would actually watermark with
+C.libUser.motif.push({ id: 'u-colour', n: 'Colour mark', vb: '0 0 24 24', sw: 2, ar: 1,
+                       own: 1, p: '<path fill="#4285F4" d="M2 2h20v20H2z"/>' });
+const wm2 = { t: 'box', k: 'motif', x: .5, y: .5, s: 3, g: 'lib:u-colour' };
+C.layerId(wm2); C.S.stack = [wm2];
+ok('a file with real colours does have own paint',
+   C.libOwnPaint(C.libGet('motif', 'u-colour')));
+ok('and is still tinted unless asked otherwise', /stroke:currentColor/.test(draw()));
+wm2.asis = true;
+let bare = draw();
+ok('as-is leaves its paint alone', !/stroke:currentColor/.test(bare));
+ok('and the colour survives', /#4285F4/.test(bare));
+ok('a raster always counts as having its own paint',
+   C.libOwnPaint({ u: 'data:image/png;base64,AAA' }));
+ok('and line art parsed at upload time is flagged honestly',
+   C.libParseSVG('<svg viewBox="0 0 24 24"><path d="M2 2h20"/></svg>').own === 0 &&
+   C.libParseSVG('<svg viewBox="0 0 24 24"><path fill="#f00" d="M2 2h20"/></svg>').own === 1);
 
 console.log('\n== depth ==');
 const back = { t: 'text', text: 'back', x: .2, y: .2 };

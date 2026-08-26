@@ -54,7 +54,14 @@ function readVector(file) {
   if (/<image[\s>]/i.test(body)) die(path.basename(file) + ' embeds a raster image — trace it or ship it as a PNG');
   if (/<(linearGradient|radialGradient)[\s>]/i.test(body)) die(path.basename(file) + ' uses a gradient — flatten it to one colour');
 
-  return { vb, w, h, body };
+  /* Does this file carry its own paint? The house treatment supplies fill:none
+     and stroke:currentColor on the root, which is exactly what a stroked
+     line-art icon needs and would wreck a full-colour logo. Only a file with
+     real colours in it can be rendered as-is — a stroked one rendered bare gets
+     the SVG default of solid black fill and turns into a blob. */
+  const own = /\b(fill|stroke)="(?!none|currentColor)[^"]+"/i.test(body);
+
+  return { vb, w, h, body, own };
 }
 
 function readRaster(file) {
@@ -101,6 +108,7 @@ for (const cat of Object.keys(manifest)) {
       e.sw = item.sw != null ? item.sw : houseWeight(v.w, v.h);
       e.ar = +(v.w / v.h).toFixed(3);
       e.p = v.body;
+      if (v.own) e.own = 1;
       if (v.body.length > 10240) console.warn('  ! ' + key + ' is over 10 KB of markup');
     } else {
       const r = readRaster(file);

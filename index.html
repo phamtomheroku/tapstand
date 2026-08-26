@@ -2388,9 +2388,14 @@ function libBox(w,h){ return 'width:'+w+'cqw;height:'+h+'cqw' }
 /* One renderer for the whole library. Tinted, an entry takes the colour it is
    handed — a vector by having its stroke set, a raster by being a mask. As-is,
    it keeps whatever colours the file has, which is what a platform logo wants. */
+// A file only has its own colours to keep if it actually carries paint. Line art
+// relies on the house fill:none/stroke:currentColor; render it bare and the SVG
+// default of solid black fill turns it into a blob.
+function libOwnPaint(e){ return !!(e && (e.own || e.u)) }
 function libArt(e,col,box,asis){
   if(!e) return '';
   if(asis==null) asis=!!e.asis;
+  if(asis && !libOwnPaint(e)) asis=false;
   if(e.p) return '<svg viewBox="'+e.vb+'" aria-hidden="true" style="'+box+';display:block'+
     (asis?'':';color:'+col+';fill:none;stroke:currentColor;stroke-width:'+e.sw+
      ';stroke-linecap:round;stroke-linejoin:round')+'">'+e.p+'</svg>';
@@ -2928,10 +2933,12 @@ function drawInspector(){
   }
   if(L.k==='motif'){
     // A decoration is normally a brand-coloured glyph. A logo used as a watermark
-    // is the exception: it has to keep the colours it came with.
-    h+='<label class="tog"><input type="checkbox" id="iAsis"'+(L.asis?' checked':'')+
-       '> Keep its own colours</label>'+
-       (L.asis?'':'<span class="lbl">Colour</span>'+
+    // is the exception: it has to keep the colours it came with — but only a file
+    // that HAS its own colours can, so line art never offers the choice.
+    var mown=libOwnPaint(libRef(L.g,'motif')), masis=mown&&L.asis;
+    h+=(mown?'<label class="tog"><input type="checkbox" id="iAsis"'+(masis?' checked':'')+
+       '> Keep its own colours</label>':'')+
+       (masis?'':'<span class="lbl">Colour</span>'+
        '<div class="chips" id="iMc">'+
        ['brand','accent','ground'].map(function(k){
          return '<button class="chip" type="button" data-c="'+k+'" aria-pressed="'+
@@ -3021,7 +3028,7 @@ function drawInspector(){
     $('iLh').addEventListener('input',function(){L.lh=+this.value;paint(true)});
   }
   if(L.k==='motif'){
-    $('iAsis').addEventListener('change',function(){
+    if($('iAsis')) $('iAsis').addEventListener('change',function(){
       L.asis=this.checked||null; drawInspector(); paint();
     });
     if($('iMc')) $('iMc').addEventListener('click',function(e){
@@ -3322,7 +3329,8 @@ function libAdd(cat,name,payload){
   var id='u'+(++S.uid)+'-'+String(name||'file').toLowerCase()
           .replace(/\.[^.]+$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24);
   var e={id:id, n:(name||'Added file').replace(/\.[^.]+$/,'').slice(0,28), from:'Yours', lic:'yours'};
-  if(payload.p){ e.vb=payload.vb; e.sw=payload.sw; e.ar=payload.ar; e.p=payload.p; }
+  if(payload.p){ e.vb=payload.vb; e.sw=payload.sw; e.ar=payload.ar; e.p=payload.p;
+                  if(payload.own) e.own=1; }
   else { e.u=payload.u; e.ar=payload.ar||1; }
   if(cat==='platform') e.asis=1;
   libUser[cat].push(e);
@@ -3337,7 +3345,9 @@ function libParseSVG(text){
                .replace(/\s+/g,' ').trim();
   if(!body) return null;
   return {vb:vb, ar:+(n[2]/n[3]).toFixed(3),
-          sw:+(2*Math.min(n[2],n[3])/24).toFixed(2), p:body};
+          sw:+(2*Math.min(n[2],n[3])/24).toFixed(2), p:body,
+          // same test tools/build-icons.js applies to a committed file
+          own:/\b(fill|stroke)="(?!none|currentColor)[^"]+"/i.test(body)?1:0};
 }
 /* ---- upload staging -------------------------------------------------------
    A dropped file does not go straight into the set. It lands in a square frame
@@ -3390,7 +3400,7 @@ function stageCommit(){
     var ux=vb[2]/w, uy=vb[3]/h;                      // user units per stage px
     var nvb=[-x*ux+vb[0], -y*uy+vb[1], FRAME*ux, FRAME*uy]
               .map(function(v){ return +v.toFixed(3) }).join(' ');
-    e=libAdd(d.cat,d.name,{vb:nvb, sw:d.payload.sw, ar:1, p:d.payload.p});
+    e=libAdd(d.cat,d.name,{vb:nvb, sw:d.payload.sw, ar:1, p:d.payload.p, own:d.payload.own});
   }else{
     var N=512, k=N/FRAME, c=document.createElement('canvas');
     c.width=c.height=N;
@@ -3430,7 +3440,7 @@ function libRead(file){
       var disp='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt)));
       if(v){
         var n=v.vb.trim().split(/[\s,]+/).map(Number);
-        stageOpen(cat,file.name,'svg',{vb:v.vb, sw:v.sw, p:v.p, disp:disp}, n[2], n[3]);
+        stageOpen(cat,file.name,'svg',{vb:v.vb, sw:v.sw, p:v.p, own:v.own, disp:disp}, n[2], n[3]);
       }else{                              // no usable viewBox — treat it as a picture
         var im=new Image();
         im.onload=function(){ stageRaster(cat,file.name,disp,im) };
