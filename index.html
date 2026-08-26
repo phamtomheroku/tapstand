@@ -2998,8 +2998,9 @@ function libTiles(){
 function libCurrentId(){
   if(!libLayer) return '';
   if(libCat==='platform') return S.platLib||'';
-  var v=libCat==='motif'?libLayer.g:libLayer.icon;
-  var e=libRef(v,libCat);
+  // a tap layer on the shipped default is still wearing an entry — mark the tile it
+  // actually renders, not nothing, or the grid looks like nothing is selected
+  var e = libCat==='motif' ? libRef(libLayer.g,'motif') : tapEntry(libLayer);
   return e?e.id:'';
 }
 function openLib(cat,L,opener){
