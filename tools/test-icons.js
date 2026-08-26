@@ -632,6 +632,44 @@ console.log('\n== clicking a tile does the useful thing ==');
      C.S.dir === 6 && C.S.theme === C.DIRECTIONS[6].def[0]);
 }
 
+console.log('\n== a platform mark and a logo make their own slot ==');
+{
+  C.libUser.platform = [{ id: 'u-plat', n: 'A badge', u: 'data:image/png;base64,AAA', ar: 2.4, asis: 1 }];
+  C.libUser.logo = [{ id: 'u-logo', n: 'A logo', u: 'data:image/png;base64,BBB', ar: 2.8, asis: 1 }];
+  // a stack with nowhere to put either
+  C.S.stack = C.PLATES[0][1](0).filter(L => L.k !== 'lockup' && L.k !== 'logo' && L.k !== 'plat');
+  C.S.stack.forEach(L => C.layerId(L));
+  C.selectOnly(null);
+  ok('the card has no slot for a platform mark',
+     !C.S.stack.some(L => L.k === 'lockup' || L.k === 'plat'));
+  C.dockUse('platform', 'u-plat');
+  ok('clicking one makes the slot', C.S.stack.some(L => L.k === 'plat'));
+  ok('and sets the mark', C.S.platLib === 'u-plat');
+  const pl = C.S.stack.filter(L => L.k === 'plat')[0];
+  ok('the new slot is selected', C.S.sel === pl.id);
+  ok('hand-placed, so auto-fit leaves it', pl._man === true);
+  ok('and it is clear of the tap target',
+     Math.abs(pl.y - C.S.stack.filter(L => L.k === 'tap')[0].y) > 0.2);
+  ok('it actually draws the mark', draw().indexOf('data:image/png;base64,AAA') >= 0);
+
+  const n1 = C.S.stack.length;
+  C.dockUse('platform', 'u-plat');
+  ok('clicking again does not stack up slots', C.S.stack.length === n1);
+
+  C.dockUse('logo', 'u-logo');
+  ok('a logo makes a logo slot when there is none', C.S.stack.some(L => L.k === 'logo'));
+  ok('and it draws', draw().indexOf('data:image/png;base64,BBB') >= 0);
+
+  // with a lockup already there, the mark belongs to it — no new layer
+  C.S.stack = [{ t: 'box', k: 'lockup', x: .5, y: .3, s: 1, word: 'Google' },
+               { t: 'box', k: 'tap', x: .5, y: .8, s: 1, cap: 'TAP' }];
+  C.S.stack.forEach(L => C.layerId(L));
+  const n2 = C.S.stack.length;
+  C.dockUse('platform', 'u-plat');
+  ok('an existing lockup takes it instead of getting a sibling', C.S.stack.length === n2);
+  ok('and the lockup shows it', draw().indexOf('data:image/png;base64,AAA') >= 0);
+}
+
 console.log('\n== a decoration can wear an asset from any folder ==');
 {
   C.libUser.image.push({ id: 'u-pic', n: 'A photo', u: 'data:image/png;base64,AAA', ar: 1, asis: 1 });

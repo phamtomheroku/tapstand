@@ -4876,8 +4876,20 @@ function dockUse(fid,id){
     if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
                S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
   }
-  else if(fid==='platform') setPlatLib(id);
-  else if(fid==='logo'){ var le=libGet('logo',id); if(le) setLogo(libDataURI(le)); }
+  /* A platform mark and a logo are not layers — they fill a slot. If the card has
+     no slot for one, setting it would be silent and look broken, so make the slot.
+     Everything else in this dock creates a layer when there is nothing to receive
+     what you clicked; these two were the exception and should not have been. */
+  else if(fid==='platform'){
+    setPlatLib(id);
+    if(!S.stack.some(function(L){ return L.k==='lockup'||L.k==='plat' }))
+      selectOnly(addSlotLayer({t:'box',k:'plat',s:1,ph:11,pw:40,word:'Google'}));
+  }
+  else if(fid==='logo'){
+    var le=libGet('logo',id); if(le) setLogo(libDataURI(le));
+    if(!S.stack.some(function(L){ return L.k==='logo'||L.k==='lockup' }))
+      selectOnly(addSlotLayer({t:'box',k:'logo',s:1,lw:42,lh:15}));
+  }
   else {
     var L=S.sel&&find(S.sel);
     if(L&&L.k==='tap')        L.icon='lib:'+id;
@@ -4890,6 +4902,17 @@ function dockUse(fid,id){
     }
   }
   drawAxes(); dockDraw(); updateSheetFit(); paint();
+}
+/* Drop a new slot layer into clear air: above the tap target if there is room
+   over it, otherwise below. Hand-placed, so auto-fit leaves it where it lands. */
+function addSlotLayer(L){
+  var tap=null;
+  S.stack.forEach(function(o){ if(o.k==='tap') tap=o });
+  var ty=tap?tap.y:.75;
+  L.x=.5; L.y = ty>.42 ? Math.max(.14, ty-.30) : Math.min(.86, ty+.30);
+  L._man=true;
+  layerId(L); S.stack.push(L);
+  return L.id;
 }
 function libDataURI(e){
   if(e.u) return e.u;
