@@ -704,9 +704,22 @@ console.log('\n== pictures get real room to grow ==');
      Math.abs(tallNarrow[0] - 30) < 0.01, tallNarrow && tallNarrow[0]);
   plat.ph = 70; plat.s = 6;
   const huge = boxOf(draw());
-  ok('past the card width it fits the width and gives the height back',
-     huge[1] <= 96 * 6 + 0.01 && Math.abs(huge[1] / huge[0] - 2.4) < 0.01,
-     huge && huge.join('x'));
+  ok('the card width is the ceiling, and it does not move when you scale',
+     Math.abs(huge[1] - 96) < 0.01, huge && huge.join('x'));
+  ok('and the aspect survives the clamp', Math.abs(huge[1] / huge[0] - 2.4) < 0.01);
+
+  // the slot the dock creates must not carry a narrower ceiling than the default
+  C.S.stack = [{ t: 'box', k: 'tap', x: .5, y: .8, s: 1, cap: 'TAP' }];
+  C.S.stack.forEach(L => C.layerId(L));
+  C.selectOnly(null);
+  C.dockUse('platform', 'u-wide');
+  const made = C.S.stack.filter(L => L.k === 'plat')[0];
+  ok('a dock-made slot has no width of its own to override the default',
+     made.pw === undefined, made.pw);
+  made.ph = 34;
+  const fromDock = boxOf(draw());
+  ok('so raising its height on a fresh slot actually works',
+     Math.abs(fromDock[0] - 34) < 0.01, fromDock && fromDock.join('x'));
   C.S.platLib = null;
 }
 

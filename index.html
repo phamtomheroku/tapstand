@@ -2782,19 +2782,19 @@ function tapAR(L){ var e=tapEntry(L); return (e&&e.ar)||1 }
    It is a trademark, so it keeps its own colours by default; 'Tint' knocks it to
    a single tone the same way an uploaded file is knocked. With no artwork at all
    it falls back to the word, which is the safest thing to actually print. */
-function platMark(L,s,mc,hCqw,maxCqw){
+function platMark(L,mc,s,hCqw,capCqw){
   var knock = S.platImgMode==='asis' ? '' : ';filter:brightness(0) saturate(0)';
   var e = S.platLib ? libGet('platform',S.platLib) : null;
   if(e){
     // height drives it; if that makes it wider than its box, fit the width instead
     // and give the height back, so the mark is never squashed and never overflows
-    var hh=hCqw*s, ww=hh*(e.ar||1), cap=maxCqw*s;
-    if(ww>cap){ ww=cap; hh=ww/(e.ar||1) }
+    var hh=hCqw, ww=hh*(e.ar||1);
+    if(ww>capCqw){ ww=capCqw; hh=ww/(e.ar||1) }
     return '<div style="height:'+hh+'cqw;width:'+ww+'cqw'+knock+'">'+
       libArt(e,mc,'height:100%;width:100%',true)+'</div>';
   }
-  if(S.platImg) return '<img src="'+S.platImg+'" alt="" style="height:'+(hCqw*s)+
-    'cqw;max-width:'+(maxCqw*s)+'cqw;object-fit:contain;display:block'+knock+'">';
+  if(S.platImg) return '<img src="'+S.platImg+'" alt="" style="height:'+hCqw+
+    'cqw;max-width:'+capCqw+'cqw;object-fit:contain;display:block'+knock+'">';
   return '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
     esc(L.word||'Google')+'</span>';
 }
@@ -2897,11 +2897,11 @@ function bodyHTML(L,ctx){
       return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+
         '<span data-part="logo">'+mark+'</span>'+
         '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
-        '<span data-part="plat">'+platMark(L,s,mc,11,30)+'</span></div>';
+        '<span data-part="plat">'+platMark(L,mc,s,11*s,30*s)+'</span></div>';
     // The right-hand half of the lockup, on its own — what Break apart leaves behind
     // so the logo and the platform mark can be placed independently.
     case 'plat':
-      return platMark(L,s,mc,(L.ph||11),(L.pw||96));
+      return platMark(L,mc,s,(L.ph||11)*s,(L.pw||96));
     case 'logo':
       var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
       if(!ctx.logo && ctx.hasName) return '';    // the name is holding this slot
@@ -4899,7 +4899,7 @@ function dockUse(fid,id){
   else if(fid==='platform'){
     setPlatLib(id);
     if(!S.stack.some(function(L){ return L.k==='lockup'||L.k==='plat' }))
-      selectOnly(addSlotLayer({t:'box',k:'plat',s:1,ph:11,pw:40,word:'Google'}));
+      selectOnly(addSlotLayer({t:'box',k:'plat',s:1,ph:11,word:'Google'}));
   }
   else if(fid==='logo'){
     var le=libGet('logo',id); if(le) setLogo(libDataURI(le));
