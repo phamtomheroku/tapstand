@@ -670,6 +670,46 @@ console.log('\n== a platform mark and a logo make their own slot ==');
   ok('and the lockup shows it', draw().indexOf('data:image/png;base64,AAA') >= 0);
 }
 
+console.log('\n== pictures get real room to grow ==');
+{
+  ok('a headline stays at 220%', C.maxScale({ k: 'head' }) === 2.2);
+  ok('so does a text layer', C.maxScale({ t: 'text' }) === 2.2);
+  ['plat', 'logo', 'lockup', 'motif', 'hero', 'pattern'].forEach((k) => {
+    ok(k + ' can reach 600%', C.maxScale({ k: k }) === 6);
+  });
+
+  C.libUser.platform = [{ id: 'u-wide', n: 'Wide badge', u: 'data:image/png;base64,AAA', ar: 2.4, asis: 1 }];
+  C.S.platLib = 'u-wide';
+  const plat = { t: 'box', k: 'plat', x: .5, y: .35, s: 1, ph: 11, word: 'Google' };
+  C.layerId(plat);
+  C.S.stack = [plat, Object.assign({ t: 'box', k: 'tap', x: .5, y: .8, s: 1, cap: 'TAP' }, {})];
+  C.S.stack.forEach(L => C.layerId(L));
+  function boxOf(h) { const m = h.match(/height:([\d.]+)cqw;width:([\d.]+)cqw/); return m && [+m[1], +m[2]] }
+  const small = boxOf(draw());
+  ok('the mark draws at its height times its aspect',
+     small && Math.abs(small[1] / small[0] - 2.4) < 0.01, small && (small[1] / small[0]));
+  plat.s = 4;
+  const big = boxOf(draw());
+  ok('scaling past the old cap actually grows it', big[0] > small[0] * 3.5, big && big[0]);
+  plat.s = 1; plat.ph = 50;
+  const tall = boxOf(draw());
+  // a 2.4:1 badge asked to be half the card TALL would be 120% of it wide, so the
+  // width cap takes over — which is the clamp working, not the height failing
+  ok('mark height grows it on its own', tall[0] > small[0] * 3, tall && tall[0]);
+  ok('the card width stops it there', Math.abs(tall[1] - 96) < 0.01, tall && tall[1]);
+  ok('and it keeps its aspect', Math.abs(tall[1] / tall[0] - 2.4) < 0.01);
+  plat.ph = 30;
+  const tallNarrow = boxOf(draw());
+  ok('under the cap, height is exactly what you asked for',
+     Math.abs(tallNarrow[0] - 30) < 0.01, tallNarrow && tallNarrow[0]);
+  plat.ph = 70; plat.s = 6;
+  const huge = boxOf(draw());
+  ok('past the card width it fits the width and gives the height back',
+     huge[1] <= 96 * 6 + 0.01 && Math.abs(huge[1] / huge[0] - 2.4) < 0.01,
+     huge && huge.join('x'));
+  C.S.platLib = null;
+}
+
 console.log('\n== a decoration can wear an asset from any folder ==');
 {
   C.libUser.image.push({ id: 'u-pic', n: 'A photo', u: 'data:image/png;base64,AAA', ar: 1, asis: 1 });
