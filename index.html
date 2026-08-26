@@ -268,6 +268,26 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   width:26px;flex:none;text-transform:uppercase}
 .lrow .ln{flex:1;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lrow.off .ln,.lrow.off .lk{opacity:.4}
+
+/* the card shelf — same row language as the layers list */
+.shelf{display:flex;flex-direction:column;border:1px solid var(--rule-2);
+  max-height:190px;overflow-y:auto}
+.crow{display:flex;align-items:center;gap:5px;padding:4px 6px;background:var(--panel);
+  border-bottom:1px solid var(--rule-2)}
+.crow:last-child{border-bottom:none}
+.crow:hover{background:var(--paper-2)}
+.crow.off{opacity:.5}
+.cpick{display:flex;align-items:center;flex:none;margin:0;cursor:pointer}
+.cpick input{margin:0;accent-color:var(--accent)}
+.crow .cn{flex:1;min-width:0;text-align:left;background:none;border:0;padding:2px 2px;
+  font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .cn:hover{color:var(--accent)}
+.crow .cm{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--ink-3);
+  flex:none;text-transform:uppercase}
+.crow .ib{font-size:13px;line-height:1;width:20px;height:20px;flex:none}
+.cempty{padding:16px 10px;text-align:center;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.07em;color:var(--ink-3);line-height:1.6;background:var(--panel)}
 .ib{background:none;border:none;padding:2px;cursor:pointer;color:var(--ink-3);
   line-height:0;border-radius:2px}
 .ib:hover{color:var(--accent);background:var(--paper)}
@@ -802,6 +822,16 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <details class="sect" open>
             <summary class="sect-h"><span class="sect-n">06</span>Export</summary>
             <div class="sect-b">
+              <!-- A shelf of finished cards. The ticks feed the sheet PDF, so a
+                   run of different designs ganged onto one sheet is two clicks. -->
+              <div class="grp"><span class="lbl">Saved cards</span>
+                <div class="shelf" id="shelf"></div>
+                <div class="row2">
+                  <button class="btn solid" id="cardSave" type="button">Save this card</button>
+                  <button class="btn" id="shelfAll" type="button">Tick all / none</button>
+                </div>
+                <span class="libnote" id="shelfNote" style="flex:none"></span>
+              </div>
               <div class="grp"><span class="lbl">Preflight</span>
                 <ul class="preflight" id="preflight"></ul></div>
               <div class="row2">
@@ -1519,38 +1549,41 @@ var PRESETS=[
  {k:"Boutique",n:"Hale & Co.",b:"#1A1A1A",g:"#F4F1EC",c:2},
  {k:"Gym",n:"Iron Yard Fitness",b:"#D64500",g:"#101315",c:3}
 ];
+/* The chip says the size, because the size is the thing you are choosing.
+   The part numbers still matter when you go to reorder, so they live in the
+   NFC tag hint below rather than shouting from every label. */
 var FORMATS=[
- {k:"4×6 counter",cls:"",d:"102 × 152 mm",mm:102,ar:1.5},
- {k:"3×5 table",cls:"f35",d:"76 × 127 mm",mm:76,ar:1.667},
- {k:"4×4 square",cls:"f44",d:"102 × 102 mm",mm:102,ar:1},
- {k:"3.5×2 card",cls:"ftap",d:"89 × 51 mm",mm:89,ar:.5714},
- {k:"ST820 48×78",cls:"f4878",d:"48 × 78 mm",mm:48,ar:1.625,tag:2},
- {k:"ST783 CR80",cls:"fcr80",d:"85.6 × 54 mm",mm:85.6,ar:.6308,tag:3},
- {k:"5×7 frame",cls:"f57",d:"127 × 178 mm",mm:127,ar:1.4016},
- /* wrap template for the ST783: 85.6 × 54 front face + 5 mm flap all round,
-    so a printed vinyl label can wrap the card and grip the back. Design fills
-    the whole 95.6 × 64 bounding box — the flaps carry the same background so
-    the wrap reads continuous. Fold guides and corner-snip marks are added by
+ {k:"102 × 152 mm",cls:"",d:"4×6 in — counter card",mm:102,ar:1.5},
+ {k:"76 × 127 mm",cls:"f35",d:"3×5 in — table card",mm:76,ar:1.667},
+ {k:"102 × 102 mm",cls:"f44",d:"4 in square",mm:102,ar:1},
+ {k:"89 × 51 mm",cls:"ftap",d:"business-card size",mm:89,ar:.5714},
+ {k:"48 × 78 mm",cls:"f4878",d:"prints straight onto the white NFC card",mm:48,ar:1.625,tag:2},
+ {k:"85.6 × 54 mm",cls:"fcr80",d:"credit-card size — print on vinyl, cut it out, stick it on the tag",mm:85.6,ar:.6308,tag:3},
+ {k:"127 × 178 mm",cls:"f57",d:"5×7 in — frame",mm:127,ar:1.4016},
+ /* wrap template for the credit-card tag: 85.6 x 54 front face + 5 mm flap all
+    round, so a printed vinyl label can wrap the card and grip the back. Design
+    fills the whole 95.6 x 64 bounding box -- the flaps carry the same background
+    so the wrap reads continuous. Fold guides and corner-snip marks are added by
     the .f783wrap CSS below. */
- {k:"ST783 wrap",cls:"f783wrap",d:"95.6 × 64 mm — 85.6 × 54 face + 5 mm flap",mm:95.6,ar:0.6695,tag:3,face:{x:0.0523,y:0.0781,w:0.8954,h:0.8438}}
+ {k:"85.6 × 54 mm wrap",cls:"f783wrap",d:"wraps the credit-card tag — 5 mm flap all round to grip the back",mm:95.6,ar:0.6695,tag:3,face:{x:0.0523,y:0.0781,w:0.8954,h:0.8438}}
 ];
 /* ---- the tags actually delivered (Seritag order x49745, 10 of each) ----------
    Two of these ARE the printed surface, so they get their own trim sizes and you
    design straight onto them. Two are discs that sit BEHIND a printed insert, so
    they show as a true-scale target the tap ring has to register against. */
 var TAGS=[
- {sku:"ST706", z:"K9JT", n:"29 mm On-Metal disc", w:29,  h:29,   shape:"disc",
+ {sku:"ST706", z:"K9JT", n:"29 mm disc, works on metal", w:29,  h:29,   shape:"disc",
   metal:true,  print:false, range:"short",
   note:"Ferrite backed, so it works stuck to metal. Smallest antenna here — shortest range."},
- {sku:"ST704", z:"85GW", n:"38 mm Clear disc",    w:38,  h:38,   shape:"disc",
+ {sku:"ST704", z:"85GW", n:"38 mm disc",    w:38,  h:38,   shape:"disc",
   metal:false, print:false, range:"good",
   note:"Bigger antenna than the 29 mm, so noticeably better range. Non-metal surfaces only."},
- {sku:"ST820", z:"3XFS", n:"48 × 78 mm White card", w:48, h:78,  shape:"card",
+ {sku:"ST820", z:"3XFS", n:"48 × 78 mm printable card", w:48, h:78,  shape:"card",
   metal:false, print:true,  range:"good",
   note:"A printable white PVC card. The tag IS the artwork — no insert, no holder needed."},
- {sku:"ST783", z:"W6RM", n:"PVC Card Stick Tag (3M)", w:85.6,h:54, shape:"card",
+ {sku:"ST783", z:"W6RM", n:"85.6 × 54 mm stick-on card", w:85.6,h:54, shape:"card",
   metal:false, print:true,  adhesive:true, range:"best",
-  note:"CR80 with 3M adhesive. Largest antenna, best range. Prints and sticks straight down."}
+  note:"Credit-card size with 3M adhesive on the back. Largest antenna, best range. Print a vinyl label at 85.6 × 54 mm, cut it out and stick it on the face."}
 ];
 function TAG(){ return TAGS[S.tag||0] }
 /* ================= the design system =================
@@ -2682,7 +2715,7 @@ function paint(quiet){
   d.style.left=(anchor.x*100)+'%'; d.style.top=(anchor.y*100)+'%';
   dl.style.left=(anchor.x*100)+'%';
   dl.style.top='calc('+(anchor.y*100)+'% + '+(dPct/2+2).toFixed(2)+'cqw)'; // cqw = 1% of card width
-  dl.textContent=TG.sku+' · '+TG.n.toUpperCase()+(TG.metal?' · FERRITE, FACE FORWARD':'')+
+  dl.textContent=TG.n.toUpperCase()+(TG.metal?' · FERRITE, FACE FORWARD':'')+
     (tap?'':' · TAP RING HIDDEN');
 
   if(autoFit && !quiet) resolveLayout();
@@ -2694,7 +2727,7 @@ function paint(quiet){
    brand+' calc(100%/4 - 1px),'+brand+' calc(100%/4))':'';
   $('gridEl').style.opacity=S.grid?'.16':'0';
 
-  $('dims').innerHTML='<span><b>'+fmt.k+'</b> — '+fmt.d+' trim</span><span>BLEED 3 MM</span>'+
+  $('dims').innerHTML='<span><b>'+fmt.k+'</b> trim · '+fmt.d+'</span><span>BLEED 3 MM</span>'+
     '<span>SAFE 5 MM</span><span>QR ≥ 30 MM</span><span>'+S.stack.length+' LAYERS</span>';
   drawPanel(); preflight();
   // Rebuilding the inspector mid-keystroke would steal focus out of the textarea,
@@ -3484,10 +3517,10 @@ presetsEl.addEventListener('click',function(e){
 var tagsEl=$('tags');
 tagsEl.innerHTML=TAGS.map(function(t,i){
   return '<button class="chip" type="button" data-g="'+i+'" aria-pressed="'+(i===0)+'">'+
-    t.sku+' · '+t.w+(t.shape==='disc'?' mm':'×'+t.h)+'</button>'}).join('');
+    esc(t.n)+'</button>'}).join('');
 function tagHint(){
   var t=TAG();
-  $('tagHint').innerHTML=esc(t.n)+' — '+esc(t.note)+
+  $('tagHint').innerHTML='<b>'+esc(t.sku)+'</b> — '+esc(t.note)+
     (t.print?' <b>Printable: pick its trim size below.</b>':' <b>Sits behind the insert.</b>');
 }
 tagsEl.addEventListener('click',function(e){
@@ -3876,7 +3909,7 @@ var BUILD=[
   body:"A blank white PVC card with the antenna inside. No insert, no disc, no alignment — the "+
    "artwork prints straight onto the tag. Portrait and small, so it wants a compact stand or a "+
    "place-card holder rather than a 4×6 frame.",
-  build:["Select ST820 in the editor — it switches to a 48 × 78 mm trim automatically",
+  build:["Pick the 48 × 78 mm format — it selects this tag for you",
    "Design at true size; the whole card is the tap target","Print, or send to a card printer",
    "Stand it up, or leave it loose on the counter"],
   fits:"Small acrylic or wood card stands. Nothing 4×6 — it will swim.",
@@ -3889,7 +3922,7 @@ var BUILD=[
   body:"Standard credit-card size with adhesive on the back, and the biggest antenna of the four, "+
    "so the best range. This is the adhesive tap card from the suite: whole back adhered, no stand, "+
    "no footprint. Best on a vertical face where it is read straight on.",
-  build:["Select ST783 — the editor switches to an 85.6 × 54 mm landscape trim",
+  build:["Pick the 85.6 × 54 mm format — it selects this tag for you",
    "Design at true size","Peel and stick to a till side, door frame, fridge or menu board",
    "Round the corners if you trim anything — a square corner is what lifts first"],
   fits:"No holder. Sticks to the surface, or drops into a business-card stand.",
@@ -4140,8 +4173,12 @@ function preflight(){
 }
 
 /* ============ 9. save / load a design ============ */
-$('saveDesign').addEventListener('click',function(){
-  var d={v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
+/* A card is one object: the stack, the axes, the copy, the colours, every asset
+   it leans on, and the library tiles you added for it. captureDesign builds it,
+   applyDesign puts it back. Both the file Save/Load and the card shelf below go
+   through these, so there is exactly one definition of what a card IS. */
+function captureDesign(){
+  return {v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
     name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo,
     userFonts:S.userFonts,dispFont:S.dispFont,bodyFont:S.bodyFont,
     platImg:S.platImg||null,platImgMode:S.platImgMode||'asis',platLib:S.platLib||null,
@@ -4151,50 +4188,159 @@ $('saveDesign').addEventListener('click',function(){
        with the design; the built-in set is already in the page. */
     iconLib:libUser,
     starCol:$('starSync').checked?null:$('starCol').value};
+}
+/* Returns a promise that settles once any custom faces are registered — the card
+   is on screen before then, just in the fallback face. */
+function applyDesign(d){
+  S.stack=d.stack; S.dir=d.dir|0; S.plate=d.plate|0; S.theme=d.theme|0; S.pal=d.pal|0; S.fmt=d.fmt|0;
+  elName.value=d.name||''; elBrand.value=d.brand||'#000000'; elBg.value=d.bg||'#ffffff';
+  fillCopy(false); if(d.copy){ if([].indexOf.call(elCopy.options,d.copy)<0)
+    elCopy.add(new Option(d.copy,d.copy)); elCopy.value=d.copy; }
+  /* restore added library tiles FIRST -- the layers below reference them by id */
+  if(d.iconLib) ['tap','platform','motif'].forEach(function(c){
+    libUser[c]=(d.iconLib[c]||[]).slice();
+    // added ids look like u7-my-mark; keep the counter past them so nothing collides
+    libUser[c].forEach(function(e){
+      var n=parseInt(String(e.id).slice(1),10);
+      if(n>S.uid) S.uid=n;
+    });
+  });
+  /* restore platform mark */
+  S.platLib=null;
+  setPlatImg(d.platImg||null);
+  if(d.platLib) setPlatLib(d.platLib);
+  S.platImgMode=d.platImgMode||'asis';
+  if($('platAsIs')) $('platAsIs').checked=(S.platImgMode==='asis');
+  /* restore the one-shot tap mark -- set, not applied, so the per-layer icon
+     choices that came back with d.stack survive */
+  S.tapImgMode=d.tapImgMode||'tint';
+  if($('tapAsIs')) $('tapAsIs').checked=(S.tapImgMode==='asis');
+  S.tapImg=d.tapImg||null; tapPreview();
+  /* restore star colour */
+  if(d.starCol){ $('starCol').value=d.starCol; $('starSync').checked=false; }
+  else { $('starSync').checked=true; $('starCol').value=d.brand||'#B4577A'; }
+  setLogo(d.logo||null); selectOnly(null);
+  /* restore custom fonts */
+  S.userFonts=(d.userFonts&&d.userFonts.length)?d.userFonts:[];
+  S.dispFont=d.dispFont||''; S.bodyFont=d.bodyFont||'';
+  drawAxes(); updateSheetFit(); paint();
+  return registerAllFaces(S.userFonts).then(function(){ refreshFontsUI(); paint(); });
+}
+function designBlob(d,name){
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
-  a.download=(elName.value||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.tapcard.json'; a.click();
+  a.download=(name||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.tapcard.json'; a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+}
+$('saveDesign').addEventListener('click',function(){
+  designBlob(captureDesign(),elName.value);
 });
 $('loadDesign').addEventListener('change',function(e){
   var f=e.target.files&&e.target.files[0]; if(!f)return;
   var r=new FileReader();
   r.onload=function(){ try{
-      var d=JSON.parse(r.result); pushUndo();
-      S.stack=d.stack; S.dir=d.dir|0; S.plate=d.plate|0; S.theme=d.theme|0; S.pal=d.pal|0; S.fmt=d.fmt|0;
-      elName.value=d.name||''; elBrand.value=d.brand||'#000000'; elBg.value=d.bg||'#ffffff';
-      fillCopy(false); if(d.copy){ if([].indexOf.call(elCopy.options,d.copy)<0)
-        elCopy.add(new Option(d.copy,d.copy)); elCopy.value=d.copy; }
-      /* restore custom fonts */
-      S.userFonts=(d.userFonts&&d.userFonts.length)?d.userFonts:[];
-      S.dispFont=d.dispFont||''; S.bodyFont=d.bodyFont||'';
-      registerAllFaces(S.userFonts).then(function(){ refreshFontsUI(); paint(); });
-      /* restore added library tiles FIRST — the layers below reference them by id */
-      if(d.iconLib) ['tap','platform','motif'].forEach(function(c){
-        libUser[c]=(d.iconLib[c]||[]).slice();
-        // added ids look like u7-my-mark; keep the counter past them so nothing collides
-        libUser[c].forEach(function(e){
-          var n=parseInt(String(e.id).slice(1),10);
-          if(n>S.uid) S.uid=n;
-        });
-      });
-      /* restore platform mark */
-      S.platLib=null;
-      setPlatImg(d.platImg||null);
-      if(d.platLib) setPlatLib(d.platLib);
-      S.platImgMode=d.platImgMode||'asis';
-      if($('platAsIs')) $('platAsIs').checked=(S.platImgMode==='asis');
-      /* restore the one-shot tap mark — set, not applied, so the per-layer icon
-         choices that came back with d.stack survive */
-      S.tapImgMode=d.tapImgMode||'tint';
-      if($('tapAsIs')) $('tapAsIs').checked=(S.tapImgMode==='asis');
-      S.tapImg=d.tapImg||null; tapPreview();
-      /* restore star colour */
-      if(d.starCol){ $('starCol').value=d.starCol; $('starSync').checked=false; }
-      else { $('starSync').checked=true; $('starCol').value=d.brand||'#B4577A'; }
-      setLogo(d.logo||null); selectOnly(null); drawAxes(); paint();
+      var d=JSON.parse(r.result); pushUndo(); applyDesign(d);
+      shelfAdd(d,f.name.replace(/\.tapcard\.json$/i,''));   // a loaded file joins the shelf
     }catch(err){ alert('That file is not a saved card.'); } e.target.value=''; };
   r.readAsText(f);
+});
+
+/* ============ 9b. the card shelf ============
+   A shelf of finished cards, so a run of different designs is a thing you HAVE
+   rather than a folder of .tapcard.json files you re-open one at a time. The
+   sheet PDF below reads the ticks straight off it.
+
+   Persistence is best-effort on purpose. This file already keeps the sourcing
+   scratchpad in localStorage and deliberately keeps studio state out of it,
+   because a card can carry embedded fonts, a logo and uploaded icon tiles and
+   those run to megabytes. So: try to keep the shelf on this device, and when a
+   card is too heavy to fit, keep it for the session and SAY SO on its row —
+   never silently drop half of it. Download is always the durable answer. */
+var CKEY='tapstand.cards.v1';
+S.cards=[]; S.cardSkip=[];
+(function(){
+  try{ var raw=localStorage.getItem(CKEY);
+       if(raw){ var v=JSON.parse(raw); if(v&&v.length) S.cards=v; } }
+  catch(e){ /* private mode, blocked, or a file:// origin that refuses */ }
+})();
+function cardsPersist(){
+  S.cardSkip=[];
+  var keep=S.cards.slice();
+  for(var guard=0; guard<40; guard++){
+    try{ localStorage.setItem(CKEY,JSON.stringify(keep)); return true; }
+    catch(err){
+      if(!keep.length){ S.cardSkip=S.cards.map(function(c){return c.id}); return false; }
+      // drop the heaviest first: it is the one costing everything else its place
+      var big=0,bs=-1;
+      keep.forEach(function(c,i){ var n=JSON.stringify(c).length; if(n>bs){bs=n;big=i} });
+      S.cardSkip.push(keep[big].id); keep.splice(big,1);
+    }
+  }
+  return false;
+}
+function cardWeight(c){ return JSON.stringify(c.d).length }
+function shelfAdd(d,name){
+  var c={id:'c'+(++S.uid)+'-'+Date.now().toString(36),
+         n:(name||d.name||'Untitled').slice(0,40),
+         fmt:d.fmt|0, on:true, d:JSON.parse(JSON.stringify(d))};
+  S.cards.push(c); cardsPersist(); shelfDraw();
+  return c;
+}
+function cardById(id){ for(var i=0;i<S.cards.length;i++) if(S.cards[i].id===id) return S.cards[i]; return null }
+function shelfDraw(){
+  var box=$('shelf'); if(!box) return;
+  if(!S.cards.length){
+    box.innerHTML='<div class="cempty">NOTHING SAVED YET &mdash; SAVE THIS CARD TO START A RUN</div>';
+  }else{
+    box.innerHTML=S.cards.map(function(c){
+      var f=FORMATS[c.fmt]||{k:'?'}, off=c.fmt!==S.fmt;
+      return '<div class="crow'+(off?' off':'')+'" data-id="'+esc(c.id)+'">'+
+        '<label class="cpick" title="include on the sheet PDF">'+
+          '<input type="checkbox" data-a="on"'+(c.on?' checked':'')+'></label>'+
+        '<button class="cn" type="button" data-a="open" title="open this card in the editor">'+
+          esc(c.n)+'</button>'+
+        '<span class="cm">'+esc(f.k)+(S.cardSkip.indexOf(c.id)>=0?' &middot; SESSION':'')+'</span>'+
+        '<button class="ib" type="button" data-a="ren" title="rename" aria-label="Rename">&#9998;</button>'+
+        '<button class="ib" type="button" data-a="dl" title="download as a file" aria-label="Download">&#8595;</button>'+
+        '<button class="ib" type="button" data-a="del" title="remove from the shelf" aria-label="Remove">&#215;</button>'+
+      '</div>';
+    }).join('');
+  }
+  var n=S.cards.filter(function(c){return c.on&&c.fmt===S.fmt}).length;
+  var wrong=S.cards.filter(function(c){return c.on&&c.fmt!==S.fmt}).length;
+  $('shelfNote').innerHTML = !S.cards.length ? ''
+    : n+' ticked for the sheet'+
+      (wrong?' &middot; '+wrong+' skipped, saved at another size':'')+
+      (S.cardSkip.length?' &middot; '+S.cardSkip.length+' too big to keep on this device':'');
+  updateSheetFit();
+}
+$('cardSave').addEventListener('click',function(){
+  var base=(elName.value||'Card').trim();
+  var n=base, i=2;
+  while(S.cards.some(function(c){return c.n===n})) n=base+' '+(i++);
+  shelfAdd(captureDesign(),n);
+});
+$('shelf').addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]'); if(!b) return;
+  var row=b.closest('.crow'); if(!row) return;
+  var c=cardById(row.dataset.id); if(!c) return;
+  var a=b.dataset.a;
+  if(a==='on'){ c.on=b.checked; cardsPersist(); shelfDraw(); return; }
+  if(a==='open'){ pushUndo(); applyDesign(c.d); shelfDraw(); return; }
+  if(a==='ren'){
+    var v=prompt('Name this card',c.n); if(v==null) return;
+    c.n=v.trim().slice(0,40)||c.n; cardsPersist(); shelfDraw(); return;
+  }
+  if(a==='dl'){ designBlob(c.d,c.n); return; }
+  if(a==='del'){
+    var i=S.cards.indexOf(c); if(i>=0) S.cards.splice(i,1);
+    cardsPersist(); shelfDraw(); return;
+  }
+});
+$('shelfAll').addEventListener('click',function(){
+  var anyOff=S.cards.some(function(c){return !c.on});
+  S.cards.forEach(function(c){ c.on=anyOff });
+  cardsPersist(); shelfDraw();
 });
 
 /* ============ 10. PDF export ============
@@ -4259,18 +4405,38 @@ function packSheet(){
   pick.n=pick.cols*pick.rows;
   return pick;
 }
+/* Which cards go on the sheet: whatever is ticked on the shelf and was saved at
+   the size the sheet is being packed for. Nothing ticked means what you are
+   looking at, which is what the button did before there was a shelf. */
+function sheetPicks(){
+  var on=(S.cards||[]).filter(function(c){ return c.on && c.fmt===S.fmt });
+  return on.length ? on : null;
+}
 function updateSheetFit(){
   var q=packSheet();
-  $('sheetFit').textContent = q.n<1
-    ? 'card larger than sheet'
-    : q.n+' up · '+q.cols+' × '+q.rows+' at '+q.pw+' × '+q.ph+' mm';
+  if(q.n<1){ $('sheetFit').textContent='card larger than sheet'; return; }
+  var picks=sheetPicks(), d=picks?picks.length:1;
+  var each=Math.floor(q.n/d), spare=q.n-each*d;
+  $('sheetFit').textContent = q.n+' up · '+q.cols+' × '+q.rows+
+    (picks ? ' · '+d+' design'+(d>1?'s':'')+' × '+each+(spare?' (+'+spare+')':'') : '') +
+    ' at '+q.pw+' × '+q.ph+' mm';
 }
 $('sheetPaper').addEventListener('change',updateSheetFit);
 $('formats').addEventListener('click',updateSheetFit);
 
+/* A saved card can lean on a face that has not been registered in this tab yet —
+   so make sure every picked card's fonts are live BEFORE any of them is painted
+   for a snapshot, or the first one prints in the fallback. */
 function exportSheet(){
   var q=packSheet();
   if(q.n<1){ alert('The '+FORMATS[S.fmt].k+' card is larger than the sheet — use Card PDF, or pick A4/Letter that fits.'); return; }
+  var picks=sheetPicks();
+  var ready = picks
+    ? Promise.all(picks.map(function(c){ return registerAllFaces(c.d.userFonts||[]) }))
+    : Promise.resolve();
+  ready.then(function(){ buildSheet(q) }, function(){ buildSheet(q) });
+}
+function buildSheet(q){
   var pw=q.pw, ph=q.ph, cols=q.cols, rows=q.rows, cw=q.cw, ch=q.ch, M=q.M, G=q.G;
   // center the block of tiles on the sheet, so the margin is even
   var gridW=cols*cw+(cols-1)*G, gridH=rows*ch+(rows-1)*G;
@@ -4288,8 +4454,27 @@ function exportSheet(){
     'grid-template-rows:repeat('+rows+','+ch+'mm)';
 
   var vars=['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'];
-  var html=card.innerHTML;
+  /* One snapshot per design. A saved card is painted into the live editor, read
+     off the DOM, and the editor is put back exactly as it was — the renderer
+     stays the single source of truth for what a card looks like, rather than
+     there being a second one that only runs at print time. */
+  function snap(){
+    var o={html:card.innerHTML, cls:card.className,
+           bg:card.style.background, fg:card.style.color, v:{}};
+    vars.forEach(function(v){ o.v[v]=card.style.getPropertyValue(v) });
+    return o;
+  }
+  var picks=sheetPicks(), shots;
+  if(picks){
+    var keep=captureDesign(), keepSel=S.sel;
+    shots=picks.map(function(c){ applyDesign(c.d); resolveLayout(); return snap() });
+    applyDesign(keep); S.sel=keepSel; resolveLayout();
+  }else{
+    shots=[snap()];
+  }
+
   for(var i=0;i<cols*rows;i++){
+    var sh=shots[i%shots.length];
     var t=document.createElement('div');
     // The card's format class (.f57 etc.) is only for the on-screen aspect-ratio
     // sizing hack — the tile is already an exact mm × mm box, so it does not need it.
@@ -4297,12 +4482,11 @@ function exportSheet(){
     // units re-resolve at print size instead of pinning to the editor's pixel width.
     // carry the format class so wrap templates get their fold guide overlay;
     // the class's own #card-prefixed width/aspect-ratio rules do not match a .tile
-    t.className='tile '+card.className;
+    t.className='tile '+sh.cls;
     t.style.cssText='container-type:inline-size;position:relative;overflow:hidden;'+
-      'width:'+cw+'mm;height:'+ch+'mm;background:'+card.style.background+
-      ';color:'+card.style.color;
-    vars.forEach(function(v){t.style.setProperty(v,card.style.getPropertyValue(v))});
-    t.innerHTML=html;
+      'width:'+cw+'mm;height:'+ch+'mm;background:'+sh.bg+';color:'+sh.fg;
+    vars.forEach(function(v){ t.style.setProperty(v,sh.v[v]) });
+    t.innerHTML=sh.html;
     grid.appendChild(t);
   }
   sheet.appendChild(grid);
@@ -4343,7 +4527,9 @@ function exportSheet(){
     '}';
   document.body.classList.add('sheetprinting');
   var keepTitle=document.title;
-  var slug=(elName.value||'tap card').replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
+  var slug=(picks&&picks.length>1 ? picks.length+'-designs'
+            : (picks?picks[0].n:elName.value)||'tap card')
+            .replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
   document.title=slug+'_'+cols+'x'+rows+'-up_'+$('sheetPaper').value;
   var restore=function(){
     document.title=keepTitle;
@@ -4356,6 +4542,7 @@ function exportSheet(){
   setTimeout(restore,1500);
 }
 $('sheetPdfBtn').addEventListener('click',exportSheet);
+shelfDraw();
 updateSheetFit();
 
 

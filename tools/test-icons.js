@@ -70,6 +70,10 @@ const win = {
   URL: { createObjectURL: () => 'blob:x', revokeObjectURL(){} },
   btoa: (s) => Buffer.from(s, 'binary').toString('base64'),
   atob: (s) => Buffer.from(s, 'base64').toString('binary'),
+  Option: function (t, v) { return { text: t, value: v == null ? t : v } },
+  localStorage: (() => { const m = {}; return {
+    getItem: (k) => (k in m ? m[k] : null), setItem(k, v) { m[k] = String(v) },
+    removeItem(k) { delete m[k] } } })(),
   console,
 };
 win.window = win; win.self = win;
@@ -369,6 +373,65 @@ const blob2 = JSON.parse(JSON.stringify({ stack: C.S.stack, iconLib: C.libUser }
 ok('a staged tile is in the saved blob',
    blob2.iconLib.motif.some(e => e.id === made.id));
 ok('and the layer still points at one', /^lib:/.test(blob2.stack.filter(L => L.k === 'motif')[0].g));
+
+console.log('\n== capture / apply is one definition of a card ==');
+C.S.stack = [{ t: 'box', k: 'tap', x: .5, y: .5, s: 1, cap: 'ONE', icon: 'lib:waves', ring: 'circle' }];
+C.S.fmt = 0; byId('bname').value = 'Card One';
+const capA = C.captureDesign();
+ok('capture takes the stack', capA.stack.length === 1 && capA.stack[0].cap === 'ONE');
+ok('capture takes the format and the name', capA.fmt === 0 && capA.name === 'Card One');
+ok('capture carries the added library tiles', !!capA.iconLib);
+
+C.S.stack = [{ t: 'box', k: 'tap', x: .3, y: .7, s: 1, cap: 'TWO' }];
+byId('bname').value = 'Card Two';
+C.applyDesign(JSON.parse(JSON.stringify(capA)));
+ok('apply puts the first one back', C.S.stack[0].cap === 'ONE' && byId('bname').value === 'Card One');
+ok('apply clears the selection', C.S.sel === null && C.S.multi.length === 0);
+
+console.log('\n== the card shelf ==');
+C.S.cards = []; C.shelfDraw();
+ok('an empty shelf says so', byId('shelf').innerHTML.indexOf('NOTHING SAVED') > 0);
+const c1 = C.shelfAdd(C.captureDesign(), 'Alpha');
+byId('bname').value = 'Beta';
+C.S.stack = [{ t: 'box', k: 'tap', x: .5, y: .5, s: 1, cap: 'BETA' }];
+const c2 = C.shelfAdd(C.captureDesign(), 'Beta');
+ok('two cards on the shelf', C.S.cards.length === 2);
+ok('each row is drawn', (byId('shelf').innerHTML.match(/class="crow/g) || []).length === 2);
+ok('both start ticked', C.S.cards.every(c => c.on));
+ok('a card keeps a deep copy, not a live reference',
+   (C.S.stack.push({ t: 'text', text: 'x', x: .1, y: .1 }), c2.d.stack.length === 1),
+   c2.d.stack.length);
+
+console.log('\n== which cards land on the sheet ==');
+ok('both ticked and both at this format', C.sheetPicks().length === 2);
+c2.on = false;
+ok('unticking drops one', C.sheetPicks().length === 1 && C.sheetPicks()[0].id === c1.id);
+c2.on = true;
+c2.fmt = 3;
+ok('a card saved at another size is skipped', C.sheetPicks().length === 1);
+c2.fmt = C.S.fmt;
+C.S.cards.forEach(c => { c.on = false });
+ok('nothing ticked falls back to the card on screen', C.sheetPicks() === null);
+C.S.cards.forEach(c => { c.on = true });
+
+console.log('\n== the sheet reports what it will do ==');
+C.updateSheetFit();
+const fit = byId('sheetFit').textContent;
+ok('the fit line names the designs', /2 designs/.test(fit), fit);
+ok('and still names the grid', /\d+ up/.test(fit), fit);
+
+console.log('\n== a card too heavy for the device is kept, not dropped ==');
+const realLS = win.localStorage;
+win.localStorage = { getItem: () => null, removeItem() {},
+  setItem(k, v) { if (v.length > 400) throw new Error('QuotaExceeded'); } };
+C.S.cards[1].d.logo = 'data:image/png;base64,' + 'A'.repeat(2000);
+const persisted = C.cardsPersist();
+ok('persisting reports it could not keep everything', persisted === false || C.S.cardSkip.length > 0);
+ok('the heavy card is still on the shelf', C.S.cards.length === 2);
+ok('and it is named as session-only', C.S.cardSkip.indexOf(C.S.cards[1].id) >= 0);
+C.shelfDraw();
+ok('the row says SESSION', byId('shelf').innerHTML.indexOf('SESSION') > 0);
+win.localStorage = realLS;
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;
