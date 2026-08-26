@@ -372,6 +372,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   align-items:center;justify-content:center}
 .tapring svg{stroke:var(--b-brand);fill:none;stroke-width:8;stroke-linecap:round}
 .tapring b{font-family:var(--mono);letter-spacing:.16em;color:var(--b-brand);font-weight:700}
+/* rubber band — drawn inside the card, never in the way of a press */
+.marq{position:absolute;z-index:930;pointer-events:none;display:none;border:1px solid var(--accent)}
+.marq::before{content:"";position:absolute;inset:0;background:var(--accent);opacity:.12}
+.marq.on{display:block}
 .orline{display:flex;align-items:center;gap:2.4cqw;font-family:var(--mono);letter-spacing:.13em;opacity:.62}
 .orline::before,.orline::after{content:"";flex:1;height:1px;background:currentColor;opacity:.35}
 .qrimg{display:block;image-rendering:pixelated}
@@ -1731,7 +1735,7 @@ function TH(){ return THEMES[S.theme||0] }
 
 var KIND_LABEL={band:"Colour band",fill:"Full bleed",split:"Diagonal split",rail:"Side rail",
                 blob:"Disc",rule:"Rule",logo:"Logo",lockup:"Logo lockup",name:"Business name",
-                stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block",
+                stars:"Stars",head:"Headline",tap:"Tap ring",qr:"QR block",plat:"Platform mark",
                 motif:"Decoration",pattern:"Pattern",hero:"Hero shape"};
 
 /* The banded "review card" plate — the layout every seller in this market ships,
@@ -2070,7 +2074,7 @@ function defaults(fmt){
 
 var curPreset=0;
 var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
-       userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,tapImg:null};
+       userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,tapImg:null,multi:[]};
 
 /* ---- custom fonts --------------------------------------------------------
    Uploaded font files, held as base64 data URLs and registered through the
@@ -2374,6 +2378,21 @@ function tapEntry(L){
 // the ring gives the mark a fixed height, so width follows its own aspect
 function tapAR(L){ var e=tapEntry(L); return (e&&e.ar)||1 }
 
+/* The platform mark, wherever it is drawn — inside the lockup or standing alone.
+   It is a trademark, so it keeps its own colours by default; 'Tint' knocks it to
+   a single tone the same way an uploaded file is knocked. With no artwork at all
+   it falls back to the word, which is the safest thing to actually print. */
+function platMark(L,s,mc,hCqw,maxCqw){
+  var knock = S.platImgMode==='asis' ? '' : ';filter:brightness(0) saturate(0)';
+  var e = S.platLib ? libGet('platform',S.platLib) : null;
+  if(e) return '<div style="height:'+(hCqw*s)+'cqw;max-width:'+(maxCqw*s)+'cqw'+knock+'">'+
+    libArt(e,mc,'height:100%;width:'+(hCqw*s*(e.ar||1))+'cqw',true)+'</div>';
+  if(S.platImg) return '<img src="'+S.platImg+'" alt="" style="height:'+(hCqw*s)+
+    'cqw;max-width:'+(maxCqw*s)+'cqw;object-fit:contain;display:block'+knock+'">';
+  return '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
+    esc(L.word||'Google')+'</span>';
+}
+
 // scanning floor: a QR under about 25 mm gets unreliable at arm's length, so the
 // per-plate scale can shrink the block around it but not the code itself
 function QW(s){ return Math.max(19*s, 25) }
@@ -2469,21 +2488,14 @@ function bodyHTML(L,ctx){
           'cqw dashed '+mc+';border-radius:'+(.8*s)+'cqw;display:flex;align-items:center;'+
           'justify-content:center;font-family:var(--f-disp);font-weight:750;font-size:'+
           (3.2*s)+'cqw;letter-spacing:.14em;color:'+mc+';opacity:.8">LOGO</div>';
-      // A platform logo is a trademark, so it keeps its own colours by default.
-      // 'Tint' knocks it to a single tone the same way an uploaded file is knocked.
-      var pKnock = S.platImgMode==='asis' ? '' : ';filter:brightness(0) saturate(0)';
-      var pe = S.platLib ? libGet('platform',S.platLib) : null;
-      var platSide = pe
-        ? '<div style="height:'+(11*s)+'cqw;max-width:'+(30*s)+'cqw'+pKnock+'">'+
-          libArt(pe,mc,'height:100%;width:'+(11*s*(pe.ar||1))+'cqw',true)+'</div>'
-        : S.platImg
-        ? '<img src="'+S.platImg+'" alt="" style="height:'+(11*s)+'cqw;max-width:'+(30*s)+
-          'cqw;object-fit:contain;display:block'+pKnock+'">'
-        : '<span style="font-weight:750;font-size:'+(5.6*s)+'cqw;letter-spacing:-.015em">'+
-          esc(L.word||'Google')+'</span>';
-      return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+mark+
+      return '<div style="display:flex;align-items:center;gap:'+(3.2*s)+'cqw">'+
+        '<span data-part="logo">'+mark+'</span>'+
         '<span style="font-size:'+(5*s)+'cqw;opacity:.42;font-weight:300">&#215;</span>'+
-        platSide+'</div>';
+        '<span data-part="plat">'+platMark(L,s,mc,11,30)+'</span></div>';
+    // The right-hand half of the lockup, on its own — what Break apart leaves behind
+    // so the logo and the platform mark can be placed independently.
+    case 'plat':
+      return platMark(L,s,mc,(L.ph||11),(L.pw||40));
     case 'logo':
       var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
       if(!ctx.logo && ctx.hasName) return '';    // the name is holding this slot
@@ -2553,8 +2565,16 @@ function bodyHTML(L,ctx){
       function tapArt(w,h){
         return libArt(tapEntry(L),mc,libBox(w*mk,h*mk));
       }
-      var rg=ctx.th.ring, rs='';
-      if(rg==='none')   rs='border:none;';
+      /* No circle unless you ask for one. A ring is a strong graphic commitment
+         and it was arriving uninvited from the theme; the theme's choice is still
+         one pick away. Without it the mark and caption stack on their own, and the
+         mark gets the room the ring was taking. */
+      var rg = L.ring==null ? 'none' : (L.ring==='theme' ? ctx.th.ring : L.ring);
+      if(rg==='none')
+        return '<div class="tapring" style="border:none;width:auto;height:auto;gap:'+
+          (1.3*s)+'cqw">'+tapArt(15*s*tapAR(L), 15*s)+
+          '<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
+      var rs='';
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
       if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
       if(rg==='dashed') rs='border-style:dashed;';
@@ -2622,7 +2642,7 @@ function paint(quiet){
   S.stack.forEach(function(L,i){
     layerId(L);
     var d=document.createElement('div');
-    d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(S.sel===L.id?' sel':'');
+    d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(isSel(L.id)?' sel':'');
     d.dataset.id=L.id; d.dataset.k=L.k||L.t;
     var M=fmap(L);
     d.style.left=(M.x*100)+'%'; d.style.top=(M.y*100)+'%'; d.style.zIndex=100+i;
@@ -2631,6 +2651,9 @@ function paint(quiet){
     // Anything sitting on the colour band flips to whatever reads against the brand,
     // resolved at paint time so it keeps up when the brand colour changes.
     if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
+    // a stars layer can carry its own colour, and it beats both the card's picker
+    // and the on-band contrast flip, because it was chosen for this one deliberately
+    if(L.starCol) d.style.setProperty('--b-star',L.starCol);
     if(L.t==='text' || L.k==='name' || L.k==='lockup'){
       d.style.fontFamily = (L.fontFamily && fontStack(L.fontFamily)) || 'var(--f-disp)';
       if(th.up) d.style.textTransform='uppercase';
@@ -2762,7 +2785,7 @@ function drawPanel(){
   var rows='';
   for(var i=S.stack.length-1;i>=0;i--){
     var L=S.stack[i];
-    rows+='<div class="lrow'+(S.sel===L.id?' sel':'')+(L.hidden?' off':'')+'" data-id="'+L.id+'">'+
+    rows+='<div class="lrow'+(isSel(L.id)?' sel':'')+(L.hidden?' off':'')+'" data-id="'+L.id+'">'+
       '<span class="lk">'+(L.t==='text'?'TXT':'BOX')+'</span>'+
       '<span class="ln">'+esc(layerLabel(L))+'</span>'+
       '<button class="ib'+(L.hidden?'':' on')+'" data-a="eye" data-id="'+L.id+'" title="Show / hide">'+(L.hidden?EYEOFF:EYE)+'</button>'+
@@ -2782,16 +2805,16 @@ $('layers').addEventListener('click',function(e){
     var L=find(b.dataset.id),i=idx(b.dataset.id),a=b.dataset.a;
     if(!L)return;
     if(typeof pushUndo==='function') pushUndo();
-    if(a==='eye'){ L.hidden=!L.hidden; if(L.hidden&&S.sel===L.id)S.sel=null; }
-    if(a==='lock'){ L.locked=!L.locked; if(L.locked&&S.sel===L.id)S.sel=null; }
+    if(a==='eye'){ L.hidden=!L.hidden; if(L.hidden&&isSel(L.id))selectOnly(null); }
+    if(a==='lock'){ L.locked=!L.locked; if(L.locked&&isSel(L.id))selectOnly(null); }
     if(a==='up'&&i<S.stack.length-1){ S.stack.splice(i,1); S.stack.splice(i+1,0,L); }
     if(a==='down'&&i>0){ S.stack.splice(i,1); S.stack.splice(i-1,0,L); }
-    if(a==='del'){ S.stack.splice(i,1); if(S.sel===L.id)S.sel=null; }
+    if(a==='del'){ S.stack.splice(i,1); if(isSel(L.id))selectOnly(null); }
     paint(); e.stopPropagation(); return;
   }
   var r=e.target.closest('.lrow'); if(!r)return;
   var L2=find(r.dataset.id);
-  if(L2&&!L2.hidden&&!L2.locked){ S.sel=L2.id; paint(); }
+  if(L2&&!L2.hidden&&!L2.locked){ if(e.shiftKey||e.metaKey||e.ctrlKey) selectToggle(L2.id); else selectOnly(L2.id); paint(); }
 });
 
 /* ---- inspector for the selected layer ---- */
@@ -2805,7 +2828,7 @@ function drawInspector(){
      it is what you actually came here for, not something under the sliders. */
   var cat=LIB_FOR[L.k];
   if(cat){
-    var cur=libRef(L.k==='motif'?L.g:L.k==='lockup'?('lib:'+(S.platLib||'')):L.icon,cat);
+    var cur=libRef(L.k==='motif'?L.g:cat==='platform'?('lib:'+(S.platLib||'')):L.icon,cat);
     h+='<button class="btn solid" id="iLib" type="button" style="margin-bottom:2px">'+
        'Choose from library</button>'+
        '<span class="libnote" style="flex:none">'+
@@ -2814,15 +2837,35 @@ function drawInspector(){
            :(L.k==='tap'&&L.icon==='custom')?'YOUR OWN FILE'
            :libSet(cat).length?'DEFAULT':'NOTHING IN THIS SET YET')+'</span>';
   }
-  if(L.k==='lockup'){
-    h+='<span class="lbl">Word beside the logo</span>'+
+  if(L.k==='lockup' || L.k==='plat'){
+    h+='<span class="lbl">'+(L.k==='lockup'?'Word beside the logo':'Word, when there is no logo file')+'</span>'+
        '<input type="text" id="iWord" value="'+esc(L.word||'Google')+'">';
+  }
+  // The lockup arrives as one piece so it lands in the right place. Once it is
+  // there, the two halves usually want to go their own way.
+  if(L.k==='lockup')
+    h+='<button class="btn" id="iSplit" type="button">Break apart</button>'+
+       '<span class="libnote" style="flex:none">SPLITS INTO A LOGO LAYER AND A PLATFORM '+
+       'MARK LAYER, BOTH EXACTLY WHERE THEY SIT NOW</span>';
+  if(L.k==='stars'){
+    var sc=L.starCol||$('starCol').value||'#B4577A';
+    h+='<span class="lbl">Star colour</span>'+
+       '<div class="row2"><input type="color" id="iStarC" value="'+esc(sc)+'" aria-label="Star colour">'+
+       '<button class="btn" id="iStarR" type="button">Follow card</button></div>'+
+       '<span class="libnote" style="flex:none">'+
+       (L.starCol?'THIS LAYER ONLY':'FOLLOWING THE CARD&rsquo;S STAR COLOUR')+'</span>';
   }
   if(L.k==='tap'){
     var mkv=Math.round((L.mk==null?1:L.mk)*100);
-    h+='<span class="lbl">Mark size &middot; '+mkv+'% of the ring</span>'+
+    h+='<span class="lbl">Ring</span>'+
+       '<div class="chips" id="iRing">'+
+       [['','None'],['circle','Circle'],['square','Square'],['hex','Hex'],
+        ['dashed','Dashed'],['theme','Theme']].map(function(o){
+         return '<button class="chip" type="button" data-r="'+o[0]+'" aria-pressed="'+
+           ((L.ring||'')===o[0])+'">'+o[1]+'</button>' }).join('')+'</div>'+
+       '<span class="lbl">Mark size &middot; '+mkv+'%</span>'+
        '<input type="range" id="iMk" min="30" max="200" value="'+mkv+'">'+
-       '<span class="lbl">Ring caption</span>'+
+       '<span class="lbl">Caption</span>'+
        '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
   }
   // the logo slot is a 2.8:1 box by default and always has been — but nothing
@@ -2882,10 +2925,20 @@ function drawInspector(){
      '<input type="range" id="iW" min="15" max="100" value="'+Math.round(wv*100)+'">';
   box.innerHTML=h;
   if(cat) $('iLib').addEventListener('click',function(){ openLib(cat,L,this) });
-  if(L.k==='lockup') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
+  if(L.k==='lockup'||L.k==='plat') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
+  if(L.k==='lockup') $('iSplit').addEventListener('click',function(){ breakLockup(L) });
+  if(L.k==='stars'){
+    $('iStarC').addEventListener('input',function(){L.starCol=this.value;paint(true)});
+    $('iStarR').addEventListener('click',function(){ delete L.starCol; paint(); });
+  }
   if(L.k==='tap'){
     $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
     $('iMk').addEventListener('input',function(){L.mk=+this.value/100;paint(true)});
+    $('iRing').addEventListener('click',function(e){
+      var b=e.target.closest('button[data-r]'); if(!b)return;
+      if(typeof pushUndo==='function') pushUndo();
+      L.ring=b.dataset.r||null; drawInspector(); paint(true);
+    });
   }
   if(L.k==='logo'){
     $('iLw').addEventListener('input',function(){L.lw=+this.value;paint(true)});
@@ -2931,22 +2984,92 @@ function norm(e){
   return {x:(cx-f.x)/f.w, y:(cy-f.y)/f.h};
 }
 
+/* ---- selection: one layer, or several -------------------------------------
+   S.sel is the layer the inspector is talking about. S.multi is every layer that
+   moves with it — empty when a single layer is selected, so nothing else in the
+   file has to know the difference. */
+function isSel(id){ return S.sel===id || (S.multi && S.multi.indexOf(id)>=0) }
+function selected(){
+  if(S.multi && S.multi.length)
+    return S.multi.map(find).filter(function(L){ return L && !L.locked });
+  var L=S.sel&&find(S.sel); return L?[L]:[];
+}
+function selectOnly(id){ S.sel=id||null; S.multi=[]; }
+function selectToggle(id){
+  S.multi=S.multi||[];
+  if(S.sel && S.multi.indexOf(S.sel)<0) S.multi.push(S.sel);
+  var i=S.multi.indexOf(id);
+  if(i>=0){ S.multi.splice(i,1); if(S.sel===id) S.sel=S.multi[0]||null; }
+  else { S.multi.push(id); S.sel=id; }
+  if(S.multi.length<2) { S.sel=S.multi[0]||S.sel; S.multi=[]; }
+}
+
+/* Drag a box across the card and everything it touches comes with you. It starts
+   on empty ground or on a background that is not already picked, so dragging the
+   background itself still works — click it once first. */
+var marq=document.createElement('div');
+marq.className='marq'; card.appendChild(marq);
+var band=null;
+function bandRect(e){
+  var r=rectOf();
+  return {l:Math.min(band.x0,e.clientX)-r.left, t:Math.min(band.y0,e.clientY)-r.top,
+          w:Math.abs(e.clientX-band.x0), h:Math.abs(e.clientY-band.y0)};
+}
+function bandApply(){
+  var r=rectOf(), hits=[];
+  var L1=band.box.l+r.left, T1=band.box.t+r.top;
+  var R1=L1+band.box.w, B1=T1+band.box.h;
+  Array.prototype.forEach.call(card.querySelectorAll('.lay'),function(n){
+    var L=find(n.dataset.id); if(!L||L.locked||L.hidden) return;
+    var b=n.getBoundingClientRect();
+    if(b.right>=L1 && b.left<=R1 && b.bottom>=T1 && b.top<=B1) hits.push(L.id);
+  });
+  if(!hits.length){ selectOnly(null); }
+  else if(hits.length===1){ selectOnly(hits[0]); }
+  else { S.multi=hits; S.sel=hits[hits.length-1]; }
+}
+
 card.addEventListener('pointerdown',function(e){
-  var hnd=e.target.closest('.hnd'),node=e.target.closest('.lay');
-  if(!node){ S.sel=null; paint(); return; }
-  var L=find(node.dataset.id); if(!L||L.locked||L.hidden) return;
+  var hnd=e.target.closest('.hnd'), node=e.target.closest('.lay');
+  var L=node?find(node.dataset.id):null;
+  if(L&&(L.locked||L.hidden)) L=null;
+
+  if(L && (e.shiftKey||e.metaKey||e.ctrlKey) && !hnd){    // add or drop from the set
+    selectToggle(L.id); paint(); e.preventDefault(); return;
+  }
+  // a marquee starts on nothing, on a locked layer, or on a background you have
+  // not already selected — otherwise the press belongs to the layer under it
+  var bgStart = !L || (BG_KINDS[L.k] && !isSel(L.id));
+  if(bgStart){
+    band={x0:e.clientX, y0:e.clientY, box:{l:0,t:0,w:0,h:0}, moved:false};
+    marq.classList.add('on');
+    marq.style.cssText='left:0;top:0;width:0;height:0';
+    try{ card.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault(); return;
+  }
+
+  if(!isSel(L.id)) selectOnly(L.id);
   S.sel=L.id; paint();
   if(typeof pushUndo==='function') pushUndo();
-  L._man=true;
   var p=norm(e);
   var mode = hnd ? (hnd.dataset.h==='w' ? 'width' : 'scale') : 'move';
+  var group = (mode==='move') ? selected() : [L];
+  group.forEach(function(o){ o._man=true });
   drag={L:L,mode:mode,ox:p.x-L.x,oy:p.y-L.y,s0:(L.s==null?1:L.s),
         w0:(L.w!=null?L.w:1), x0:p.x,
-        d0:Math.hypot(p.x-L.x,p.y-L.y)||.001};
+        d0:Math.hypot(p.x-L.x,p.y-L.y)||.001,
+        group:group.map(function(o){ return {L:o,x:o.x,y:o.y} })};
   try{ card.setPointerCapture(e.pointerId); }catch(err){}
   e.preventDefault();
 });
 card.addEventListener('pointermove',function(e){
+  if(band){
+    band.box=bandRect(e);
+    if(band.box.w>3||band.box.h>3) band.moved=true;
+    marq.style.cssText='left:'+band.box.l+'px;top:'+band.box.t+'px;'+
+      'width:'+band.box.w+'px;height:'+band.box.h+'px';
+    return;
+  }
   if(!drag)return;
   var p=norm(e);
   if(drag.mode==='scale'){
@@ -2958,17 +3081,31 @@ card.addEventListener('pointermove',function(e){
     drag.L.w=Math.round(nw*100)/100;
   }else{
     var x=p.x-drag.ox,y=p.y-drag.oy,T=.018,sx=null,sy=null;
+    var many=drag.group&&drag.group.length>1;
+    // guides snap the layer under the cursor; with a group, everything else keeps
+    // its offset from it, so the arrangement travels intact
     [0.5,0.12,0.88].forEach(function(g){ if(Math.abs(x-g)<T){x=g;sx=g} });
     [0.5,0.12,0.88].forEach(function(g){ if(Math.abs(y-g)<T){y=g;sy=g} });
-    S.stack.forEach(function(o){ if(o===drag.L||o.hidden)return;
+    if(!many) S.stack.forEach(function(o){ if(o===drag.L||o.hidden)return;
       if(Math.abs(x-o.x)<T){x=o.x;sx=o.x} if(Math.abs(y-o.y)<T){y=o.y;sy=o.y} });
-    drag.L.x=Math.max(.02,Math.min(.98,x)); drag.L.y=Math.max(.02,Math.min(.98,y));
+    x=Math.max(.02,Math.min(.98,x)); y=Math.max(.02,Math.min(.98,y));
+    var lead=null;
+    drag.group.forEach(function(g){ if(g.L===drag.L) lead=g });
+    var dx=x-lead.x, dy=y-lead.y;
+    drag.group.forEach(function(g){
+      g.L.x=Math.max(0,Math.min(1,g.x+dx)); g.L.y=Math.max(0,Math.min(1,g.y+dy));
+    });
     gv.classList.toggle('on',sx!==null); if(sx!==null)gv.style.left=(sx*100)+'%';
     gh.classList.toggle('on',sy!==null); if(sy!==null)gh.style.top=(sy*100)+'%';
   }
   paint(true);
 });
 function endDrag(){
+  if(band){
+    // a press with no drag is a click: it clears the selection
+    if(band.moved) bandApply(); else selectOnly(null);
+    band=null; marq.classList.remove('on'); paint(); return;
+  }
   if(!drag)return; drag=null;
   gv.classList.remove('on'); gh.classList.remove('on');
   paint();                     // refresh the inspector's scale readout once, on release
@@ -3000,7 +3137,7 @@ dirsEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-d]'); if(!b)return;
   S.dir=+b.dataset.d; var d=DIR();
   if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
-             S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; }
+             S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
   Array.prototype.forEach.call(dirsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
   drawAxes(); paint();
@@ -3018,7 +3155,7 @@ $('pals').addEventListener('click',function(e){
    layer's category — a tap layer never has to scroll past Yelp to find a hand.
    Same dim-and-blur backdrop and corner × as the holder sheet, its own element
    so neither one has to know about the other. */
-var LIB_FOR={tap:'tap', lockup:'platform', motif:'motif'};
+var LIB_FOR={tap:'tap', lockup:'platform', plat:'platform', motif:'motif'};
 var LIB_TITLE={tap:'Tap marks', platform:'Platform logos', motif:'Decorations'};
 var LIB_HINT={
   tap:'Tinted with the brand colour, so a file you add has to be genuinely transparent — '+
@@ -3282,7 +3419,7 @@ var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draf
 var platesEl=$('plates');
 platesEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-p]'); if(!b)return;
-  S.plate=+b.dataset.p; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
+  S.plate=+b.dataset.p; S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
   drawAxes(); paint();
 });
 
@@ -3292,7 +3429,7 @@ $('addText').addEventListener('click',function(){
   if(typeof pushUndo==='function') pushUndo();
   var n=S.stack.filter(function(o){return o.t==='text'}).length;
   var L={t:'text',text:'New text',x:.5,y:Math.min(.08+n*.07,.9),s:1,fw:700,w:.8};
-  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+  layerId(L); S.stack.push(L); selectOnly(L.id); paint();
 });
 
 // Fill-space adds — each drops a face-relative layer users can then drag / restyle.
@@ -3302,7 +3439,7 @@ $('addLine').addEventListener('click',function(){
   if(typeof pushUndo==='function') pushUndo();
   var n=_stackCount(function(L){return L.k==='rule'});
   var L={t:'box',k:'rule',x:.5,y:.44+n*.06,s:1,w:.62};
-  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+  layerId(L); S.stack.push(L); selectOnly(L.id); paint();
 });
 /* + Graphic: drop a decoration in the next empty corner and open the library on it
    straight away, so picking the artwork is the same gesture as adding it. */
@@ -3314,7 +3451,7 @@ $('addDeco').addEventListener('click',function(){
   var pos=slots[n%slots.length];
   var g=(typeof DIR==='function'?DIR().g.motif:'coffee');
   var L={t:'box',k:'motif',x:pos[0],y:pos[1],s:.6,g:g,op:.85,_man:true};
-  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+  layerId(L); S.stack.push(L); selectOnly(L.id); paint();
   openLib('motif',L,this);
 });
 $('addPatBand').addEventListener('click',function(){
@@ -3323,13 +3460,13 @@ $('addPatBand').addEventListener('click',function(){
   var g=(typeof DIR==='function'?DIR().g.pat:'terrazzo');
   // alternate top and bottom bands, cover the width
   var L={t:'box',k:'pattern',x:.5,y:n%2?.9:.1,s:.7,w:1,hf:.2,g:g,op:.35};
-  layerId(L); S.stack.push(L); S.sel=L.id; paint();
+  layerId(L); S.stack.push(L); selectOnly(L.id); paint();
 });
 $('resetLay').addEventListener('click',function(){ if(typeof pushUndo==='function') pushUndo();
-  S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
+  S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); paint(); });
 $('autoFit').addEventListener('change',function(){ autoFit=this.checked;
   if(autoFit) S.stack.forEach(function(L){ delete L._man });
-  S.stack=PLATES[S.plate][1](S.fmt); S.sel=null; paint(); });
+  S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); paint(); });
 
 var presetsEl=$('presets');
 presetsEl.innerHTML=PRESETS.map(function(p,i){
@@ -3360,7 +3497,7 @@ tagsEl.addEventListener('click',function(e){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
   // a printable tag is its own trim size, so jump straight to it
   var fi=-1; FORMATS.forEach(function(F,i){ if(F.tag===S.tag) fi=i; });
-  if(fi>=0){ S.fmt=fi; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
+  if(fi>=0){ S.fmt=fi; S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
              Array.prototype.forEach.call(fmtEl.children,function(c){
                c.setAttribute('aria-pressed', c.dataset.f==String(fi) ? 'true':'false')}); }
   tagHint(); paint();
@@ -3371,7 +3508,7 @@ fmtEl.innerHTML=FORMATS.map(function(f,i){
   return '<button class="chip" type="button" data-f="'+i+'" aria-pressed="'+(i===0)+'">'+f.k+'</button>'}).join('');
 fmtEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-f]'); if(!b)return;
-  S.fmt=+b.dataset.f; S.stack=PLATES[S.plate][1](S.fmt); S.sel=null;
+  S.fmt=+b.dataset.f; S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
   Array.prototype.forEach.call(fmtEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
   paint();
@@ -3869,7 +4006,7 @@ function snap(){ return JSON.stringify({stack:S.stack,plate:S.plate,theme:S.them
 function pushUndo(){ UNDO.push(snap()); if(UNDO.length>40)UNDO.shift(); REDO.length=0; }
 function restore(j){ var o=JSON.parse(j); S.stack=o.stack; S.plate=o.plate; S.theme=o.theme;
   S.pal=o.pal; S.dir=o.dir; S.dispFont=o.dispFont||''; S.bodyFont=o.bodyFont||'';
-  S.sel=null; refreshFontsUI(); drawAxes(); paint(); }
+  selectOnly(null); refreshFontsUI(); drawAxes(); paint(); }
 function undo(){ if(!UNDO.length)return; REDO.push(snap()); restore(UNDO.pop()); }
 function redo(){ if(!REDO.length)return; UNDO.push(snap()); restore(REDO.pop()); }
 $('undoBtn').addEventListener('click',undo);
@@ -3881,34 +4018,78 @@ document.addEventListener('keydown',function(e){
   var meta=e.metaKey||e.ctrlKey;
   if(meta && e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
   if(meta && e.key.toLowerCase()==='d'){ e.preventDefault(); dupLayer(); return; }
-  if(!S.sel) return;
-  var L=find(S.sel); if(!L) return;
-  var step=e.shiftKey?.02:.004;
-  L._man=true;
-  if(e.key==='ArrowLeft'){ pushUndo(); L.x=Math.max(0,L.x-step); }
-  else if(e.key==='ArrowRight'){ pushUndo(); L.x=Math.min(1,L.x+step); }
-  else if(e.key==='ArrowUp'){ pushUndo(); L.y=Math.max(0,L.y-step); }
-  else if(e.key==='ArrowDown'){ pushUndo(); L.y=Math.min(1,L.y+step); }
-  else if(e.key==='Backspace'||e.key==='Delete'){ pushUndo(); var i=idx(S.sel); S.stack.splice(i,1); S.sel=null; }
+  if(meta && e.key.toLowerCase()==='a'){          // everything you could move
+    e.preventDefault();
+    S.multi=S.stack.filter(function(L){ return !L.locked && !L.hidden }).map(function(L){ return L.id });
+    S.sel=S.multi[S.multi.length-1]||null;
+    if(S.multi.length<2) S.multi=[];
+    paint(); return;
+  }
+  var sel=selected(); if(!sel.length) return;
+  var step=e.shiftKey?.02:.004, dx=0, dy=0;
+  if(e.key==='ArrowLeft') dx=-step;
+  else if(e.key==='ArrowRight') dx=step;
+  else if(e.key==='ArrowUp') dy=-step;
+  else if(e.key==='ArrowDown') dy=step;
+  else if(e.key==='Backspace'||e.key==='Delete'){
+    pushUndo();
+    sel.forEach(function(L){ var i=idx(L.id); if(i>=0) S.stack.splice(i,1) });
+    selectOnly(null); e.preventDefault(); paint(); return;
+  }
   else return;
+  pushUndo();
+  sel.forEach(function(L){
+    L._man=true;
+    L.x=Math.max(0,Math.min(1,L.x+dx)); L.y=Math.max(0,Math.min(1,L.y+dy));
+  });
   e.preventDefault(); paint();
 });
+
+/* ---- break the lockup apart ------------------------------------------------
+   The lockup exists so the logo and the platform mark arrive together, in the
+   relationship a co-brand needs. Once it is placed, that relationship is usually
+   the thing you want to start adjusting — so this measures where the two halves
+   are actually sitting and leaves them there as layers of their own. */
+function breakLockup(L){
+  var node=card.querySelector('.lay[data-id="'+L.id+'"]'); if(!node) return;
+  var lg=node.querySelector('[data-part="logo"]'), pl=node.querySelector('[data-part="plat"]');
+  if(!lg||!pl) return;
+  var r=rectOf(), fmt=FORMATS[S.fmt], f=(fmt&&fmt.face)||{x:0,y:0,w:1,h:1};
+  function centre(el){
+    var b=el.getBoundingClientRect();
+    var cx=((b.left+b.width/2)-r.left)/r.width, cy=((b.top+b.height/2)-r.top)/r.height;
+    return {x:+((cx-f.x)/f.w).toFixed(4), y:+((cy-f.y)/f.h).toFixed(4)};
+  }
+  var a=centre(lg), b2=centre(pl), s=(L.s==null?1:L.s);
+  pushUndo();
+  // same numbers the lockup was drawing them at, so nothing moves on the split
+  var logoL={t:'box', k:'logo', x:a.x, y:a.y, s:s, lw:30, lh:11, _man:true,
+             onBand:L.onBand, rotd:L.rotd};
+  var platL={t:'box', k:'plat', x:b2.x, y:b2.y, s:s, ph:11, pw:40, word:L.word,
+             _man:true, onBand:L.onBand, rotd:L.rotd, fontFamily:L.fontFamily};
+  layerId(logoL); layerId(platL);
+  var i=idx(L.id);
+  S.stack.splice(i,1,logoL,platL);
+  S.multi=[logoL.id,platL.id]; S.sel=platL.id;
+  paint();
+}
 
 /* ============ 5. duplicate layer ============ */
 function dupLayer(){
   if(!S.sel) return; var L=find(S.sel); if(!L) return;
   pushUndo();
   var c=JSON.parse(JSON.stringify(L)); c.id=null; c.x=Math.min(.96,L.x+.03); c.y=Math.min(.96,L.y+.03);
-  layerId(c); S.stack.splice(idx(S.sel)+1,0,c); S.sel=c.id; paint();
+  layerId(c); S.stack.splice(idx(S.sel)+1,0,c); selectOnly(c.id); paint();
 }
 $('dupBtn').addEventListener('click',dupLayer);
 
 /* ============ 6. align the selected layer ============ */
 $('alignRow').addEventListener('click',function(e){
-  var b=e.target.closest('button[data-al]'); if(!b||!S.sel)return;
-  var L=find(S.sel); if(!L)return; pushUndo(); L._man=true;
-  ({l:function(){L.x=.09},c:function(){L.x=.5},r:function(){L.x=.91},
-    t:function(){L.y=.09},m:function(){L.y=.5},b:function(){L.y=.91}})[b.dataset.al]();
+  var b=e.target.closest('button[data-al]'); if(!b)return;
+  var sel=selected(); if(!sel.length)return;
+  pushUndo();
+  var at={l:['x',.09],c:['x',.5],r:['x',.91],t:['y',.09],m:['y',.5],b:['y',.91]}[b.dataset.al];
+  sel.forEach(function(L){ L._man=true; L[at[0]]=at[1] });
   paint();
 });
 
@@ -4011,7 +4192,7 @@ $('loadDesign').addEventListener('change',function(e){
       /* restore star colour */
       if(d.starCol){ $('starCol').value=d.starCol; $('starSync').checked=false; }
       else { $('starSync').checked=true; $('starCol').value=d.brand||'#B4577A'; }
-      setLogo(d.logo||null); S.sel=null; drawAxes(); paint();
+      setLogo(d.logo||null); selectOnly(null); drawAxes(); paint();
     }catch(err){ alert('That file is not a saved card.'); } e.target.value=''; };
   r.readAsText(f);
 });

@@ -18,8 +18,12 @@ const cache = new Map();
 function el(tag, id) {
   const node = {
     tagName: (tag || 'div').toUpperCase(), id: id || '',
-    style: new Proxy({ setProperty(){}, removeProperty(){}, getPropertyValue(){ return '' } },
-      { get: (t, k) => (k in t ? t[k] : ''), set: () => true }),
+    style: new Proxy({
+      _props: {},
+      setProperty(k, v) { this._props[k] = v },
+      removeProperty(k) { delete this._props[k] },
+      getPropertyValue(k) { return this._props[k] || '' },
+    }, { get: (t, k) => (k in t ? t[k] : ''), set: () => true }),
     classList: { add(){}, remove(){}, toggle(){}, contains(){ return false } },
     dataset: {}, children: [], options: [], files: [],
     value: '', textContent: '', innerHTML: '', checked: false, hidden: true,
@@ -72,6 +76,20 @@ win.window = win; win.self = win;
 win.unescape = (s) => decodeURIComponent(s);
 const C = vm.createContext(win);
 vm.runInContext(code, C, { filename: 'page', timeout: 20000 });
+
+/* paint() clears real .lay nodes via querySelectorAll, which the stub cannot do —
+   so tests clear card.children themselves through draw(). And breakLockup measures
+   the two halves off the DOM, so give it two halves with rects it can measure. */
+byId('card').querySelector = function (sel) {
+  if (sel.indexOf('data-id') < 0) return null;
+  return {
+    querySelector: (s) => ({
+      getBoundingClientRect: () => s.indexOf('logo') > 0
+        ? { left: 40, top: 100, width: 80, height: 30, right: 120, bottom: 130 }
+        : { left: 160, top: 100, width: 60, height: 30, right: 220, bottom: 130 },
+    }),
+  };
+};
 
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {
@@ -204,23 +222,91 @@ html2 = card.children.map(c => c.innerHTML).join('');
 ok('legacy tap icon still draws', /viewBox="0 0 100 100"/.test(html2));
 ok('legacy motif still draws', html2.indexOf('M10 2v2') > 0);
 
-console.log('\n== mark size inside the ring ==');
+console.log('\n== the ring, and the mark inside it ==');
 function ringOf(h) { const m = h.match(/class="tapring" style="width:([\d.]+)cqw/); return m && +m[1] }
 function markOf(h) { const m = h.match(/viewBox="0 0 100 100"[\s\S]*?width:([\d.]+)cqw/); return m && +m[1] }
+function draw() { card.children.length = 0; C.paint(); return card.children.map(c => c.innerHTML).join('') }
 const tapL2 = { t: 'box', k: 'tap', x: .5, y: .5, s: 1, cap: 'TAP', icon: 'lib:waves' };
-C.layerId(tapL2); C.S.stack = [tapL2]; C.S.sel = null;
-card.children.length = 0; C.paint();
-const base = card.children.map(c => c.innerHTML).join('');
-ok('the mark renders inside the ring', markOf(base) > 0 && ringOf(base) > 0);
+C.layerId(tapL2); C.S.stack = [tapL2]; C.selectOnly(null);
+let out = draw();
+ok('no circle unless it is asked for', ringOf(out) === null && out.indexOf('border:none') > 0);
+ok('the mark still renders without one', markOf(out) > 0);
+
+tapL2.ring = 'circle';
+out = draw();
+ok('picking a ring brings the circle back', ringOf(out) > 0);
+const inRing = markOf(out);
 tapL2.mk = 1.6;
-card.children.length = 0; C.paint();
-const big = card.children.map(c => c.innerHTML).join('');
-ok('mark size scales the mark', Math.abs(markOf(big) / markOf(base) - 1.6) < 0.01,
-   markOf(big) + ' vs ' + markOf(base));
-ok('the ring itself is untouched by it', ringOf(big) === ringOf(base));
-tapL2.mk = null;
-card.children.length = 0; C.paint();
-ok('no mark size behaves as 100%', markOf(card.children.map(c => c.innerHTML).join('')) === markOf(base));
+out = draw();
+ok('mark size scales the mark', Math.abs(markOf(out) / inRing - 1.6) < 0.01,
+   markOf(out) + ' vs ' + inRing);
+ok('and leaves the ring alone', ringOf(out) === ringOf(draw()));
+tapL2.mk = null; tapL2.ring = 'theme';
+ok('theme falls back to the theme ring', ringOf(draw()) > 0);
+tapL2.ring = null;
+
+console.log('\n== stars take their own colour ==');
+const starL = { t: 'box', k: 'stars', x: .5, y: .2, s: 1 };
+C.layerId(starL); C.S.stack = [starL];
+ok('a stars layer renders', draw().indexOf('stars') > 0);
+function nodeOf(kind) { draw(); return card.children.filter(c => c.dataset.k === kind)[0] }
+starL.starCol = '#00ff88';
+let starNode = nodeOf('stars');
+ok('the layer carries its own --b-star',
+   starNode && starNode.style.getPropertyValue('--b-star') === '#00ff88',
+   starNode && starNode.style.getPropertyValue('--b-star'));
+starL.onBand = 1;
+starNode = nodeOf('stars');
+ok('and it beats the on-band contrast flip',
+   starNode.style.getPropertyValue('--b-star') === '#00ff88');
+delete starL.starCol; delete starL.onBand;
+ok('"Follow card" gives it back to the card',
+   nodeOf('stars').style.getPropertyValue('--b-star') === '');
+
+console.log('\n== breaking the lockup apart ==');
+const lock2 = { t: 'box', k: 'lockup', x: .5, y: .3, s: 1, word: 'Google' };
+C.layerId(lock2); C.S.stack = [lock2]; C.selectOnly(lock2.id);
+out = draw();
+ok('the lockup marks its two halves', /data-part="logo"/.test(out) && /data-part="plat"/.test(out));
+C.breakLockup(lock2);
+const kinds = C.S.stack.map(L => L.k).sort().join(',');
+ok('it becomes a logo layer and a platform layer', kinds === 'logo,plat', kinds);
+ok('the lockup itself is gone', !C.S.stack.some(L => L.k === 'lockup'));
+ok('both halves come out selected', C.S.multi.length === 2);
+ok('both are marked hand-placed so auto-fit leaves them', C.S.stack.every(L => L._man));
+const logoOut = C.S.stack.filter(L => L.k === 'logo')[0];
+const platOut = C.S.stack.filter(L => L.k === 'plat')[0];
+ok('each half lands where it was actually sitting',
+   Math.abs(logoOut.x - 0.2) < .001 && Math.abs(platOut.x - 0.475) < .001,
+   logoOut.x + ' / ' + platOut.x);
+ok('and they keep the lockup\'s own scale', logoOut.s === 1 && platOut.s === 1);
+ok('a lone platform layer still draws', draw().length > 0);
+
+console.log('\n== selecting more than one ==');
+const a1 = { t: 'text', text: 'a', x: .2, y: .2, s: 1 };
+const a2 = { t: 'text', text: 'b', x: .4, y: .4, s: 1 };
+const a3 = { t: 'text', text: 'c', x: .6, y: .6, s: 1 };
+[a1, a2, a3].forEach(L => C.layerId(L));
+C.S.stack = [a1, a2, a3];
+C.selectOnly(a1.id);
+ok('one selected means no group', C.S.multi.length === 0 && C.selected().length === 1);
+C.selectToggle(a2.id);
+ok('adding a second makes a group of two', C.selected().length === 2);
+ok('both read as selected', C.isSel(a1.id) && C.isSel(a2.id) && !C.isSel(a3.id));
+C.selectToggle(a3.id);
+ok('a third joins', C.selected().length === 3);
+C.selectToggle(a3.id);
+ok('toggling it again drops it', C.selected().length === 2 && !C.isSel(a3.id));
+C.selectToggle(a2.id);
+ok('dropping back to one collapses the group', C.S.multi.length === 0 && C.selected().length === 1);
+C.selectOnly(null);
+ok('clearing selects nothing', C.selected().length === 0);
+
+console.log('\n== a locked layer never joins a move ==');
+a3.locked = true;
+C.S.multi = [a1.id, a2.id, a3.id]; C.S.sel = a1.id;
+ok('selected() leaves the locked one out', C.selected().length === 2);
+a3.locked = false;
 
 console.log('\n== logo box ==');
 const logoL = { t: 'box', k: 'logo', x: .5, y: .3, s: 1 };
