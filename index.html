@@ -4159,8 +4159,10 @@ function preflight(){
       :TG.sku+' is '+TG.w+' mm — too wide for a '+fmt.mm+' mm insert']);
     if(tap){
       var ringMM=(25*(tap.s==null?1:tap.s)/100)*fmt.mm;
-      out.push([ringMM>=TG.w*0.85,'Tap ring ≈ '+ringMM.toFixed(0)+' mm vs '+TG.w+' mm tag'+
-        (ringMM>=TG.w*0.85?'':' — ring is smaller than the tag, people will aim wrong')]);
+      // "target", not "ring" — a tap layer with no ring is still the thing being
+      // aimed at, and it is the drawn size that has to cover the tag
+      out.push([ringMM>=TG.w*0.85,'Tap target ≈ '+ringMM.toFixed(0)+' mm vs '+TG.w+' mm tag'+
+        (ringMM>=TG.w*0.85?'':' — smaller than the tag, so people will aim wrong. Turn a ring on, or raise Mark size.')]);
     }
   }
   out.push([!!S.logo,S.logo?'Logo set':'No logo — placeholder will print']);
