@@ -105,6 +105,8 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
 .libgrid{display:grid;gap:1px;background:var(--rule-2);padding:1px;
   grid-template-columns:repeat(auto-fill,minmax(78px,1fr));
   max-height:min(56vh,420px);overflow-y:auto}
+/* display:grid/flex here would otherwise beat the UA's [hidden] rule */
+.libgrid[hidden]{display:none}
 .libtile{background:var(--panel);border:0;padding:9px 5px;cursor:pointer;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit}
 .libtile:hover,.libtile:focus-visible{background:var(--paper-2);color:var(--accent);outline:none}
