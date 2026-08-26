@@ -18,13 +18,27 @@ const cache = new Map();
 function el(tag, id) {
   const node = {
     tagName: (tag || 'div').toUpperCase(), id: id || '',
+    /* paint() sets the whole wrapper in one cssText string now, so the stub has to
+       parse it — otherwise the tests are blind to everything a layer is given. */
     style: new Proxy({
       _props: {},
       setProperty(k, v) { this._props[k] = v },
       removeProperty(k) { delete this._props[k] },
       getPropertyValue(k) { return this._props[k] || '' },
-    }, { get: (t, k) => (k in t ? t[k] : ''),
-         set: (t, k, v) => { t[k] = v; return true } }),
+    }, {
+      get: (t, k) => (k in t ? t[k] : ''),
+      set: (t, k, v) => {
+        t[k] = v;
+        if (k === 'cssText') String(v).split(';').forEach((d) => {
+          const c = d.indexOf(':'); if (c < 0) return;
+          const prop = d.slice(0, c).trim(), val = d.slice(c + 1).trim();
+          if (!prop) return;
+          t._props[prop] = val;
+          t[prop.replace(/-([a-z])/g, (_, ch) => ch.toUpperCase())] = val;
+        });
+        return true;
+      },
+    }),
     classList: { add(){}, remove(){}, toggle(){}, contains(){ return false } },
     dataset: {}, children: [], options: [], files: [],
     value: '', textContent: '', innerHTML: '', checked: false, hidden: true,
@@ -502,6 +516,132 @@ ok('and it is named as session-only', C.S.cardSkip.indexOf(C.S.cards[1].id) >= 0
 C.shelfDraw();
 ok('the row says SESSION', byId('shelf').innerHTML.indexOf('SESSION') > 0);
 win.localStorage = realLS;
+
+console.log('\n== every composition builds at every trim ==');
+{
+  const fmtN = 8, bad = [];
+  let stacks = 0;
+  for (let p = 0; p < C.PLATES.length; p++) {
+    for (let f = 0; f < fmtN; f++) {
+      let st;
+      try { C.S.fmt = f; st = C.PLATES[p][1](f) } catch (e) { bad.push(C.PLATES[p][0] + '@' + f + ': threw ' + e.message); continue }
+      if (!Array.isArray(st) || !st.length) { bad.push(C.PLATES[p][0] + '@' + f + ': empty'); continue }
+      stacks++;
+      const taps = st.filter(L => L.k === 'tap');
+      if (taps.length !== 1) bad.push(C.PLATES[p][0] + '@' + f + ': ' + taps.length + ' taps');
+      for (const L of st) {
+        if (typeof L.x !== 'number' || typeof L.y !== 'number')
+          bad.push(C.PLATES[p][0] + '@' + f + ': ' + (L.k || L.t) + ' has no position');
+        if (L.g === undefined && (L.k === 'motif' || L.k === 'pattern' || L.k === 'hero'))
+          bad.push(C.PLATES[p][0] + '@' + f + ': ' + L.k + ' has no graphic');
+      }
+    }
+  }
+  C.S.fmt = 0;
+  ok(C.PLATES.length + ' compositions, ' + stacks + ' stacks, all sound', bad.length === 0,
+     bad.slice(0, 4).join(' | '));
+  ok('the twelve new ones are all there', C.PLATES.length === 28, C.PLATES.length);
+}
+
+console.log('\n== every composition renders, and so does its miniature ==');
+{
+  const broke = [];
+  C.paint();                                   // seed PREVIEW
+  for (let p = 0; p < C.PLATES.length; p++) {
+    const st = C.PLATES[p][1](0);
+    try { st.forEach(L => C.bodyHTML(L, C.PREVIEW.ctx)) }
+    catch (e) { broke.push(C.PLATES[p][0] + ': body ' + e.message); continue }
+    let mini;
+    try { mini = C.miniCard(st) } catch (e) { broke.push(C.PLATES[p][0] + ': mini ' + e.message); continue }
+    if (!mini || mini.indexOf('class="mini') < 0) broke.push(C.PLATES[p][0] + ': empty miniature');
+  }
+  ok('every composition renders and previews', broke.length === 0, broke.slice(0, 3).join(' | '));
+  const m = C.miniCard(C.PLATES[0][1](0));
+  ok('a miniature is a real card, not a swatch', /aspect-ratio/.test(m) && /--b-brand/.test(m));
+  ok('and it uses the same layer positioning as the card', /left:\d/.test(m) && /transform:translate/.test(m));
+}
+
+console.log('\n== directions still point at compositions that exist ==');
+{
+  const bad = [];
+  C.DIRECTIONS.forEach((d) => {
+    (d.pl || []).forEach((i) => { if (!C.PLATES[i]) bad.push(d.k + ' -> plate ' + i) });
+    if (d.def) {
+      if (!C.THEMES[d.def[0]]) bad.push(d.k + ' -> theme ' + d.def[0]);
+      if (!C.PALETTES[d.def[1]]) bad.push(d.k + ' -> palette ' + d.def[1]);
+      if (!C.PLATES[d.def[2]]) bad.push(d.k + ' -> default plate ' + d.def[2]);
+    }
+    ['pat', 'hero', 'motif'].forEach((g) => {
+      const bank = g === 'pat' ? C.PATTERNS : g === 'hero' ? C.HEROES : null;
+      if (bank && !(d.g[g] in bank)) bad.push(d.k + ' -> ' + g + ' "' + d.g[g] + '"');
+      if (g === 'motif' && !C.libGet('motif', d.g.motif)) bad.push(d.k + ' -> motif "' + d.g.motif + '"');
+    });
+  });
+  ok(C.DIRECTIONS.length + ' directions, every reference resolves', bad.length === 0, bad.join(' | '));
+}
+
+console.log('\n== the docked library ==');
+C.dockDraw();
+ok('folders render', byId('dockFolders').innerHTML.indexOf('Favourites') > 0);
+ok('every asset folder is offered',
+   ['Tap marks', 'Decorations', 'Platform', 'Logos', 'Images']
+     .every(n => byId('dockFolders').innerHTML.indexOf(n) > 0));
+ok('and every style folder',
+   ['Compositions', 'Themes', 'Palettes', 'Directions']
+     .every(n => byId('dockFolders').innerHTML.indexOf(n) > 0));
+ok('the grid fills with the current folder', byId('dockGrid').innerHTML.indexOf('dtile') > 0);
+
+C.S.favs = {};
+ok('favourites starts empty', Object.keys(C.S.favs).length === 0);
+C.toggleFav('tap', 'waves');
+ok('starring records it', C.isFav('tap', 'waves'));
+C.dockFolder = 'fav'; C.dockDraw();
+ok('the favourites folder shows it', byId('dockGrid').innerHTML.indexOf('waves') > 0);
+ok('and nothing else', (byId('dockGrid').innerHTML.match(/dtile/g) || []).length === 1);
+C.toggleFav('plate', 'p3');
+C.dockDraw();
+ok('a style can be starred alongside an asset',
+   (byId('dockGrid').innerHTML.match(/dtile/g) || []).length === 2);
+C.toggleFav('tap', 'waves'); C.toggleFav('plate', 'p3');
+C.dockDraw();
+ok('un-starring empties it again', byId('dockGrid').innerHTML.indexOf('NOTHING STARRED') > 0);
+
+C.dockFolder = 'motif'; C.dockDraw();
+ok('a decoration folder lists the whole set',
+   (byId('dockGrid').innerHTML.match(/dtile/g) || []).length === C.libSet('motif').length);
+
+console.log('\n== clicking a tile does the useful thing ==');
+{
+  C.S.stack = C.PLATES[0][1](0);
+  const tapL = C.S.stack.filter(L => L.k === 'tap')[0];
+  C.selectOnly(tapL.id ? tapL.id : (C.layerId(tapL), tapL.id));
+  C.dockUse('tap', 'nfc-arcs');
+  ok('a tap mark goes to the selected tap layer', tapL.icon === 'lib:nfc-arcs', tapL.icon);
+  C.selectOnly(null);
+  const before = C.S.stack.length;
+  C.dockUse('motif', 'pizza');
+  ok('with nothing selected it lands as a new decoration', C.S.stack.length === before + 1);
+  const added = C.S.stack[C.S.stack.length - 1];
+  ok('and that decoration is selected and hand-placed', C.S.sel === added.id && added._man);
+  C.dockUse('plate', 'p16');
+  ok('a composition tile swaps the whole layout', C.S.plate === 16);
+  C.dockUse('theme', 't3');
+  ok('a theme tile swaps the theme', C.S.theme === 3);
+  C.dockUse('dir', 'd6');
+  ok('a direction tile applies its whole starting point',
+     C.S.dir === 6 && C.S.theme === C.DIRECTIONS[6].def[0]);
+}
+
+console.log('\n== a decoration can wear an asset from any folder ==');
+{
+  C.libUser.image.push({ id: 'u-pic', n: 'A photo', u: 'data:image/png;base64,AAA', ar: 1, asis: 1 });
+  ok('libRefAny finds it across categories', C.libRefAny('lib:u-pic').n === 'A photo');
+  ok('and still finds a decoration', C.libRefAny('lib:pizza').id === 'pizza');
+  ok('and a tap mark', C.libRefAny('lib:waves').id === 'waves');
+  const d = { t: 'box', k: 'motif', x: .5, y: .5, s: 1, g: 'lib:u-pic', asis: 1 };
+  C.layerId(d); C.S.stack = [d];
+  ok('and a decoration renders one', draw().indexOf('<img') >= 0);
+}
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;

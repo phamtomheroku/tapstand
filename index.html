@@ -288,6 +288,58 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .crow .ib{font-size:13px;line-height:1;width:20px;height:20px;flex:none}
 .cempty{padding:16px 10px;text-align:center;font-family:var(--mono);font-size:9.5px;
   letter-spacing:.07em;color:var(--ink-3);line-height:1.6;background:var(--panel)}
+
+/* ---- the docked library ---- */
+.dock{margin-top:14px;border:1px solid var(--rule);background:var(--panel)}
+.dockbar{width:100%;display:flex;align-items:center;gap:9px;padding:9px 12px;cursor:pointer;
+  background:var(--paper-2);border:0;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-2)}
+.dockbar:hover{color:var(--accent)}
+.dockttl{font-weight:600}
+.dockcount{flex:1;text-align:left;color:var(--ink-3);letter-spacing:.06em}
+.dockchev{transition:transform .15s}
+.dock.shut .dockchev{transform:rotate(-90deg)}
+.dock.shut .dockbody{display:none}
+.dock.shut .dockbar{border-bottom:0}
+.dockfolders{display:flex;flex-wrap:wrap;gap:4px;padding:9px 10px;
+  border-bottom:1px solid var(--rule-2)}
+.dfold{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+  padding:4px 8px;border:1px solid var(--rule);background:transparent;color:var(--ink-2);
+  cursor:pointer;border-radius:2px}
+.dfold:hover{border-color:var(--ink-3)}
+.dfold[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dfold .dn{opacity:.55;margin-left:5px}
+.dsep{width:1px;align-self:stretch;background:var(--rule);margin:0 3px}
+.dockgrid{display:grid;gap:1px;background:var(--rule-2);padding:1px;
+  grid-template-columns:repeat(auto-fill,minmax(86px,1fr));
+  max-height:264px;overflow-y:auto}
+.dockgrid[hidden]{display:none}
+.dtile{position:relative;background:var(--panel);border:0;padding:8px 5px 6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit;color:var(--ink)}
+.dtile:hover,.dtile:focus-visible{background:var(--paper-2);color:var(--accent);outline:none}
+.dtile[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent);color:var(--accent)}
+.dart{width:100%;height:46px;display:flex;align-items:center;justify-content:center}
+.dart>*{max-width:100%;max-height:100%}
+.dname{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;line-height:1.35;word-break:break-word}
+.dtile:hover .dname,.dtile[aria-pressed="true"] .dname{color:var(--accent)}
+.dstar{position:absolute;top:2px;right:2px;width:19px;height:19px;padding:0;line-height:1;
+  border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:12px;opacity:0}
+.dtile:hover .dstar,.dstar.on,.dstar:focus-visible{opacity:1}
+.dstar.on{color:var(--gold)}
+.dstar:hover{color:var(--accent)}
+.dempty{grid-column:1/-1;background:var(--panel);padding:26px 14px;text-align:center;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;color:var(--ink-3);line-height:1.8}
+.dockfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 10px;
+  border-top:1px solid var(--rule-2)}
+.dockfoot .btn{flex:none;margin:0}
+/* a true miniature of the card, rendered by the same code that draws the real one */
+.mini{position:relative;overflow:hidden;container-type:inline-size;width:100%;
+  border:1px solid var(--rule-2)}
+.mini>div{position:absolute;display:flex;flex-direction:column;align-items:center;
+  text-align:center;max-width:92cqw;overflow-wrap:break-word}
+.mini .qrimg{image-rendering:pixelated}
 .ib{background:none;border:none;padding:2px;cursor:pointer;color:var(--ink-3);
   line-height:0;border-radius:2px}
 .ib:hover{color:var(--accent);background:var(--paper)}
@@ -897,6 +949,28 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
         </div>
         <p class="dims" id="dims"></p>
         <p class="hint">DRAG TO MOVE · CORNER DOT TO SCALE · ARROWS NUDGE · ⌘Z UNDO · ⌘D DUPLICATE</p>
+
+        <!-- The library, docked under the card: every asset and every style in one
+             place, in folders, with a favourites folder that only holds what you
+             starred. Clicking a tile applies it to what is selected, or drops it on
+             the card if nothing is. -->
+        <div class="dock" id="dock">
+          <button class="dockbar" id="dockToggle" type="button" aria-expanded="true" aria-controls="dockBody">
+            <span class="dockttl">Library</span>
+            <span class="dockcount" id="dockCount"></span>
+            <span class="dockchev" aria-hidden="true">▾</span>
+          </button>
+          <div class="dockbody" id="dockBody">
+            <div class="dockfolders" id="dockFolders"></div>
+            <div class="dockgrid" id="dockGrid"></div>
+            <div class="dockfoot">
+              <label class="btn" style="cursor:pointer">Add files
+                <input type="file" id="dockFile" accept="image/*" multiple hidden></label>
+              <span class="libnote" id="dockNote"></span>
+            </div>
+          </div>
+        </div>
+
         <div class="sheet" id="sheet" hidden></div>
       </div>
     </div>
@@ -2050,8 +2124,286 @@ function wideFor(g,kind){
   if(kind==='motif')   L.unshift({t:"box",k:"motif",  x:.965,y:.14,s:.85,g:g.motif,op:.2});
   return L;
 }
+/* ---- more compositions ----------------------------------------------------
+   Twelve further archetypes, each built on one compositional idea rather than a
+   mood: how the eye enters the card, where it turns, and what it lands on. Same
+   contract as the eight above — a layer list per shape, bottom of the stack
+   first, wide cards handed to the shared wideFor fallback. */
+/* Bracket — No colour anywhere: two hairline rules clamp the top and bottom edges and a third dashed rule cuts the card in two, so the upper half is identity and the lower half is one empty field holding a single circled tap ring — a receipt-tear structure that reads in one glance and suits quiet, premium trades (optician, dentist, tailor, specialty coffee) where a brand block would look cheap. */
+function aBracket(f,g){ if(isWide(f)) return wideFor(g,"none");
+ if(isSq(f)) return[
+  {t:"box",k:"rule",x:.5,y:.08,w:.84},
+  {t:"box",k:"rule",x:.5,y:.92,w:.84},
+  {t:"box",k:"rule",x:.5,y:.615,w:.5,dash:1},
+  {t:"text",x:.5,y:.155,s:.5,op:.7,text:"THANK YOU FOR VISITING",fw:650,ls:.22},
+  {t:"box",k:"logo",x:.5,y:.3,s:1,lw:40,lh:14},
+  {t:"box",k:"name",x:.5,y:.3,s:1},
+  {t:"box",k:"stars",x:.5,y:.41,s:.8},
+  {t:"box",k:"head",x:.5,y:.51,s:1,w:.7},
+  {t:"box",k:"tap",x:.5,y:.775,s:1.1,style:"bare",cap:"TAP",icon:"",ring:"circle"}];
+ return[
+  {t:"box",k:"rule",x:.5,y:.06,w:.86},
+  {t:"box",k:"rule",x:.5,y:.94,w:.86},
+  {t:"box",k:"rule",x:.5,y:.55,w:.52,dash:1},
+  {t:"text",x:.5,y:.125,s:.48,op:.7,text:"THANK YOU FOR VISITING",fw:650,ls:.22},
+  {t:"box",k:"logo",x:.5,y:.25,s:1,lw:42,lh:15},
+  {t:"box",k:"name",x:.5,y:.25,s:1},
+  {t:"box",k:"stars",x:.5,y:.35,s:.8},
+  {t:"box",k:"head",x:.5,y:.455,s:1.05,w:.78},
+  {t:"box",k:"tap",x:.5,y:.725,s:1.1,style:"bare",cap:"TAP",icon:"",ring:"circle"},
+  {t:"text",x:.5,y:.875,s:.44,op:.6,text:"HOLD YOUR PHONE HERE",ls:.18}]}
+
+/* Passepartout — A brand panel is mounted on the card rather than bled off it — deliberately off-centre so bare stock survives as a thin left margin, a wide right margin carrying one vertical word, and a deep bottom margin where the tap sits alone in a square ring that echoes the mount; suits businesses with a real logo and a strong brand colour (salon, boutique, barber, studio). */
+function aPassepartout(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"fill",x:.46,y:.4,w:.72,hf:.6},
+  {t:"box",k:"motif",x:.72,y:.17,s:.95,g:g.motif,op:.16,onBand:1},
+  {t:"box",k:"logo",x:.18,y:.26,s:.9,al:"left",onBand:1,lw:34,lh:12},
+  {t:"box",k:"name",x:.18,y:.26,s:.95,al:"left",onBand:1},
+  {t:"box",k:"stars",x:.18,y:.39,s:.75,al:"left",onBand:1},
+  {t:"box",k:"head",x:.18,y:.535,s:.9,w:.55,al:"left",onBand:1},
+  {t:"text",x:.91,y:.4,s:.46,op:.7,rot:1,text:"LEAVE A REVIEW",fw:650,ls:.3},
+  {t:"box",k:"tap",x:.46,y:.84,s:1,style:"bare",cap:"TAP",icon:"",ring:"square"}];
+ return[
+  {t:"box",k:"fill",x:.46,y:.335,w:.74,hf:.55},
+  {t:"box",k:"motif",x:.73,y:.15,s:.95,g:g.motif,op:.16,onBand:1},
+  {t:"box",k:"logo",x:.17,y:.235,s:.95,al:"left",onBand:1,lw:36,lh:13},
+  {t:"box",k:"name",x:.17,y:.235,s:1,al:"left",onBand:1},
+  {t:"box",k:"stars",x:.17,y:.35,s:.75,al:"left",onBand:1},
+  {t:"box",k:"head",x:.17,y:.475,s:.95,w:.58,al:"left",onBand:1},
+  {t:"text",x:.91,y:.32,s:.46,op:.7,rot:1,text:"LEAVE A REVIEW",fw:650,ls:.3},
+  {t:"box",k:"tap",x:.46,y:.78,s:1.05,style:"bare",cap:"TAP",icon:"",ring:"square"},
+  {t:"text",x:.46,y:.925,s:.42,op:.6,text:"HOLD YOUR PHONE HERE",ls:.16}]}
+
+/* Dogleg — A brand slab cropped into the top-right corner holds the identity flush right, a faint glyph counterweights the empty top-left, and the eye then drops back down-left across a clean diagonal channel to a lone square tap ring in the bottom-left corner — a right-to-left turn that suits a confident single-word brand with a strong mark (barber, garage, bakery). */
+function aDogleg(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"fill",x:.74,y:.17,w:.62,hf:.4},
+  {t:"box",k:"motif",x:.15,y:.17,s:.95,g:g.motif,op:.14},
+  {t:"box",k:"logo",x:.93,y:.12,s:1,al:"right",onBand:1,lw:36,lh:13},
+  {t:"box",k:"name",x:.93,y:.12,s:1,al:"right",onBand:1},
+  {t:"box",k:"stars",x:.93,y:.27,s:.9,al:"right",onBand:1},
+  {t:"box",k:"head",x:.93,y:.52,s:1.05,w:.5,al:"right"},
+  {t:"text",x:.93,y:.66,s:.6,w:.5,al:"right",text:"IT TAKES 10 SECONDS",fw:650,ls:.1},
+  {t:"box",k:"tap",x:.09,y:.86,s:1.15,al:"left",cap:"TAP TO REVIEW",ring:"square",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",x:.74,y:.13,w:.62,hf:.3},
+  {t:"box",k:"motif",x:.16,y:.14,s:.9,g:g.motif,op:.13},
+  {t:"box",k:"logo",x:.93,y:.1,s:1,al:"right",onBand:1,lw:38,lh:13},
+  {t:"box",k:"name",x:.93,y:.1,s:1,al:"right",onBand:1},
+  {t:"box",k:"stars",x:.93,y:.22,s:.9,al:"right",onBand:1},
+  {t:"box",k:"head",x:.93,y:.45,s:1.1,w:.58,al:"right"},
+  {t:"text",x:.93,y:.66,s:.58,w:.55,al:"right",text:"IT TAKES 10 SECONDS",fw:650,ls:.1},
+  {t:"box",k:"tap",x:.09,y:.87,s:1.15,al:"left",cap:"TAP TO REVIEW",ring:"square",lay:"inline"}]}
+
+/* Notch — The brand colour is spent on the TARGET, not the identity: a cropped tile fills the bottom-right corner with the tap ring reversed out inside it, while name, stars and headline run down the left in plain reading order and a dashed tear-line runs out of the copy straight into the tile — a receipt-like card for cafes, takeaways and counter-service trades where the coloured corner is the only thing anyone has to find. */
+function aNotch(f,g){ if(isWide(f)) return wideFor(g,"motif");
+ if(isSq(f)) return[
+  {t:"box",k:"fill",x:.78,y:.82,w:.5,hf:.4},
+  {t:"box",k:"logo",x:.08,y:.17,s:1,al:"left",lw:44,lh:16},
+  {t:"box",k:"name",x:.08,y:.17,s:1,al:"left"},
+  {t:"box",k:"stars",x:.08,y:.31,s:.95,al:"left"},
+  {t:"box",k:"head",x:.08,y:.47,s:1.15,w:.5,al:"left"},
+  {t:"box",k:"rule",x:.08,y:.64,w:.42,al:"left",dash:1},
+  {t:"text",x:.08,y:.72,s:.6,w:.4,al:"left",text:"IT TAKES 10 SECONDS",fw:650,ls:.1},
+  {t:"box",k:"motif",x:.16,y:.86,s:.8,g:g.motif,op:.14},
+  {t:"box",k:"tap",x:.78,y:.79,s:1.2,onBand:1,cap:"TAP",ring:"circle"}];
+ return[
+  {t:"box",k:"fill",x:.78,y:.855,w:.5,hf:.3},
+  {t:"box",k:"logo",x:.08,y:.13,s:1,al:"left",lw:46,lh:16},
+  {t:"box",k:"name",x:.08,y:.13,s:1,al:"left"},
+  {t:"box",k:"stars",x:.08,y:.24,s:.95,al:"left"},
+  {t:"box",k:"head",x:.08,y:.42,s:1.2,w:.56,al:"left"},
+  {t:"box",k:"rule",x:.08,y:.6,w:.44,al:"left",dash:1},
+  {t:"text",x:.08,y:.68,s:.6,w:.42,al:"left",text:"IT TAKES 10 SECONDS",fw:650,ls:.1},
+  {t:"box",k:"motif",x:.17,y:.88,s:.85,g:g.motif,op:.13},
+  {t:"box",k:"tap",x:.78,y:.845,s:1.25,onBand:1,cap:"TAP",ring:"circle"}]}
+
+/* Masthead — A broadsheet front page: a hairline rule under a kicker-and-byline top line, a headline set so large it eats the middle third, and the tap demoted to one underlined line at the foot — suits an owner-operator (restaurant, barber, bookshop) who wants the card to look written rather than designed. */
+function aMasthead(f,g){ if(isWide(f)) return wideFor(g,"none");
+ if(isSq(f)) return[
+  {t:"box",k:"rule",x:.5,y:.19,w:.86},
+  {t:"text",x:.07,y:.1,s:.5,al:"left",text:"GOOGLE REVIEWS",fw:750,ls:.2},
+  {t:"box",k:"logo",x:.93,y:.1,s:.6,al:"right",lw:26,lh:9},
+  {t:"box",k:"name",x:.93,y:.1,s:.6,al:"right"},
+  {t:"text",x:.93,y:.52,s:.5,op:.28,rot:1,text:"REVIEW",fw:600,ls:.3},
+  {t:"box",k:"head",x:.07,y:.46,s:1.75,w:.76,al:"left"},
+  {t:"box",k:"stars",x:.07,y:.69,s:.7,al:"left"},
+  {t:"box",k:"tap",x:.07,y:.88,s:1,al:"left",style:"underline",cap:"TAP HERE",lay:"inline"}];
+ return[
+  {t:"box",k:"rule",x:.5,y:.15,w:.86},
+  {t:"box",k:"rule",x:.5,y:.78,w:.86,dash:1},
+  {t:"text",x:.07,y:.085,s:.45,al:"left",text:"GOOGLE REVIEWS",fw:750,ls:.2},
+  {t:"box",k:"logo",x:.93,y:.085,s:.55,al:"right",lw:24,lh:8},
+  {t:"box",k:"name",x:.93,y:.085,s:.55,al:"right"},
+  {t:"text",x:.93,y:.5,s:.5,op:.28,rot:1,text:"REVIEW",fw:600,ls:.3},
+  {t:"box",k:"head",x:.07,y:.43,s:1.8,w:.76,al:"left"},
+  {t:"box",k:"stars",x:.07,y:.67,s:.7,al:"left"},
+  {t:"box",k:"tap",x:.07,y:.89,s:1,al:"left",style:"underline",cap:"TAP HERE",lay:"inline"}]}
+
+/* Button — The tap is a brand-coloured disc sitting low and large with its caption knocked out of it, and logo, headline and stars are a small quiet centred stack floating above — the card reads as one pressable button rather than a poster, which suits high-traffic counters, clinics and salons where the customer has three seconds. */
+function aButton(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"blob",x:.5,y:.75,s:1.2},
+  {t:"box",k:"logo",x:.5,y:.12,s:.9,lw:38,lh:13},
+  {t:"box",k:"name",x:.5,y:.12,s:.9},
+  {t:"box",k:"head",x:.5,y:.31,s:1.15,w:.76},
+  {t:"box",k:"stars",x:.5,y:.46,s:.75},
+  {t:"box",k:"tap",x:.5,y:.75,s:1.3,onBand:1,style:"bare",cap:"TAP"}];
+ return[
+  {t:"box",k:"blob",x:.5,y:.77,s:1.1},
+  {t:"box",k:"logo",x:.5,y:.1,s:.85,lw:34,lh:12},
+  {t:"box",k:"name",x:.5,y:.1,s:.85},
+  {t:"box",k:"head",x:.5,y:.28,s:1.3,w:.78},
+  {t:"box",k:"stars",x:.5,y:.48,s:.8},
+  {t:"box",k:"tap",x:.5,y:.77,s:1.35,onBand:1,style:"bare",cap:"TAP"}]}
+
+/* Letterbox — Two brand bars clamp the card top and bottom and the whole middle stays empty except for a pair — headline hard left, tap ring floating right at the same height — so the eye crosses the card sideways instead of falling down it; suits a business with a wordy pitch that still wants one obvious target, and it is the only layout where copy and target sit shoulder to shoulder. */
+function aLetterbox(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"fill",x:.5,y:.11,w:1,hf:.22},
+  {t:"box",k:"fill",x:.5,y:.89,w:1,hf:.22,c:"accent"},
+  {t:"box",k:"logo",x:.5,y:.11,s:1,onBand:1,lw:40,lh:12},
+  {t:"box",k:"name",x:.5,y:.11,s:1,onBand:1},
+  {t:"box",k:"head",x:.08,y:.44,s:1.1,w:.46,al:"left"},
+  {t:"box",k:"rule",x:.08,y:.6,w:.38,op:.55,al:"left"},
+  {t:"box",k:"stars",x:.08,y:.69,s:.8,al:"left"},
+  {t:"box",k:"tap",x:.76,y:.48,s:1.15,cap:"TAP",ring:"circle"},
+  {t:"box",k:"lockup",x:.5,y:.89,s:.75,onBand:1,word:"Google"}];
+ return[
+  {t:"box",k:"fill",x:.5,y:.08,w:1,hf:.16},
+  {t:"box",k:"fill",x:.5,y:.91,w:1,hf:.18,c:"accent"},
+  {t:"box",k:"logo",x:.5,y:.085,s:1,onBand:1,lw:44,lh:11},
+  {t:"box",k:"name",x:.5,y:.085,s:1,onBand:1},
+  {t:"text",x:.08,y:.23,s:.55,op:.7,al:"left",text:"WAS IT ANY GOOD?",fw:750,ls:.16},
+  {t:"box",k:"head",x:.08,y:.39,s:1.15,w:.82,al:"left"},
+  {t:"box",k:"rule",x:.08,y:.51,w:.5,op:.55,al:"left"},
+  {t:"box",k:"stars",x:.08,y:.575,s:.9,al:"left"},
+  {t:"box",k:"lockup",x:.92,y:.575,s:.7,al:"right",word:"Google"},
+  {t:"box",k:"tap",x:.5,y:.72,s:1.15,cap:"TAP TO REVIEW",ring:"circle"},
+  {t:"text",x:.5,y:.91,s:.5,op:.8,onBand:1,text:"TAKES TEN SECONDS",ls:.12}]}
+
+/* Belt — The tap bar is slung across the waist of the card — where a thumb actually lands when the card is picked up — with a slim brand band overhead holding the identity and quiet proof (stars, platform mark) sitting below it as small print; the target is hit before anything else is read, which suits busy counters where the card gets handled rather than admired. */
+function aBelt(f,g){ if(isWide(f)) return wideFor(g,"motif");
+ if(isSq(f)) return[
+  {t:"box",k:"fill",x:.5,y:.11,w:1,hf:.22},
+  {t:"box",k:"motif",x:.92,y:.11,s:.8,g:g.motif,op:.25,al:"right",onBand:1},
+  {t:"box",k:"logo",x:.08,y:.11,s:1,al:"left",onBand:1,lw:40,lh:11},
+  {t:"box",k:"name",x:.08,y:.11,s:1,al:"left",onBand:1},
+  {t:"box",k:"head",x:.08,y:.34,s:1.05,w:.78,al:"left"},
+  {t:"box",k:"tap",x:.5,y:.58,s:1.05,w:1,style:"bar",cap:"TAP HERE TO REVIEW",lay:"inline"},
+  {t:"box",k:"rule",x:.5,y:.7,w:.84,op:.5,dash:1},
+  {t:"box",k:"stars",x:.08,y:.79,s:.9,al:"left"},
+  {t:"box",k:"lockup",x:.92,y:.79,s:.7,al:"right",word:"Google"},
+  {t:"text",x:.5,y:.91,s:.5,op:.65,text:"TAKES TEN SECONDS",ls:.12}];
+ return[
+  {t:"box",k:"fill",x:.5,y:.09,w:1,hf:.18},
+  {t:"box",k:"motif",x:.93,y:.09,s:.75,g:g.motif,op:.22,al:"right",onBand:1},
+  {t:"box",k:"logo",x:.08,y:.085,s:1,al:"left",onBand:1,lw:42,lh:11},
+  {t:"box",k:"name",x:.08,y:.085,s:1,al:"left",onBand:1},
+  {t:"text",x:.08,y:.25,s:.55,op:.75,al:"left",text:"REVIEWS KEEP US HERE",fw:750,ls:.16},
+  {t:"box",k:"head",x:.08,y:.41,s:1.15,w:.8,al:"left"},
+  {t:"box",k:"tap",x:.5,y:.58,s:1.1,w:1,style:"bar",cap:"TAP TO LEAVE A REVIEW",lay:"inline"},
+  {t:"box",k:"rule",x:.5,y:.69,w:.84,op:.5,dash:1},
+  {t:"box",k:"stars",x:.08,y:.78,s:.95,al:"left"},
+  {t:"box",k:"lockup",x:.92,y:.78,s:.7,al:"right",word:"Google"},
+  {t:"box",k:"qr",x:.5,y:.89,s:.26}]}
+
+/* Cachet — A brand disc works as a masthead seal — logo knocked out dead centre of it with the five stars stamped just underneath, still inside the colour — then plain ground below carries a dashed ledger rule, a short headline flanked by two whisper-faint trade glyphs like laurels, and a hex-ringed tap alone at the foot; the medallion is the letterhead, never the target, which suits a barber, bakery or brewery with a badge-ish brand. */
+function aCachet(f,g){ if(isWide(f)) return wideFor(g,"pattern");
+ if(isSq(f)) return[
+  {t:"box",k:"pattern",x:.5,y:.5,w:1,hf:1.2,g:g.pat,op:.09},
+  {t:"box",k:"blob",x:.5,y:.26,s:1.25},
+  {t:"box",k:"logo",x:.5,y:.25,s:.95,onBand:1,lw:34,lh:12},
+  {t:"box",k:"name",x:.5,y:.25,s:.95,onBand:1},
+  {t:"box",k:"stars",x:.5,y:.34,s:.55,onBand:1},
+  {t:"box",k:"rule",x:.5,y:.52,w:.28,dash:1},
+  {t:"box",k:"motif",x:.12,y:.64,s:.55,g:g.motif,op:.14},
+  {t:"box",k:"head",x:.5,y:.64,s:1,w:.6},
+  {t:"box",k:"motif",x:.88,y:.64,s:.55,g:g.motif,op:.14},
+  {t:"box",k:"tap",x:.5,y:.85,s:1.1,cap:"TAP TO REVIEW",ring:"hex"}];
+ return[
+  {t:"box",k:"pattern",x:.5,y:.5,w:1,hf:1.2,g:g.pat,op:.09},
+  {t:"box",k:"blob",x:.5,y:.22,s:1.15},
+  {t:"box",k:"logo",x:.5,y:.205,s:.9,onBand:1,lw:34,lh:12},
+  {t:"box",k:"name",x:.5,y:.205,s:.9,onBand:1},
+  {t:"box",k:"stars",x:.5,y:.29,s:.52,onBand:1},
+  {t:"box",k:"rule",x:.5,y:.44,w:.26,dash:1},
+  {t:"box",k:"motif",x:.11,y:.56,s:.5,g:g.motif,op:.14},
+  {t:"box",k:"head",x:.5,y:.56,s:1,w:.62},
+  {t:"box",k:"motif",x:.89,y:.56,s:.5,g:g.motif,op:.14},
+  {t:"box",k:"tap",x:.5,y:.81,s:1.1,cap:"TAP TO REVIEW",ring:"hex"}]}
+
+/* Aperture — One full-bleed colour band sits across the middle of the card like a letterbox window and is the only place type is knocked out — the headline lives inside it with a faint glyph tucked at its right end — while the mark and stars float above on clean ground and a circle-ringed tap sits alone in the empty lower half with a hairline footer line; the band, not a ring or a seal, is the thing you see from three metres, which suits a dentist, garage or clinic that wants formal and blunt rather than crafty. */
+function aAperture(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"hero",x:.5,y:.2,s:1.4,g:g.hero,op:.16},
+  {t:"box",k:"fill",x:.5,y:.45,w:1,hf:.27},
+  {t:"box",k:"motif",x:.86,y:.45,s:.55,g:g.motif,op:.2,onBand:1},
+  {t:"box",k:"logo",x:.5,y:.17,s:1.05,lw:40,lh:14},
+  {t:"box",k:"name",x:.5,y:.17,s:1.05},
+  {t:"box",k:"stars",x:.5,y:.28,s:.78},
+  {t:"box",k:"head",x:.5,y:.45,s:1.15,w:.6,onBand:1},
+  {t:"box",k:"tap",x:.5,y:.75,s:1.25,cap:"TAP",ring:"circle"},
+  {t:"text",x:.5,y:.92,s:.5,op:.7,text:"· ONE TAP · NO APP ·",fw:700,ls:.2}];
+ return[
+  {t:"box",k:"hero",x:.5,y:.17,s:1.5,g:g.hero,op:.16},
+  {t:"box",k:"fill",x:.5,y:.44,w:1,hf:.22},
+  {t:"box",k:"motif",x:.87,y:.44,s:.5,g:g.motif,op:.2,onBand:1},
+  {t:"box",k:"logo",x:.5,y:.15,s:1,lw:40,lh:14},
+  {t:"box",k:"name",x:.5,y:.15,s:1},
+  {t:"box",k:"stars",x:.5,y:.25,s:.75},
+  {t:"box",k:"head",x:.5,y:.44,s:1.1,w:.62,onBand:1},
+  {t:"box",k:"tap",x:.5,y:.72,s:1.25,cap:"TAP",ring:"circle"},
+  {t:"text",x:.5,y:.9,s:.48,op:.7,text:"· ONE TAP · NO APP ·",fw:700,ls:.2}]}
+
+/* Pivot — The card is weighted corner-to-corner — one brand disc bled off the bottom-left with the tap target seated dead centre inside it, and the entire identity stacked hard right against empty space, so the thumb travels low-left while the eye reads high-right; no tilt, no rules, no bled motif, so it never collides with Edge. */
+function aPivot(f,g){ if(isWide(f)) return wideFor(g,"fill");
+ if(isSq(f)) return[
+  {t:"box",k:"blob",x:.25,y:.79,s:1.55},
+  {t:"box",k:"logo",x:.93,y:.14,s:1,al:"right",lw:40,lh:14},
+  {t:"box",k:"name",x:.93,y:.14,s:1.15,al:"right"},
+  {t:"box",k:"head",x:.93,y:.35,s:1.05,w:.6,al:"right"},
+  {t:"box",k:"stars",x:.93,y:.52,s:.95,al:"right"},
+  {t:"text",x:.93,y:.92,s:.5,op:.45,al:"right",text:"THANK YOU",fw:700,ls:.26},
+  {t:"box",k:"tap",x:.25,y:.79,s:1.2,onBand:1,cap:"TAP",ring:"circle"}];
+ return[
+  {t:"box",k:"blob",x:.24,y:.78,s:1.4},
+  {t:"box",k:"logo",x:.93,y:.11,s:1,al:"right",lw:46,lh:13},
+  {t:"box",k:"name",x:.93,y:.11,s:1.1,al:"right"},
+  {t:"box",k:"head",x:.93,y:.3,s:1.1,w:.68,al:"right"},
+  {t:"box",k:"stars",x:.93,y:.47,s:1,al:"right"},
+  {t:"text",x:.93,y:.93,s:.48,op:.45,al:"right",text:"THANK YOU",fw:700,ls:.26},
+  {t:"box",k:"tap",x:.24,y:.78,s:1.25,onBand:1,cap:"TAP",ring:"circle"}]}
+
+/* Thumb Rail — A full-height brand column bled off the right edge carries the tap exactly where a picked-up card meets the thumb, with a vertical word above it, while every other element is left-aligned in a tall stack against a hero shape bleeding off the top-left — a one-sided vertical composition rather than a top/bottom one. */
+function aThumbRail(f,g){ if(isWide(f)) return wideFor(g,"pattern");
+ if(isSq(f)) return[
+  {t:"box",k:"hero",x:.22,y:.12,s:1.6,g:g.hero,op:.16},
+  {t:"box",k:"fill",x:.85,y:.5,w:.3,hf:1},
+  {t:"box",k:"lockup",x:.08,y:.13,s:.8,al:"left",word:"Google"},
+  {t:"text",x:.85,y:.26,s:.55,onBand:1,rot:1,text:"THANK YOU",fw:700,ls:.3},
+  {t:"box",k:"head",x:.08,y:.38,s:1.25,w:.55,al:"left"},
+  {t:"box",k:"stars",x:.08,y:.58,s:1,al:"left"},
+  {t:"box",k:"logo",x:.08,y:.78,s:1,al:"left",lw:36,lh:13},
+  {t:"box",k:"name",x:.08,y:.78,s:1.05,al:"left"},
+  {t:"box",k:"rule",x:.08,y:.88,w:.24,al:"left",dash:1},
+  {t:"box",k:"tap",x:.85,y:.68,s:.95,onBand:1,cap:"TAP",ring:"square"}];
+ return[
+  {t:"box",k:"hero",x:.2,y:.1,s:1.5,g:g.hero,op:.16},
+  {t:"box",k:"fill",x:.84,y:.5,w:.32,hf:1},
+  {t:"box",k:"lockup",x:.07,y:.09,s:.8,al:"left",word:"Google"},
+  {t:"text",x:.84,y:.24,s:.55,onBand:1,rot:1,text:"THANK YOU",fw:700,ls:.3},
+  {t:"box",k:"head",x:.07,y:.34,s:1.3,w:.58,al:"left"},
+  {t:"box",k:"stars",x:.07,y:.53,s:1.05,al:"left"},
+  {t:"box",k:"logo",x:.07,y:.74,s:1,al:"left",lw:42,lh:14},
+  {t:"box",k:"name",x:.07,y:.74,s:1.1,al:"left"},
+  {t:"box",k:"rule",x:.07,y:.84,w:.28,al:"left",dash:1},
+  {t:"box",k:"tap",x:.84,y:.7,s:1,onBand:1,cap:"TAP",ring:"square"}]}
+
 var ARCHETYPES=[["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
- ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth]];
+ ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
+ ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail]];
 
 /* ---- direction ------------------------------------------------------------
    Chosen first, and it governs the rest: which compositions, themes and palettes
@@ -2065,8 +2417,18 @@ var DIRECTIONS=[
                   g:{pat:"topo",hero:"concentric",motif:"flower"},    def:[1,5,11]},
  {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:[9,15,13],
                   g:{pat:"confetti",hero:"blob",motif:"coffee"},      def:[5,1,9]},
- {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:[12,11,13],
-                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,12]}
+ {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:[12,11,13,19,27],
+                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,12]},
+ /* The four below lean on the newer compositions. A direction is a starting
+    point, not a cage — every axis under it stays yours to override. */
+ {k:"Quiet",      th:[7,1,3], pal:[0,1],   pl:[16,17,25,8],
+                  g:{pat:"grid",hero:"concentric",motif:"leaf"},      def:[7,0,16]},
+ {k:"Newsprint",  th:[1,6,2], pal:[0,2],   pl:[20,22,26,15],
+                  g:{pat:"topo",hero:"rays",motif:"croissant"},       def:[1,0,20]},
+ {k:"Counter",    th:[0,4,5], pal:[3,4,1], pl:[22,23,19,8],
+                  g:{pat:"halftone",hero:"blob",motif:"coffee"},      def:[0,3,22]},
+ {k:"Badge",      th:[3,6,1], pal:[1,5,0], pl:[24,25,21,10],
+                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[3,1,24]}
 ];
 function DIR(){ return DIRECTIONS[S.dir||0] }
 
@@ -2501,7 +2863,7 @@ function bodyHTML(L,ctx){
     // A decoration: any library glyph, at any size, in brand / accent / ground.
     // Opacity is the layer's own, applied by paint() on the wrapper.
     case 'motif':
-      var me=libRef(L.g,'motif'); if(!me) return '';
+      var me=libRefAny(L.g); if(!me) return '';
       var mfc = L.c==='accent' ? gc.accent : L.c==='ground' ? gc.ground : gc.brand;
       return libArt(me,mfc,libBox(30*s*(me.ar||1),30*s), L.asis||undefined);
     case 'fill':
@@ -2693,32 +3055,11 @@ function paint(quiet){
     var d=document.createElement('div');
     d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(isSel(L.id)?' sel':'');
     d.dataset.id=L.id; d.dataset.k=L.k||L.t;
-    var M=fmap(L);
-    d.style.left=(M.x*100)+'%'; d.style.top=(M.y*100)+'%'; d.style.zIndex=100+i;
-    if(M.w!=null) d.style.width=(M.w*100)+'%';
-    ctx.sMul = M.sMul;                          // bodyHTML reads this to keep physical size
-    // Anything sitting on the colour band flips to whatever reads against the brand,
-    // resolved at paint time so it keeps up when the brand colour changes.
-    if(L.onBand){ var oc=contrast(brand); d.style.color=oc; d.style.setProperty('--b-star',oc); }
-    // a stars layer can carry its own colour, and it beats both the card's picker
-    // and the on-band contrast flip, because it was chosen for this one deliberately
-    if(L.starCol) d.style.setProperty('--b-star',L.starCol);
-    if(L.t==='text' || L.k==='name' || L.k==='lockup'){
-      d.style.fontFamily = (L.fontFamily && fontStack(L.fontFamily)) || 'var(--f-disp)';
-      if(th.up) d.style.textTransform='uppercase';
-      if(th.tr) d.style.letterSpacing=th.tr+'em';
-    }
-    if(L.op!=null) d.style.opacity=L.op;
-    if(L.rot){ d.style.transform='translate(-50%,-50%) rotate(-90deg)'; }
-    else if(L.rotd){ d.style.transform='translate(-50%,-50%) rotate('+L.rotd+'deg)'; }
-    if(L.al){ d.style.alignItems = L.al==='left'?'flex-start':L.al==='right'?'flex-end':'center';
-              d.style.textAlign = L.al;
-              if(!L.rot) d.style.transform = L.al==='left' ? 'translate(0,-50%)'
-                                           : L.al==='right' ? 'translate(-100%,-50%)'
-                                           : 'translate(-50%,-50%)'; }
+    d.style.cssText=layerCSS(L,fmap(L),ctx,th,brand,i);
     d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="w"></div><div class="hnd" data-h="1"></div>';
     card.appendChild(d);
   });
+  PREVIEW = {ctx:ctx, th:th, brand:brand, face:face};   // the library's previews reuse this
 
   // Pin the disc overlay to the tap ring — at true scale for this format's trim width.
   var tap=null;
@@ -2735,6 +3076,7 @@ function paint(quiet){
     (tap?'':' · TAP RING HIDDEN');
 
   if(autoFit && !quiet) resolveLayout();
+  if(!quiet && typeof dockSync==='function') dockSync();
 
   $('gridEl').classList.toggle('on',S.grid);
   $('gridEl').style.background=S.grid?
@@ -2764,6 +3106,39 @@ var autoFit=true, showQR=false;
 /* The mark every card gets when its tap layer has no icon of its own is simply the
    FIRST entry in the tap category of icons/manifest.json. Reorder that file, run
    node tools/build-icons.js, and the default changes for everyone. */
+/* Everything that positions a layer inside its card, as one string. paint() puts
+   it on a real .lay element; the library's thumbnails put it on a miniature. One
+   definition, so a preview cannot drift from what the card actually does — which
+   is the whole point of previewing. `ctx.sMul` is set as a side effect because
+   bodyHTML reads it to keep physical sizes right on face-mapped formats. */
+function layerCSS(L,M,ctx,th,brand,i){
+  ctx.sMul=M.sMul;
+  var css='left:'+(M.x*100)+'%;top:'+(M.y*100)+'%;z-index:'+(100+i)+';';
+  if(M.w!=null) css+='width:'+(M.w*100)+'%;';
+  // Anything sitting on the colour band flips to whatever reads against the brand,
+  // resolved at paint time so it keeps up when the brand colour changes.
+  if(L.onBand){ var oc=contrast(brand); css+='color:'+oc+';--b-star:'+oc+';' }
+  // a stars layer can carry its own colour, and it beats both the card's picker
+  // and the on-band contrast flip, because it was chosen for this one deliberately
+  if(L.starCol) css+='--b-star:'+L.starCol+';';
+  if(L.t==='text' || L.k==='name' || L.k==='lockup'){
+    css+='font-family:'+((L.fontFamily && fontStack(L.fontFamily)) || 'var(--f-disp)')+';';
+    if(th.up) css+='text-transform:uppercase;';
+    if(th.tr) css+='letter-spacing:'+th.tr+'em;';
+  }
+  if(L.op!=null) css+='opacity:'+L.op+';';
+  var tf='translate(-50%,-50%)';
+  if(L.al){
+    css+='align-items:'+(L.al==='left'?'flex-start':L.al==='right'?'flex-end':'center')+';'+
+         'text-align:'+L.al+';';
+    if(!L.rot) tf = L.al==='left' ? 'translate(0,-50%)'
+                  : L.al==='right' ? 'translate(-100%,-50%)' : 'translate(-50%,-50%)';
+  }
+  if(L.rot) tf='translate(-50%,-50%) rotate(-90deg)';
+  else if(L.rotd) tf=tf+' rotate('+L.rotd+'deg)';
+  return css+'transform:'+tf+';';
+}
+var PREVIEW=null;                  // last paint's context, borrowed by the thumbnails
 var BG_KINDS={fill:1,pattern:1,band:1,split:1,rail:1,hero:1,blob:1,rule:1};
 function resolveLayout(){
   var r=card.getBoundingClientRect(); if(!r.height) return;
@@ -2877,7 +3252,8 @@ function drawInspector(){
      it is what you actually came here for, not something under the sliders. */
   var cat=LIB_FOR[L.k];
   if(cat){
-    var cur=libRef(L.k==='motif'?L.g:cat==='platform'?('lib:'+(S.platLib||'')):L.icon,cat);
+    var cur=L.k==='motif' ? libRefAny(L.g)
+            : libRef(cat==='platform'?('lib:'+(S.platLib||'')):L.icon,cat);
     h+='<button class="btn solid" id="iLib" type="button" style="margin-bottom:2px">'+
        'Choose from library</button>'+
        '<span class="libnote" style="flex:none">'+
@@ -2935,7 +3311,7 @@ function drawInspector(){
     // A decoration is normally a brand-coloured glyph. A logo used as a watermark
     // is the exception: it has to keep the colours it came with — but only a file
     // that HAS its own colours can, so line art never offers the choice.
-    var mown=libOwnPaint(libRef(L.g,'motif')), masis=mown&&L.asis;
+    var mown=libOwnPaint(libRefAny(L.g)), masis=mown&&L.asis;
     h+=(mown?'<label class="tog"><input type="checkbox" id="iAsis"'+(masis?' checked':'')+
        '> Keep its own colours</label>':'')+
        (masis?'':'<span class="lbl">Colour</span>'+
@@ -3279,7 +3655,7 @@ function libCurrentId(){
   if(libCat==='platform') return S.platLib||'';
   // a tap layer on the shipped default is still wearing an entry — mark the tile it
   // actually renders, not nothing, or the grid looks like nothing is selected
-  var e = libCat==='motif' ? libRef(libLayer.g,'motif') : tapEntry(libLayer);
+  var e = libCat==='motif' ? libRefAny(libLayer.g) : tapEntry(libLayer);
   return e?e.id:'';
 }
 function openLib(cat,L,opener){
@@ -4303,6 +4679,281 @@ $('loadDesign').addEventListener('change',function(e){
   r.readAsText(f);
 });
 
+/* ============ 9a. the docked library ============
+   One place, under the card, holding everything a design is made of: the icon
+   sets, the files you have uploaded, and the styles themselves. Folders across
+   the top, a Favourites folder holding only what you starred, and a grid you
+   scroll. Clicking a tile applies it to whatever is selected; with nothing
+   selected an icon lands on the card as a new decoration.
+
+   The style folders show a REAL miniature of the card, drawn by the same
+   renderer as the card itself, because a swatch that only approximates the thing
+   is worse than no swatch at all. */
+var FKEY='tapstand.favs.v1';
+S.favs={};
+try{ var _fv=localStorage.getItem(FKEY); if(_fv) S.favs=JSON.parse(_fv)||{}; }catch(e){}
+function favKey(f,id){ return f+'/'+id }
+function isFav(f,id){ return !!S.favs[favKey(f,id)] }
+function toggleFav(f,id){
+  var k=favKey(f,id);
+  if(S.favs[k]) delete S.favs[k]; else S.favs[k]=1;
+  try{ localStorage.setItem(FKEY,JSON.stringify(S.favs)); }catch(e){}
+}
+
+/* Uploaded artwork gets its own folders: a logo is a thing you put in the logo
+   slot, an image is anything else. They sit alongside the icon sets so there is
+   one answer to "where is my stuff". */
+libUser.logo=libUser.logo||[]; libUser.image=libUser.image||[];
+var ASSET_CATS=['tap','motif','platform','logo','image'];
+/* A decoration can wear ANY asset, whichever folder it came from — that is what
+   makes the library global rather than five separate ones. */
+function libRefAny(v){
+  if(typeof v!=='string'||!v) return null;
+  var id=v.slice(0,4)==='lib:'?v.slice(4):v;
+  for(var i=0;i<ASSET_CATS.length;i++){
+    var e=libGet(ASSET_CATS[i],id); if(e) return e;
+  }
+  return libGet('motif',LIB_ALIAS[id]||'');
+}
+var DOCK_FOLDERS=[
+ {id:'fav',      n:'★ Favourites', kind:'fav'},
+ {id:'tap',      n:'Tap marks',    kind:'asset'},
+ {id:'motif',    n:'Decorations',  kind:'asset'},
+ {id:'platform', n:'Platform',     kind:'asset'},
+ {id:'logo',     n:'Logos',        kind:'asset'},
+ {id:'image',    n:'Images',       kind:'asset'},
+ {id:'sep'},
+ {id:'plate',    n:'Compositions', kind:'style'},
+ {id:'theme',    n:'Themes',       kind:'style'},
+ {id:'pal',      n:'Palettes',     kind:'style'},
+ {id:'dir',      n:'Directions',   kind:'style'}
+];
+var dockFolder='tap';
+function dockFold(id){ if(!DOCK_FOLDERS) return null;
+  for(var i=0;i<DOCK_FOLDERS.length;i++) if(DOCK_FOLDERS[i].id===id) return DOCK_FOLDERS[i]; return null }
+function dockCount(f){
+  if(f.kind==='asset') return libSet(f.id).length;
+  if(f.kind==='style') return dockStyleItems(f.id).length;
+  if(f.kind==='fav')   return Object.keys(S.favs).length;
+  return 0;
+}
+function dockStyleItems(id){
+  if(id==='plate') return PLATES.map(function(p,i){ return {id:'p'+i, i:i, n:p[0]} });
+  if(id==='theme') return THEMES.map(function(t,i){ return {id:'t'+i, i:i, n:t.k} });
+  if(id==='pal')   return PALETTES.map(function(p,i){ return {id:'a'+i, i:i, n:p.k} });
+  if(id==='dir')   return DIRECTIONS.map(function(d,i){ return {id:'d'+i, i:i, n:d.k} });
+  return [];
+}
+
+/* A miniature of the card. Same bodyHTML, same layerCSS as the real one — the box
+   is 90 px wide instead of 400 and container queries do the rest, which is why
+   every cqw measurement in the design keeps its proportions. */
+function miniCard(stack,over){
+  if(!PREVIEW||!stack) return '';
+  var base=PREVIEW.ctx;
+  var th=(over&&over.th)||PREVIEW.th;
+  var pal=(over&&over.pal)||base.pal;
+  var brand=pal.brand||PREVIEW.brand;
+  var ctx={}; for(var k in base) ctx[k]=base[k];
+  ctx.th=th; ctx.pal=pal; ctx.brand=brand; ctx.bg=pal.ground; ctx.fg=contrast(pal.ground);
+  ctx.hasName=stack.some(function(L){ return L.k==='name' && !L.hidden });
+  var face=ctx.face||{x:0,y:0,w:1,h:1};
+  var GR={pattern:1,fill:1,hero:1,motif:1,band:1,split:1,rail:1,blob:1};
+  var out='';
+  stack.forEach(function(L,i){
+    if(L.hidden || (L.k==='qr' && !showQR)) return;
+    var M = GR[L.k] ? {x:L.x,y:L.y,w:L.w,sMul:1}
+          : {x:face.x+L.x*face.w, y:face.y+L.y*face.h,
+             w:(L.w!=null?L.w*face.w:null), sMul:face.w};
+    out+='<div style="'+layerCSS(L,M,ctx,th,brand,i)+'">'+bodyHTML(L,ctx)+'</div>';
+  });
+  var fmt=FORMATS[S.fmt];
+  return '<div class="mini fr-'+th.frame+' tx-'+th.tex+'" style="aspect-ratio:1/'+(fmt.ar||1.5)+
+    ';background:'+pal.groundCSS+';color:'+ctx.fg+';--b-brand:'+brand+';--b-bg:'+pal.ground+
+    ';--b-fg:'+ctx.fg+';--b-star:'+brand+';--rad:'+th.rad+'cqw;border-radius:'+th.rad+'cqw'+
+    ';--f-disp:'+(S.dispFont?fontStack(S.dispFont):FONTS[th.disp])+
+    ';--f-body:'+(S.bodyFont?fontStack(S.bodyFont):FONTS[th.body])+'">'+out+'</div>';
+}
+function dockStyleArt(fid,it){
+  try{
+    if(fid==='plate') return miniCard(PLATES[it.i][1](S.fmt));
+    if(fid==='theme') return miniCard(S.stack,{th:THEMES[it.i]});
+    if(fid==='pal')   return miniCard(S.stack,{pal:PALETTES[it.i].fn(elBrand.value,elBg.value)});
+    if(fid==='dir'){
+      var d=DIRECTIONS[it.i], df=d.def||[0,0,S.plate];
+      var pl=PLATES[df[2]]||PLATES[S.plate];
+      return miniCard(pl[1](S.fmt),{th:THEMES[df[0]]||PREVIEW.th,
+        pal:(PALETTES[df[1]]||PALETTES[0]).fn(elBrand.value,elBg.value)});
+    }
+  }catch(err){ return '' }   // a broken plate must not take the whole shelf down
+  return '';
+}
+function dockTile(fid,id,name,art,on){
+  return '<button class="dtile" type="button" data-f="'+esc(fid)+'" data-id="'+esc(id)+
+    '" aria-pressed="'+(!!on)+'" title="'+esc(name)+'">'+
+    '<span class="dart">'+art+'</span><span class="dname">'+esc(name)+'</span>'+
+    '<span class="dstar'+(isFav(fid,id)?' on':'')+'" data-fav="1" aria-hidden="true">'+
+    (isFav(fid,id)?'★':'☆')+'</span></button>';
+}
+function assetTiles(cat){
+  return libSet(cat).map(function(e){
+    return dockTile(cat,e.id,e.n,libArt(e,'currentColor','width:100%;height:100%'),dockOn(cat,e.id));
+  });
+}
+function styleTiles(fid){
+  return dockStyleItems(fid).map(function(it){
+    return dockTile(fid,it.id,it.n,dockStyleArt(fid,it),dockOn(fid,it.id));
+  });
+}
+function dockDraw(){
+  var box=$('dockGrid'); if(!box) return;
+  $('dockFolders').innerHTML=DOCK_FOLDERS.map(function(f){
+    if(f.id==='sep') return '<span class="dsep"></span>';
+    return '<button class="dfold" type="button" data-fold="'+f.id+'" aria-pressed="'+
+      (dockFolder===f.id)+'">'+esc(f.n)+'<span class="dn">'+dockCount(f)+'</span></button>';
+  }).join('');
+  var cur=dockFold(dockFolder), html='';
+  if(cur&&cur.kind==='fav'){
+    DOCK_FOLDERS.forEach(function(f){
+      if(f.id==='sep'||f.kind==='fav') return;
+      var rows = f.kind==='asset'
+        ? libSet(f.id).filter(function(e){ return isFav(f.id,e.id) })
+            .map(function(e){ return dockTile(f.id,e.id,e.n,
+                 libArt(e,'currentColor','width:100%;height:100%'),dockOn(f.id,e.id)) })
+        : dockStyleItems(f.id).filter(function(it){ return isFav(f.id,it.id) })
+            .map(function(it){ return dockTile(f.id,it.id,it.n,
+                 dockStyleArt(f.id,it),dockOn(f.id,it.id)) });
+      html+=rows.join('');
+    });
+    if(!html) html='<div class="dempty">NOTHING STARRED YET<br>'+
+      'HOVER ANY TILE AND HIT ITS STAR TO KEEP A COPY HERE</div>';
+  }else if(cur&&cur.kind==='asset'){
+    var rows=assetTiles(cur.id);
+    html = rows.length ? rows.join('')
+      : '<div class="dempty">THIS FOLDER IS EMPTY<br>ADD FILES BELOW</div>';
+  }else if(cur){
+    html=styleTiles(cur.id).join('');
+  }
+  box.innerHTML=html;
+  var tot=0; DOCK_FOLDERS.forEach(function(f){ if(f.kind==='asset') tot+=libSet(f.id).length });
+  $('dockCount').textContent=tot+' assets · '+Object.keys(S.favs).length+' starred';
+  $('dockNote').textContent = cur&&cur.kind==='style'
+    ? 'Click a style to apply it to the card. The tiles are real miniatures, not swatches.'
+    : 'Click to use it on whatever is selected — or with nothing selected, to drop it on the card.';
+}
+/* Only refresh from paint() when it is cheap. Style folders build a miniature per
+   tile, which is not something to do on every frame of a drag. */
+function dockSync(){
+  // paint() runs once before this block is evaluated, so tolerate not existing yet
+  if(typeof DOCK_FOLDERS==='undefined'||!DOCK_FOLDERS) return;
+  var d=$('dock'); if(!d||d.classList.contains('shut')) return;
+  var cur=dockFold(dockFolder);
+  if(cur&&cur.kind==='style') return;
+  dockDraw();
+}
+// is this tile the one currently in use?
+function dockOn(fid,id){
+  if(fid==='plate') return id==='p'+(S.plate|0);
+  if(fid==='theme') return id==='t'+(S.theme|0);
+  if(fid==='pal')   return id==='a'+(S.pal|0);
+  if(fid==='dir')   return id==='d'+(S.dir|0);
+  if(fid==='platform') return S.platLib===id;
+  var L=S.sel&&find(S.sel); if(!L) return false;
+  if(L.k==='motif'){ var e=libRefAny(L.g); return !!e&&e.id===id }
+  if(L.k==='tap'){ var t=tapEntry(L); return !!t&&t.id===id }
+  return false;
+}
+
+/* Clicking a tile does the most useful thing available: hand it to the selected
+   layer if that layer can wear it, otherwise put it on the card as a new one. */
+function dockUse(fid,id){
+  pushUndo();
+  if(fid==='plate'){ S.plate=+id.slice(1); S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
+  else if(fid==='theme') S.theme=+id.slice(1);
+  else if(fid==='pal')   S.pal=+id.slice(1);
+  else if(fid==='dir'){
+    S.dir=+id.slice(1); var d=DIR();
+    if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
+               S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
+  }
+  else if(fid==='platform') setPlatLib(id);
+  else if(fid==='logo'){ var le=libGet('logo',id); if(le) setLogo(libDataURI(le)); }
+  else {
+    var L=S.sel&&find(S.sel);
+    if(L&&L.k==='tap')        L.icon='lib:'+id;
+    else if(L&&L.k==='motif') L.g='lib:'+id;
+    else {
+      var e=libGet(fid,id);
+      var n={t:'box',k:'motif',x:.5,y:.5,s:1,g:'lib:'+id,_man:true};
+      if(e&&libOwnPaint(e)) n.asis=1;      // your own artwork keeps its colours
+      layerId(n); S.stack.push(n); selectOnly(n.id);
+    }
+  }
+  drawAxes(); dockDraw(); updateSheetFit(); paint();
+}
+function libDataURI(e){
+  if(e.u) return e.u;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+e.vb+'" fill="none" stroke="currentColor"'+
+    ' stroke-width="'+e.sw+'" stroke-linecap="round" stroke-linejoin="round">'+e.p+'</svg>');
+}
+$('dockFolders').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-fold]'); if(!b)return;
+  dockFolder=b.dataset.fold; dockDraw();
+});
+$('dockGrid').addEventListener('click',function(e){
+  var tile=e.target.closest('.dtile'); if(!tile)return;
+  if(e.target.closest('[data-fav]')){
+    e.preventDefault(); e.stopPropagation();
+    toggleFav(tile.dataset.f,tile.dataset.id); dockDraw(); return;
+  }
+  dockUse(tile.dataset.f,tile.dataset.id);
+});
+$('dockToggle').addEventListener('click',function(){
+  var d=$('dock'); d.classList.toggle('shut');
+  this.setAttribute('aria-expanded', d.classList.contains('shut')?'false':'true');
+  if(!d.classList.contains('shut')) dockDraw();
+});
+/* Files added here land in the folder you are looking at, except that anything
+   named like a logo goes to Logos wherever you were — that is nearly always what
+   you meant, and it is one drag to move it after. */
+$('dockFile').addEventListener('change',function(e){
+  var files=[].slice.call(e.target.files||[]); e.target.value='';
+  if(!files.length) return;
+  var left=files.length;
+  files.forEach(function(f){ dockIngest(f,function(){ if(!--left){ dockDraw(); paint(); } }) });
+});
+function dockIngest(file,cb){
+  if(!file || file.type.indexOf('image')!==0) return cb();
+  var cat = /logo|wordmark|brand/i.test(file.name) ? 'logo'
+          : (libUser[dockFolder] ? dockFolder : 'image');
+  var r=new FileReader();
+  if(/svg/.test(file.type)){
+    r.onload=function(){
+      var txt=String(r.result), v=libParseSVG(txt);
+      libAddTo(cat,file.name, v || {u:'data:image/svg+xml;base64,'+
+        btoa(unescape(encodeURIComponent(txt)))});
+      cb();
+    };
+    r.readAsText(file);
+  }else{
+    r.onload=function(){
+      var im=new Image();
+      im.onload=function(){ libAddTo(cat,file.name,{u:String(r.result),
+        ar:+(im.naturalWidth/im.naturalHeight).toFixed(3)}); cb() };
+      im.onerror=function(){ libAddTo(cat,file.name,{u:String(r.result)}); cb() };
+      im.src=String(r.result);
+    };
+    r.readAsDataURL(file);
+  }
+}
+function libAddTo(cat,name,payload){
+  libUser[cat]=libUser[cat]||[];
+  var e=libAdd(cat,name,payload);
+  if(cat==='logo'||cat==='image') e.asis=1;   // your own artwork keeps its colours
+  return e;
+}
+
 /* ============ 9b. the card shelf ============
    A shelf of finished cards, so a run of different designs is a thing you HAVE
    rather than a folder of .tapcard.json files you re-open one at a time. The
@@ -4601,6 +5252,7 @@ function buildSheet(q){
 }
 $('sheetPdfBtn').addEventListener('click',exportSheet);
 shelfDraw();
+dockDraw();
 updateSheetFit();
 
 
