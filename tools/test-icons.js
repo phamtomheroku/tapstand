@@ -23,7 +23,8 @@ function el(tag, id) {
       setProperty(k, v) { this._props[k] = v },
       removeProperty(k) { delete this._props[k] },
       getPropertyValue(k) { return this._props[k] || '' },
-    }, { get: (t, k) => (k in t ? t[k] : ''), set: () => true }),
+    }, { get: (t, k) => (k in t ? t[k] : ''),
+         set: (t, k, v) => { t[k] = v; return true } }),
     classList: { add(){}, remove(){}, toggle(){}, contains(){ return false } },
     dataset: {}, children: [], options: [], files: [],
     value: '', textContent: '', innerHTML: '', checked: false, hidden: true,
@@ -373,6 +374,49 @@ const blob2 = JSON.parse(JSON.stringify({ stack: C.S.stack, iconLib: C.libUser }
 ok('a staged tile is in the saved blob',
    blob2.iconLib.motif.some(e => e.id === made.id));
 ok('and the layer still points at one', /^lib:/.test(blob2.stack.filter(L => L.k === 'motif')[0].g));
+
+console.log('\n== mark and caption in one spot ==');
+const tapL3 = { t: 'box', k: 'tap', x: .5, y: .8, s: 1, cap: 'TAP TO REVIEW', icon: 'lib:waves' };
+C.layerId(tapL3); C.S.stack = [tapL3]; C.selectOnly(null);
+let t = draw();
+ok('stacked by default', /flex-direction:column/.test(t) && /TAP TO REVIEW/.test(t));
+tapL3.lay = 'inline';
+t = draw();
+ok('side by side puts them on one row', /flex-direction:row/.test(t));
+ok('and the caption is still there', /TAP TO REVIEW/.test(t));
+ok('the mark shrinks to sit on the line', markOf(t) < 15 && markOf(t) > 0, markOf(t));
+tapL3.lay = 'mark';
+t = draw();
+ok('mark only drops the caption', markOf(t) > 0 && t.indexOf('TAP TO REVIEW') < 0);
+tapL3.lay = 'cap';
+t = draw();
+ok('caption only drops the mark', markOf(t) === null && /TAP TO REVIEW/.test(t));
+tapL3.lay = 'inline'; tapL3.mk = 1.8;
+ok('mark size still applies side by side', markOf(draw()) > markOf((tapL3.mk = 1, draw())));
+tapL3.lay = null; tapL3.mk = null;
+
+console.log('\n== a decoration can keep its own colours ==');
+const wm = { t: 'box', k: 'motif', x: .5, y: .5, s: 3, g: 'lib:coffee' };
+C.layerId(wm); C.S.stack = [wm];
+ok('tinted by default', /stroke:currentColor/.test(draw()));
+wm.asis = true;
+ok('as-is leaves the file\'s own paint alone', !/stroke:currentColor/.test(draw()));
+wm.asis = null;
+
+console.log('\n== depth ==');
+const back = { t: 'text', text: 'back', x: .2, y: .2 };
+const mid = { t: 'text', text: 'mid', x: .3, y: .3 };
+const front = { t: 'text', text: 'front', x: .4, y: .4 };
+[back, mid, front].forEach(L => C.layerId(L));
+C.S.stack = [back, mid, front];
+draw();
+const z = () => card.children.map(c => [c.dataset.id, +c.style.zIndex]);
+ok('stack order is z order', z()[0][1] < z()[2][1]);
+C.selectOnly(front.id);
+// stack index 0 paints first, so it is the back
+C.S.stack = [front].concat(C.S.stack.filter(o => o !== front));
+ok('sending to back puts it first in the stack', C.S.stack[0] === front);
+ok('and the others keep their order', C.S.stack[1] === back && C.S.stack[2] === mid);
 
 console.log('\n== capture / apply is one definition of a card ==');
 C.S.stack = [{ t: 'box', k: 'tap', x: .5, y: .5, s: 1, cap: 'ONE', icon: 'lib:waves', ring: 'circle' }];

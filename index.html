@@ -2498,7 +2498,7 @@ function bodyHTML(L,ctx){
     case 'motif':
       var me=libRef(L.g,'motif'); if(!me) return '';
       var mfc = L.c==='accent' ? gc.accent : L.c==='ground' ? gc.ground : gc.brand;
-      return libArt(me,mfc,libBox(30*s*(me.ar||1),30*s));
+      return libArt(me,mfc,libBox(30*s*(me.ar||1),30*s), L.asis||undefined);
     case 'fill':
       return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:240*s)+
         'cqw;background:'+(L.c==='accent'?ctx.pal.accent:ctx.brand)+';opacity:'+(L.op==null?1:L.op)+'"></div>';
@@ -2603,10 +2603,21 @@ function bodyHTML(L,ctx){
          one pick away. Without it the mark and caption stack on their own, and the
          mark gets the room the ring was taking. */
       var rg = L.ring==null ? 'none' : (L.ring==='theme' ? ctx.th.ring : L.ring);
-      if(rg==='none')
-        return '<div class="tapring" style="border:none;width:auto;height:auto;gap:'+
-          (1.3*s)+'cqw">'+tapArt(15*s*tapAR(L), 15*s)+
-          '<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
+      if(rg==='none'){
+        /* With no ring the mark and the caption are just two things that have to
+           sit together, so how they sit is a choice: stacked, side by side, or
+           only one of them. Side by side is what "TAP TO REVIEW" wants — the mark
+           reading as part of the line rather than a separate object above it. */
+        var lay=L.lay||'stack';
+        var capHTML='<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b>';
+        if(lay==='cap')  return '<div class="tapring" style="border:none;width:auto;height:auto">'+
+          capHTML+'</div>';
+        if(lay==='mark') return tapArt(15*s*tapAR(L), 15*s);
+        var side = lay==='inline';
+        return '<div class="tapring" style="border:none;width:auto;height:auto;'+
+          'flex-direction:'+(side?'row':'column')+';gap:'+((side?2:1.3)*s)+'cqw">'+
+          tapArt((side?5.4:15)*s*tapAR(L), (side?5.4:15)*s)+capHTML+'</div>';
+      }
       var rs='';
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
       if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
@@ -2896,6 +2907,12 @@ function drawInspector(){
         ['dashed','Dashed'],['theme','Theme']].map(function(o){
          return '<button class="chip" type="button" data-r="'+o[0]+'" aria-pressed="'+
            ((L.ring||'')===o[0])+'">'+o[1]+'</button>' }).join('')+'</div>'+
+       (L.ring?'':'<span class="lbl">Mark and caption</span>'+
+       '<div class="chips" id="iLay">'+
+       [['stack','Stacked'],['inline','Side by side'],['mark','Mark only'],
+        ['cap','Caption only']].map(function(o){
+         return '<button class="chip" type="button" data-l="'+o[0]+'" aria-pressed="'+
+           ((L.lay||'stack')===o[0])+'">'+o[1]+'</button>' }).join('')+'</div>')+
        '<span class="lbl">Mark size &middot; '+mkv+'%</span>'+
        '<input type="range" id="iMk" min="30" max="200" value="'+mkv+'">'+
        '<span class="lbl">Caption</span>'+
@@ -2910,11 +2927,15 @@ function drawInspector(){
        '<input type="range" id="iLh" min="5" max="70" value="'+Math.round(L.lh||15)+'">';
   }
   if(L.k==='motif'){
-    h+='<span class="lbl">Colour</span>'+
+    // A decoration is normally a brand-coloured glyph. A logo used as a watermark
+    // is the exception: it has to keep the colours it came with.
+    h+='<label class="tog"><input type="checkbox" id="iAsis"'+(L.asis?' checked':'')+
+       '> Keep its own colours</label>'+
+       (L.asis?'':'<span class="lbl">Colour</span>'+
        '<div class="chips" id="iMc">'+
        ['brand','accent','ground'].map(function(k){
          return '<button class="chip" type="button" data-c="'+k+'" aria-pressed="'+
-           ((L.c||'brand')===k)+'">'+k+'</button>' }).join('')+'</div>'+
+           ((L.c||'brand')===k)+'">'+k+'</button>' }).join('')+'</div>')+
        '<span class="lbl">Opacity &middot; '+Math.round((L.op==null?1:L.op)*100)+'%</span>'+
        '<input type="range" id="iOp" min="5" max="100" value="'+
        Math.round((L.op==null?1:L.op)*100)+'">'+
@@ -2951,12 +2972,29 @@ function drawInspector(){
        '<option value="750">Bold</option><option value="850">Heavy</option></select></div>'+
        (fFams.length ? '<select id="iFf" title="Font family">'+fOpts+'</select>' : '');
   }
+  // a decoration used as a watermark wants to get far bigger than a headline does
+  var sMax = (L.k==='motif'||L.k==='pattern'||L.k==='hero') ? 500 : 220;
   h+='<span class="lbl">Scale · '+Math.round((L.s==null?1:L.s)*100)+'%</span>'+
-     '<input type="range" id="iS" min="30" max="220" value="'+Math.round((L.s==null?1:L.s)*100)+'">';
+     '<input type="range" id="iS" min="30" max="'+sMax+'" value="'+
+     Math.min(sMax,Math.round((L.s==null?1:L.s)*100))+'">';
   var wv=L.w!=null?L.w:1;
   h+='<span class="lbl">Width · '+Math.round(wv*100)+'%</span>'+
      '<input type="range" id="iW" min="15" max="100" value="'+Math.round(wv*100)+'">';
+  // "behind the stars" is a thing you want in one click, not five taps of the
+  // Layers arrows — and it applies to the whole selection, not just this layer
+  h+='<span class="lbl">Depth</span>'+
+     '<div class="row2"><button class="btn" id="iBack" type="button">Send to back</button>'+
+     '<button class="btn" id="iFront" type="button">Bring to front</button></div>';
   box.innerHTML=h;
+  function reorder(toBack){
+    var sel=selected(); if(!sel.length) return;
+    pushUndo();
+    var keep=S.stack.filter(function(o){ return sel.indexOf(o)<0 });
+    S.stack = toBack ? sel.concat(keep) : keep.concat(sel);   // stack order IS z-order
+    paint();
+  }
+  $('iBack').addEventListener('click',function(){ reorder(true) });
+  $('iFront').addEventListener('click',function(){ reorder(false) });
   if(cat) $('iLib').addEventListener('click',function(){ openLib(cat,L,this) });
   if(L.k==='lockup'||L.k==='plat') $('iWord').addEventListener('input',function(){L.word=this.value;paint(true)});
   if(L.k==='lockup') $('iSplit').addEventListener('click',function(){ breakLockup(L) });
@@ -2972,13 +3010,21 @@ function drawInspector(){
       if(typeof pushUndo==='function') pushUndo();
       L.ring=b.dataset.r||null; drawInspector(); paint(true);
     });
+    if($('iLay')) $('iLay').addEventListener('click',function(e){
+      var b=e.target.closest('button[data-l]'); if(!b)return;
+      if(typeof pushUndo==='function') pushUndo();
+      L.lay=b.dataset.l==='stack'?null:b.dataset.l; drawInspector(); paint(true);
+    });
   }
   if(L.k==='logo'){
     $('iLw').addEventListener('input',function(){L.lw=+this.value;paint(true)});
     $('iLh').addEventListener('input',function(){L.lh=+this.value;paint(true)});
   }
   if(L.k==='motif'){
-    $('iMc').addEventListener('click',function(e){
+    $('iAsis').addEventListener('change',function(){
+      L.asis=this.checked||null; drawInspector(); paint();
+    });
+    if($('iMc')) $('iMc').addEventListener('click',function(e){
       var b=e.target.closest('button[data-c]'); if(!b)return;
       L.c=b.dataset.c; drawInspector(); paint(true);
     });
