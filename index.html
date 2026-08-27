@@ -145,6 +145,14 @@ section{padding:60px 0;border-bottom:1px solid var(--rule)}
 .libwarn{font-family:var(--mono);font-size:9px;letter-spacing:.05em;line-height:1.6;
   color:var(--accent);text-align:center}
 .libwarn:empty{display:none}
+.cutrow{display:flex;align-items:center;gap:10px;justify-content:space-between;
+  padding-top:4px;border-top:1px solid var(--rule-2);margin-top:4px}
+.cutrow[hidden],.cutopts[hidden]{display:none}
+.cutrow .tog{margin:0;flex:1}
+.cutrow .btn{flex:none;margin:0;padding:4px 9px}
+.cutrow .btn.held{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.cutopts{display:flex;flex-direction:column;gap:5px}
+.cutopts .libnote{flex:none;text-align:center;min-width:0}
 .hname{font-size:15.5px;font-weight:700;letter-spacing:-.01em;margin:0}
 .hspec{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
   letter-spacing:.03em;display:flex;flex-wrap:wrap;gap:3px 8px;margin:0}
@@ -1018,6 +1026,17 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
       <div class="libctl">
         <span class="lbl">Size &middot; <span id="libZoomV">100%</span></span>
         <input type="range" id="libZoom" min="20" max="400" value="100">
+        <div class="cutrow" id="libCutRow" hidden>
+          <label class="tog"><input type="checkbox" id="libCut"> Remove background</label>
+          <button class="btn" id="libCompare" type="button" title="hold to see the original">Compare</button>
+        </div>
+        <div class="cutopts" id="libCutOpts" hidden>
+          <span class="lbl">Strength &middot; <span id="libTolV">42</span></span>
+          <input type="range" id="libTol" min="4" max="150" value="42">
+          <span class="lbl">Edge softness &middot; <span id="libFeatV">22</span></span>
+          <input type="range" id="libFeat" min="0" max="70" value="22">
+          <span class="libnote" id="libCutStat"></span>
+        </div>
         <span class="libwarn" id="libWarn"></span>
       </div>
     </div>
@@ -2607,7 +2626,7 @@ function defaults(fmt){
 
 var curPreset=0;
 var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
-       userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,tapImg:null,multi:[]};
+       userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,platImgMode:'asis',tapImg:null,tapImgMode:'tint',multi:[]};
 
 /* ---- custom fonts --------------------------------------------------------
    Uploaded font files, held as base64 data URLs and registered through the
@@ -2921,7 +2940,7 @@ function tapAR(L){ var e=tapEntry(L); return (e&&e.ar)||1 }
    a single tone the same way an uploaded file is knocked. With no artwork at all
    it falls back to the word, which is the safest thing to actually print. */
 function platMark(L,mc,s,hCqw,capCqw){
-  var knock = S.platImgMode==='asis' ? '' : ';filter:brightness(0) saturate(0)';
+  var knock = S.platImgMode==='tint' ? ';filter:brightness(0) saturate(0)' : '';
   var e = S.platLib ? libGet('platform',S.platLib) : null;
   if(e){
     // height drives it; if that makes it wider than its box, fit the width instead
@@ -3896,9 +3915,15 @@ function stageOpen(cat,name,kind,payload,natW,natH){
   stage={cat:cat, name:name, kind:kind, payload:payload, img:null,
          natW:natW||1, natH:natH||1,
          fit:Math.min(FRAME/(natW||1), FRAME/(natH||1)), z:1, ox:0, oy:0};
+  stage.src=payload.disp;
   $('libPrev').src=payload.disp;
   $('libZoom').value=100;
   $('libWarn').textContent='';
+  // only a raster has a background to key out; an SVG is already a cut-out
+  $('libCut').checked=false;
+  $('libCutRow').hidden = kind!=='raster';
+  $('libCutOpts').hidden=true;
+  $('libCutStat').textContent='';
   libGrid.hidden=true; $('libStage').hidden=false;
   $('libPick').hidden=true;
   ['libStageFit','libStageCancel','libStageAdd'].forEach(function(i){ $(i).hidden=false });
@@ -3919,6 +3944,9 @@ function stageClose(){
   $('libPick').hidden=false;
   ['libStageFit','libStageCancel','libStageAdd'].forEach(function(i){ $(i).hidden=true });
   $('libWarn').textContent='';
+  $('libCut').checked=false;
+  $('libCutRow').hidden=true; $('libCutOpts').hidden=true;
+  $('libCutStat').textContent='';
   $('libPrev').removeAttribute('src');
   $('libNote').textContent=LIB_HINT[libCat]||'';
 }
@@ -3960,10 +3988,8 @@ function stageRaster(cat,name,src,img){
   stageOpen(cat,name,'raster',{disp:src}, img.naturalWidth||img.width||1,
                                           img.naturalHeight||img.height||1);
   stage.img=img;
-  var clear=alphaLook(img);
-  if(clear!=null && clear<.02 && cat!=='platform')
-    $('libWarn').textContent='NOTHING IN THIS FILE IS TRANSPARENT. TINTED, IT WILL '+
-      'PRINT AS A SOLID BRAND-COLOURED BLOCK — USE A CUT-OUT PNG OR AN SVG.';
+  stage.orig={src:src, img:img};      // Compare and the sliders both work off this
+  stageWarn();
 }
 function libRead(file){
   if(!file || file.type.indexOf('image')!==0) return;
@@ -3993,6 +4019,121 @@ function libRead(file){
     r.readAsDataURL(file);
   }
 }
+/* ---- background removal ----------------------------------------------------
+   Most artwork people have is a JPEG on white, and a JPEG on white is useless
+   here: tinted it masks as a solid block, and untinted it prints a white box
+   over the card. So the placement frame can key the background out before the
+   file ever reaches the set.
+
+   The key colour is sampled from the border rather than assumed to be white,
+   which costs nothing and also handles a scan on cream or a screenshot on grey.
+   Strength is how far from that colour still counts as background; softness is
+   the band above it where pixels fade out instead of dropping, which is what
+   keeps a curve from turning into a staircase. */
+function keyColour(px, w, h) {
+  var pts = [], i, x, y;
+  function at(x, y) { var o = (y * w + x) * 4; return [px[o], px[o + 1], px[o + 2], px[o + 3]] }
+  var edge = [[0,0],[w-1,0],[0,h-1],[w-1,h-1],[w>>1,0],[w>>1,h-1],[0,h>>1],[w-1,h>>1]];
+  for (i = 0; i < edge.length; i++) { var p = at(edge[i][0], edge[i][1]); if (p[3] > 8) pts.push(p) }
+  if (!pts.length) return null;
+  // median of the samples, so one dark corner cannot drag the key
+  var out = [0, 0, 0];
+  for (var c = 0; c < 3; c++) {
+    var v = pts.map(function (p) { return p[c] }).sort(function (a, b) { return a - b });
+    out[c] = v[v.length >> 1];
+  }
+  return out;
+}
+/* Returns a data URI with the background keyed out, and how much of the picture
+   it removed — which is the number that tells you whether it worked. */
+function keyOut(img, tol, feather) {
+  var W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  var cap = 1400, sc = Math.min(1, cap / Math.max(W, H));
+  var w = Math.max(1, Math.round(W * sc)), h = Math.max(1, Math.round(H * sc));
+  var c = document.createElement('canvas'); c.width = w; c.height = h;
+  var g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, w, h);
+  var d;
+  try { d = g.getImageData(0, 0, w, h) } catch (err) { return null }
+  var px = d.data, k = keyColour(px, w, h);
+  if (!k) return null;
+  var soft = Math.max(1, feather), cleared = 0, total = w * h;
+  for (var i = 0; i < px.length; i += 4) {
+    if (!px[i + 3]) { cleared++; continue }
+    var dr = px[i] - k[0], dg = px[i + 1] - k[1], db = px[i + 2] - k[2];
+    var dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (dist <= tol) { px[i + 3] = 0; cleared++; }
+    else if (dist <= tol + soft) {
+      var a = (dist - tol) / soft;
+      px[i + 3] = Math.round(px[i + 3] * a);
+      if (px[i + 3] < 8) cleared++;
+    }
+  }
+  g.putImageData(d, 0, 0);
+  return { src: c.toDataURL('image/png'), cleared: cleared / total };
+}
+
+var cutToken = 0;
+function stageCutApply() {
+  if (!stage || stage.kind !== 'raster' || !stage.orig) return;
+  var on = $('libCut').checked;
+  $('libCutOpts').hidden = !on;
+  if (!on) { stageShow(stage.orig.src, stage.orig.img); $('libCutStat').textContent = ''; stageWarn(); return; }
+  var tol = +$('libTol').value, feat = +$('libFeat').value;
+  $('libTolV').textContent = tol; $('libFeatV').textContent = feat;
+  var my = ++cutToken;
+  var r = keyOut(stage.orig.img, tol, feat);
+  if (!r) { $('libCutStat').textContent = 'THIS FILE CANNOT BE READ PIXEL BY PIXEL'; return; }
+  var im = new Image();
+  im.onload = function () {
+    if (my !== cutToken) return;                 // a later drag already won
+    stageShow(r.src, im);
+    $('libCutStat').textContent = Math.round(r.cleared * 100) + '% OF THE PICTURE REMOVED';
+    stageWarn();
+  };
+  im.src = r.src;
+}
+// swap what the frame is showing without disturbing zoom or position
+function stageShow(src, img) {
+  if (!stage) return;
+  stage.src = src; stage.img = img;
+  $('libPrev').src = src;
+  stageDraw();
+}
+function stageWarn() {
+  if (!stage) return;
+  var clear = stage.img ? alphaLook(stage.img) : null;
+  $('libWarn').textContent = (clear != null && clear < .02 && stage.cat !== 'platform')
+    ? 'NOTHING IN THIS FILE IS TRANSPARENT. TINTED, IT WILL PRINT AS A SOLID '+
+      'BRAND-COLOURED BLOCK — REMOVE THE BACKGROUND, OR USE A CUT-OUT PNG.'
+    : '';
+}
+$('libCut').addEventListener('change', stageCutApply);
+['libTol', 'libFeat'].forEach(function (id) {
+  $(id).addEventListener('input', function () {
+    $('libTolV').textContent = $('libTol').value;
+    $('libFeatV').textContent = $('libFeat').value;
+    if ($('libCut').checked) stageCutApply();
+  });
+});
+/* Hold to see what you started with. A before/after you have to hold is better
+   than a toggle you can leave in the wrong state and then commit from. */
+(function () {
+  var b = $('libCompare'), holding = false;
+  function show(orig) {
+    if (!stage || !stage.orig) return;
+    if (orig === holding) return;
+    holding = orig;
+    b.classList.toggle('held', orig);
+    var s = orig ? stage.orig : { src: stage.src, img: stage.img };
+    $('libPrev').src = orig ? stage.orig.src : stage.src;
+  }
+  ['pointerdown'].forEach(function (t) { b.addEventListener(t, function (e) { e.preventDefault(); show(true) }) });
+  ['pointerup', 'pointerleave', 'pointercancel', 'blur'].forEach(function (t) {
+    b.addEventListener(t, function () { show(false) });
+  });
+})();
+
 $('libZoom').addEventListener('input',function(){
   if(!stage) return; stage.z=+this.value/100; stageDraw();
 });

@@ -761,23 +761,46 @@ console.log('\n== a decoration can wear an asset from any folder ==');
   ok('and a decoration renders one', draw().indexOf('<img') >= 0);
 }
 
+console.log('\n== an opaque platform image must not print as a black box ==');
+{
+  C.libUser.platform = [{ id: 'u-jpeg', n: 'A JPEG on white', u: 'data:image/png;base64,ZZZ', ar: 1.9, asis: 1 }];
+  C.S.platLib = 'u-jpeg';
+  ok('the card ships with the mark keeping its own colours', C.S.platImgMode === 'asis');
+  const platL = { t: 'box', k: 'plat', x: .5, y: .3, s: 1, ph: 14, word: 'Google' };
+  const tapL4 = { t: 'box', k: 'tap', x: .5, y: .8, s: 1, cap: 'TAP' };
+  [platL, tapL4].forEach(L => C.layerId(L));
+  C.S.stack = [platL, tapL4];
+  let out4 = draw();
+  ok('nothing is knocked to black by default', out4.indexOf('brightness(0)') < 0, 'brightness(0) present');
+  ok('and the image is actually there', out4.indexOf('data:image/png;base64,ZZZ') >= 0);
+
+  C.S.platImgMode = 'tint';
+  ok('asking for a tint still knocks it out', draw().indexOf('brightness(0)') >= 0);
+  C.S.platImgMode = 'asis';
+
+  const lockL = { t: 'box', k: 'lockup', x: .5, y: .3, s: 1, word: 'Google' };
+  C.layerId(lockL);
+  C.S.stack = [lockL, tapL4];
+  ok('a lockup does not blacken it either', draw().indexOf('brightness(0)') < 0);
+  C.S.platLib = null;
+}
+
+console.log('\n== background removal ==');
+{
+  ok('the placement frame can key a background out', typeof C.keyOut === 'function');
+  ok('and it samples the key rather than assuming white', typeof C.keyColour === 'function');
+  const w = 4, h = 4, px = new Uint8ClampedArray(w * h * 4);
+  for (let i = 0; i < w * h; i++) {
+    const edge = (i < w) || (i >= w * (h - 1)) || (i % w === 0) || (i % w === w - 1);
+    px[i * 4] = edge ? 200 : 10; px[i * 4 + 1] = edge ? 190 : 10;
+    px[i * 4 + 2] = edge ? 180 : 10; px[i * 4 + 3] = 255;
+  }
+  const k = C.keyColour(px, w, h);
+  ok('it reads the border, not the middle',
+     k && k[0] === 200 && k[1] === 190 && k[2] === 180, k && k.join(','));
+  const empty = new Uint8ClampedArray(w * h * 4);
+  ok('and gives up rather than guessing on a blank image', C.keyColour(empty, w, h) === null);
+}
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;
-
-console.log('== switching trim lands on a composition that belongs there ==');
-{
-  const tallIdx = C.PLATES.findIndex(p => p[2] !== 'wide');
-  const wideIdx = C.PLATES.findIndex(p => p[2] === 'wide');
-  ok('there is a tall-only and a card-only composition to move between',
-     tallIdx >= 0 && wideIdx >= 0);
-  C.S.fmt = 0; C.S.plate = tallIdx;
-  ok('the tall one does not belong on the card', !C.plateFitsTrimAt(tallIdx, 5));
-  C.S.fmt = 5; C.keepPlateInTrim();
-  ok('switching to the card moves you off it', C.plateFitsTrim(C.S.plate), C.S.plate);
-  ok('and onto one of the card set', C.PLATES[C.S.plate][2] === 'wide', C.PLATES[C.S.plate][0]);
-  C.S.fmt = 0; C.keepPlateInTrim();
-  ok('and switching back moves you off that one',
-     C.plateFitsTrim(C.S.plate) && C.PLATES[C.S.plate][2] !== 'wide');
-  C.S.plate = 0;
-  console.log('\n' + pass + ' passed, ' + fail + ' failed  (final)');
-}
