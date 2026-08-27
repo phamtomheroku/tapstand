@@ -7,6 +7,12 @@
       "lic": "own"
     },
     {
+      "file": "contactless-hand.png",
+      "name": "Contactless hand",
+      "src": "Yours",
+      "lic": "licensed by you"
+    },
+    {
       "file": "phone-waves.svg",
       "name": "Phone and waves",
       "src": "Tap Stand",
@@ -79,7 +85,15 @@
       "lic": "own"
     }
   ],
-  "platform": [],
+  "platform": [
+    {
+      "file": "review-us-google.png",
+      "name": "Review us on Google",
+      "src": "Yours",
+      "lic": "trademark — see README",
+      "asis": true
+    }
+  ],
   "motif": [
     {
       "file": "coffee.svg",

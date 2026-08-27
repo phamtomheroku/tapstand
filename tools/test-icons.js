@@ -117,10 +117,35 @@ function ok(name, cond, extra) {
 }
 
 console.log('\n== library shape ==');
-ok('tap set non-empty', C.libSet('tap').length === 13, C.libSet('tap').length);
+ok('tap set non-empty', C.libSet('tap').length === 14, C.libSet('tap').length);
 ok('motif set non-empty', C.libSet('motif').length === 59, C.libSet('motif').length);
-ok('platform set empty', C.libSet('platform').length === 0);
+ok('platform set carries the one badge', C.libSet('platform').length === 1);
 ok('default tap mark is hand-phone', C.libSet('tap')[0].id === 'hand-phone');
+
+console.log('\n== the marks this business actually prints ==');
+{
+  const ch = C.libGet('tap', 'contactless-hand');
+  ok('the contactless hand is in the tap set', !!ch);
+  ok('it is a raster with real alpha to mask against', !!ch.u && !ch.p);
+  ok('it is not as-is, so it takes the brand colour', !ch.asis);
+  ok('and it sits second, so the shipped default is unchanged',
+     C.libSet('tap')[1].id === 'contactless-hand');
+  const g = C.libGet('platform', 'review-us-google');
+  ok('the Google badge is in the platform set', !!g);
+  ok('and keeps its own colours, as a trademark must', g.asis === 1);
+  ok('it is landscape-ish, not square', g.ar > 0.6 && g.ar < 1.2, g.ar);
+
+  ok('both are starred out of the box',
+     C.isFav('tap', 'contactless-hand') && C.isFav('platform', 'review-us-google'));
+  C.dockFolder = 'fav'; C.dockDraw();
+  const favs = byId('dockGrid').innerHTML;
+  ok('so Favourites opens with something in it',
+     favs.indexOf('contactless-hand') > 0 && favs.indexOf('review-us-google') > 0);
+  ok('the seed is only a seed — un-starring sticks',
+     (C.toggleFav('tap', 'contactless-hand'), !C.isFav('tap', 'contactless-hand')));
+  C.toggleFav('tap', 'contactless-hand');
+  C.dockFolder = 'tap';
+}
 
 console.log('\n== reference resolution ==');
 ok('lib: prefix', C.libRef('lib:nfc-arcs', 'tap').id === 'nfc-arcs');
