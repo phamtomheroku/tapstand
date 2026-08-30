@@ -2970,6 +2970,21 @@ function tapEntry(L){
 }
 // the ring gives the mark a fixed height, so width follows its own aspect
 function tapAR(L){ var e=tapEntry(L); return (e&&e.ar)||1 }
+/* How far a box centred at (cx,cy) has to move to sit inside a WxH area with pad
+   clear on every side. Returns null when it already does, so callers can skip the
+   transform entirely. If the box is simply bigger than the space, it centres
+   rather than jamming one edge against the trim. */
+function fitInside(cx,cy,w,h,W,H,pad){
+  function axis(c,len,span){
+    if(len+pad*2>=span) return span/2-c;          // wider than the space: centre it
+    var over=(c+len/2)-(span-pad); if(over>0) return -over;
+    var under=pad-(c-len/2);       if(under>0) return under;
+    return 0;
+  }
+  var dx=axis(cx,w,W), dy=axis(cy,h,H);
+  if(!dx && !dy) return null;
+  return [+dx.toFixed(2), +dy.toFixed(2)];
+}
 
 /* The platform mark, wherever it is drawn — inside the lockup or standing alone.
    It is a trademark, so it keeps its own colours by default; 'Tint' knocks it to
@@ -3198,11 +3213,37 @@ function bodyHTML(L,ctx){
       if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
       if(rg==='dashed') rs='border-style:dashed;';
       var ringCap = (L.cap==null ? 'TAP' : L.cap);
+      /* A ring is allowed to run off the trim — that is the whole point of a plate
+         like Bleed Ring. Its CONTENTS are not. The icon sits at the ring's centre,
+         so when the ring is centred past the edge the icon is centred past the edge
+         too and gets sliced in half by the trim. Nudge the icon and caption back
+         inside as a unit, by exactly the amount they overhang, leaving PAD clear.
+         Everything here is in cqw — percent of card width — so one rule holds at
+         every trim and every scale; a ring already fully inside gets a zero nudge
+         and renders identically to before. */
+      /* The icon is sized from its height, so a wide mark gets wide without limit —
+         a 4:1 upload rendered 204 px across inside a 116 px ring and burst out of
+         both sides. Fit it to the ring instead, keeping its aspect: at most 80% of
+         the diameter across, and short enough that icon + gap + caption still clear
+         the curve. A 1:1 mark is 44% of the diameter and the shipped 1.8:1 marks
+         land just inside the cap, so nothing that already fitted moves. */
+      var iw=11*s*tapAR(L), ih=11*s, PAD=3.5;
+      var capH = ringCap ? 2.9*s*1.25 : 0;
+      var fitW = 25*s*.80;
+      var fitH = 25*s*.80 - (capH ? capH + .5*s : 0);
+      var kFit = Math.min(1, fitW/iw, fitH/ih);
+      if(kFit<1){ iw*=kFit; ih*=kFit; }
+      var nudge=fitInside((L.x==null?.5:L.x)*100, (L.y==null?.5:L.y)*ctx.cardH,
+                          iw, ih, 100, ctx.cardH, PAD);
+      var inner='display:flex;flex-direction:column;align-items:center;justify-content:center;'+
+        'gap:'+(.5*s)+'cqw'+
+        (nudge ? ';transform:translate('+nudge[0]+'cqw,'+nudge[1]+'cqw)' : '');
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
-        tapArt(11*s*tapAR(L), 11*s)+
+        '<div style="'+inner+'">'+
+        tapArt(iw, ih)+
         (ringCap ? '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(ringCap)+'</b>' : '')+
-        '</div>';
+        '</div></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
         '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
