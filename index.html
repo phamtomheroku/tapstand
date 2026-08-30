@@ -2492,7 +2492,9 @@ function wLowBand(f,g){ if(!isWide(f)) return aFullbleed(f,g);
 function wBleedRing(f,g){ if(!isWide(f)) return aRadial(f,g);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
- {t:"box",k:"tap",x:.94,y:.5,s:2.2,onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"mark"},
+ // no caption: the ring deliberately bleeds off the right edge, so any words
+ // inside it get cut mid-letter, and the type to its left already says it
+ {t:"box",k:"tap",x:.94,y:.5,s:2.2,onBand:1,cap:"",ring:"circle",lay:"mark"},
  {t:"box",k:"logo",x:0.07,y:0.1875,s:1,al:"left",onBand:1,lw:30,lh:9},
  {t:"box",k:"name",x:0.07,y:0.1875,s:1,al:"left",onBand:1},
  {t:"text",x:0.07,y:0.5625,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW US ON",fw:800,ls:.14},
@@ -3167,13 +3169,22 @@ function bodyHTML(L,ctx){
          one pick away. Without it the mark and caption stack on their own, and the
          mark gets the room the ring was taking. */
       var rg = L.ring==null ? 'none' : (L.ring==='theme' ? ctx.th.ring : L.ring);
+      /* An inline mark and a ring are mutually exclusive: inline lays the icon and
+         the caption out as one horizontal line, and a circle drawn round a wide row
+         either becomes an ellipse or bursts out of whatever band the row sits in.
+         The ring silently won, so plates that asked for an inline mark on a band
+         got a circle straddling the band edge with the caption wrapped inside it
+         and its second line falling onto the opposite ground colour. Inline wins. */
+      if(L.lay==='inline') rg='none';
       if(rg==='none'){
         /* With no ring the mark and the caption are just two things that have to
            sit together, so how they sit is a choice: stacked, side by side, or
            only one of them. Side by side is what "TAP TO REVIEW" wants — the mark
            reading as part of the line rather than a separate object above it. */
         var lay=L.lay||'stack';
-        var capHTML='<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b>';
+        // cap:"" is a deliberate "no words" — only an absent cap falls back to TAP
+        var capTxt = (L.cap==null ? 'TAP' : L.cap);
+        var capHTML = capTxt ? '<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(capTxt)+'</b>' : '';
         if(lay==='cap')  return '<div class="tapring" style="border:none;width:auto;height:auto">'+
           capHTML+'</div>';
         if(lay==='mark') return tapArt(15*s*tapAR(L), 15*s);
@@ -3186,10 +3197,12 @@ function bodyHTML(L,ctx){
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
       if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
       if(rg==='dashed') rs='border-style:dashed;';
+      var ringCap = (L.cap==null ? 'TAP' : L.cap);
       return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
         (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
         tapArt(11*s*tapAR(L), 11*s)+
-        '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
+        (ringCap ? '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(ringCap)+'</b>' : '')+
+        '</div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
         '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
