@@ -2471,21 +2471,21 @@ function wActionThird(f,g){ if(!isWide(f)) return aSplit(f,g);
  return[
  {t:"box",k:"fill",x:.18,y:.5,w:.4,hf:1.2},
  {t:"box",k:"tap",x:.17,y:.5,s:1,w:.27,onBand:1,cap:"TAP TO REVIEW",ring:"circle"},
- {t:"box",k:"logo",x:.42,y:.24,s:1,al:"left",lw:26,lh:9},
- {t:"box",k:"name",x:.42,y:.24,s:.95,al:"left"},
- {t:"box",k:"stars",x:.42,y:.52,s:.68,al:"left"},
- {t:"box",k:"plat",x:.95,y:.52,s:1,al:"right",word:"Google",ph:8},
- {t:"box",k:"head",x:.42,y:.8,s:.78,w:.5,al:"left"}]}
+ {t:"box",k:"logo",x:.42,y:0.25,s:1,al:"left",lw:26,lh:9},
+ {t:"box",k:"name",x:.42,y:0.25,s:.95,al:"left"},
+ {t:"box",k:"stars",x:.42,y:0.5,s:.68,al:"left"},
+ {t:"box",k:"plat",x:0.93,y:0.5,s:1,al:"right",word:"Google",ph:8},
+ {t:"box",k:"head",x:.42,y:0.8125,s:.78,w:.5,al:"left"}]}
 
 /* Low Band — The split is turned on its side — a full-width colour band runs off the bottom edge carrying one big inline tap mark and caption as a strip you press, while the bare stock above works corner to corner instead of down a column: logo left against the Google mark right, stars left against the headline right; suits a business that wants the ask to be the loudest thing on the card. */
 function wLowBand(f,g){ if(!isWide(f)) return aFullbleed(f,g);
  return[
  {t:"box",k:"fill",x:.5,y:.82,w:1,hf:.44},
- {t:"box",k:"logo",x:.07,y:.22,s:1,al:"left",lw:28,lh:9},
- {t:"box",k:"name",x:.07,y:.22,s:1,al:"left"},
- {t:"box",k:"plat",x:.94,y:.22,s:1,al:"right",word:"Google",ph:8.5},
- {t:"box",k:"stars",x:.07,y:.44,s:.7,al:"left"},
- {t:"box",k:"head",x:.94,y:.44,s:.72,w:.36,al:"right"},
+ {t:"box",k:"logo",x:.07,y:0.25,s:1,al:"left",lw:28,lh:9},
+ {t:"box",k:"name",x:.07,y:0.25,s:1,al:"left"},
+ {t:"box",k:"plat",x:0.93,y:0.25,s:1,al:"right",word:"Google",ph:8.5},
+ {t:"box",k:"stars",x:.07,y:0.4375,s:.7,al:"left"},
+ {t:"box",k:"head",x:0.93,y:0.4375,s:.72,w:.36,al:"right"},
  {t:"box",k:"tap",x:.5,y:.81,s:1.15,onBand:1,cap:"TAP TO REVIEW",lay:"inline"}]}
 
 /* Bleed Ring — The card floods to one brand colour and an enormous ring runs off the right short edge while the type occupies a wide left half, so the mark reads as pure graphic from a metre away and the instruction reads as a headline — for a confident single-colour brand (barber, coffee bar, nail studio) that already owns a strong hue. */
@@ -2493,41 +2493,41 @@ function wBleedRing(f,g){ if(!isWide(f)) return aRadial(f,g);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
  {t:"box",k:"tap",x:.94,y:.5,s:2.2,onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"mark"},
- {t:"box",k:"logo",x:.08,y:.21,s:1,al:"left",onBand:1,lw:30,lh:9},
- {t:"box",k:"name",x:.08,y:.21,s:1,al:"left",onBand:1},
- {t:"text",x:.08,y:.55,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW US ON",fw:800,ls:.14},
- {t:"box",k:"plat",x:.08,y:.85,s:1,al:"left",onBand:1,word:"Google",ph:9}]}
+ {t:"box",k:"logo",x:0.07,y:0.1875,s:1,al:"left",onBand:1,lw:30,lh:9},
+ {t:"box",k:"name",x:0.07,y:0.1875,s:1,al:"left",onBand:1},
+ {t:"text",x:0.07,y:0.5625,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW US ON",fw:800,ls:.14},
+ {t:"box",k:"plat",x:0.07,y:0.875,s:1,al:"left",onBand:1,word:"Google",ph:9}]}
 
 /* Standing Panel — A hard vertical brand band holds the left third with the mark reversed out of it and the words directly under, leaving the wide right two-thirds white for logo, headline and platform — the split is only possible on a landscape trim and stays restrained enough for a premium counter (bakery, optician, wine shop) where a flooded card would shout. */
 function wStandingPanel(f,g){ if(!isWide(f)) return aEdge(f,g);
  return[
  {t:"box",k:"fill",x:.16,y:.5,w:.38,hf:1.2},
  {t:"box",k:"tap",x:.16,y:.36,s:1.5,onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"mark"},
- {t:"text",x:.16,y:.78,s:.62,w:.3,onBand:1,lh:1.1,text:"TAP TO REVIEW",fw:820,ls:.16},
- {t:"box",k:"logo",x:.94,y:.18,s:1,al:"right",lw:30,lh:9},
- {t:"box",k:"name",x:.94,y:.18,s:.95,al:"right"},
- {t:"box",k:"head",x:.94,y:.5,s:.9,w:.5,al:"right"},
- {t:"box",k:"plat",x:.94,y:.84,s:1,al:"right",word:"Google",ph:8}]}
+ {t:"text",x:.16,y:0.75,s:.62,w:.3,onBand:1,lh:1.1,text:"TAP TO REVIEW",fw:820,ls:.16},
+ {t:"box",k:"logo",x:0.93,y:0.1875,s:1,al:"right",lw:30,lh:9},
+ {t:"box",k:"name",x:0.93,y:0.1875,s:.95,al:"right"},
+ {t:"box",k:"head",x:0.93,y:.5,s:.9,w:.5,al:"right"},
+ {t:"box",k:"plat",x:0.93,y:0.8125,s:1,al:"right",word:"Google",ph:8}]}
 
 /* Spine Stub — A torn ticket stub: the left third is a full-bleed brand block that carries the tap mark as a graphic panel, the type sits as one flush-left block across the remaining two-thirds, and a single word runs vertically down the far edge — suits a barber, cafe or bar with a short, strong name. */
 function wSpineStub(f,g){ if(!isWide(f)) return aGrid(f,g);
  return[
  {t:"box",k:"fill",x:.16,y:.5,w:.34,hf:1.14,c:"accent"},
  {t:"box",k:"tap",x:.15,y:.48,s:1.15,w:.28,onBand:1,cap:"TAP TO REVIEW",ring:"circle"},
- {t:"box",k:"logo",x:.42,y:.18,s:1,al:"left",lw:30,lh:7.5},
- {t:"box",k:"name",x:.42,y:.18,s:1,al:"left"},
- {t:"box",k:"head",x:.42,y:.48,s:1.3,w:.44,al:"left"},
- {t:"box",k:"stars",x:.42,y:.78,s:.7,al:"left"},
- {t:"box",k:"plat",x:.93,y:.78,s:1,al:"right",word:"Google",ph:7},
- {t:"text",x:.93,y:.35,s:.45,rot:1,text:"REVIEWS",fw:800,ls:.3}]}
+ {t:"box",k:"logo",x:.42,y:0.1875,s:1,al:"left",lw:30,lh:7.5},
+ {t:"box",k:"name",x:.42,y:0.1875,s:1,al:"left"},
+ {t:"box",k:"head",x:.42,y:0.5,s:1.3,w:.44,al:"left"},
+ {t:"box",k:"stars",x:.42,y:0.75,s:.7,al:"left"},
+ {t:"box",k:"plat",x:.93,y:0.75,s:1,al:"right",word:"Google",ph:7},
+ {t:"text",x:.93,y:0.375,s:.45,rot:1,text:"REVIEWS",fw:800,ls:.3}]}
 
 /* Admission Ticket — Symmetrical printed-ticket structure — a hairline rule under a small top row, one enormous centred headline owning the whole width, and a full-bleed colour bar along the bottom edge carrying the instruction — for a restaurant or venue whose one-line promise is the whole message. */
 function wAdmissionTicket(f,g){ if(!isWide(f)) return aBanded(f,g);
  return[
- {t:"box",k:"rule",x:.5,y:.22,w:.88},
- {t:"box",k:"logo",x:.07,y:.115,s:1,al:"left",lw:24,lh:6.5},
- {t:"box",k:"name",x:.07,y:.115,s:.85,al:"left"},
- {t:"box",k:"stars",x:.93,y:.115,s:.55,al:"right"},
+ {t:"box",k:"rule",x:.5,y:0.25,w:.88},
+ {t:"box",k:"logo",x:.07,y:0.125,s:1,al:"left",lw:24,lh:6.5},
+ {t:"box",k:"name",x:.07,y:0.125,s:.85,al:"left"},
+ {t:"box",k:"stars",x:.93,y:0.125,s:.55,al:"right"},
  {t:"box",k:"head",x:.5,y:.5,s:1.55,w:.84},
  {t:"box",k:"tap",x:.5,y:.87,s:.9,w:1,onBand:1,style:"bar",cap:"TAP HERE TO REVIEW US ON GOOGLE",lay:"cap"}]}
 
@@ -2535,12 +2535,12 @@ function wAdmissionTicket(f,g){ if(!isWide(f)) return aBanded(f,g);
 function wFooterBar(f,g){ if(!isWide(f)) return aDiagonal(f,g);
  return[
  {t:"box",k:"hero",x:.82,y:.4,s:1.6,g:g.hero,op:.12},
- {t:"text",x:.06,y:.07,s:.32,al:"left",text:"THANKS FOR STOPPING BY",fw:760,ls:.24},
- {t:"box",k:"logo",x:.06,y:.25,s:1,al:"left",lw:27,lh:8.5},
- {t:"box",k:"name",x:.06,y:.25,s:.95,al:"left"},
- {t:"box",k:"stars",x:.06,y:.5,s:.62,al:"left"},
- {t:"box",k:"head",x:.94,y:.3,s:.72,w:.42,al:"right"},
- {t:"box",k:"plat",x:.94,y:.56,s:1,al:"right",word:"Google",ph:8},
+ {t:"text",x:0.07,y:0.0625,s:.32,al:"left",text:"THANKS FOR STOPPING BY",fw:760,ls:.24},
+ {t:"box",k:"logo",x:0.07,y:.25,s:1,al:"left",lw:27,lh:8.5},
+ {t:"box",k:"name",x:0.07,y:.25,s:.95,al:"left"},
+ {t:"box",k:"stars",x:0.07,y:.5,s:.62,al:"left"},
+ {t:"box",k:"head",x:0.93,y:0.3125,s:.72,w:.42,al:"right"},
+ {t:"box",k:"plat",x:0.93,y:0.5625,s:1,al:"right",word:"Google",ph:8},
  {t:"box",k:"tap",x:.5,y:.87,s:1,w:1,onBand:1,style:"bar",cap:"TAP TO REVIEW",lay:"inline"}]}
 
 /* Centre Band — A full-bleed accent band across the waist carries the tap mark and its caption inline from the left edge with the platform mark answering it at the right, so the instruction is a sentence read left to right across the long axis rather than a badge in a corner, and the two white stripes above and below hold a matched pair of three-item columns; suits a bolder brand with one strong colour and a short line of copy. */
@@ -2548,36 +2548,38 @@ function wCentreBand(f,g){ if(!isWide(f)) return aDepth(f,g);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1,hf:.52,c:"accent"},
  {t:"box",k:"pattern",x:.5,y:.5,w:1,hf:.52,g:g.pat,op:.14},
- {t:"box",k:"logo",x:.06,y:.11,s:1,al:"left",lw:24,lh:7},
- {t:"box",k:"name",x:.06,y:.11,s:.9,al:"left"},
- {t:"box",k:"stars",x:.94,y:.11,s:.58,al:"right"},
+ {t:"box",k:"logo",x:0.07,y:0.125,s:1,al:"left",lw:24,lh:7},
+ {t:"box",k:"name",x:0.07,y:0.125,s:.9,al:"left"},
+ {t:"box",k:"stars",x:0.93,y:0.125,s:.58,al:"right"},
  {t:"box",k:"tap",x:.06,y:.5,s:1.05,al:"left",onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"inline"},
- {t:"box",k:"plat",x:.94,y:.5,s:1,al:"right",onBand:1,word:"Google",ph:7},
- {t:"box",k:"head",x:.06,y:.88,s:.46,w:.5,al:"left"},
- {t:"text",x:.94,y:.88,s:.3,al:"right",text:"THANK YOU",fw:750,ls:.22}]}
+ {t:"box",k:"plat",x:0.93,y:.5,s:1,al:"right",onBand:1,word:"Google",ph:7},
+ {t:"box",k:"head",x:0.07,y:0.875,s:.46,w:.5,al:"left"},
+ {t:"text",x:0.93,y:0.875,s:.3,al:"right",text:"THANK YOU",fw:750,ls:.22}]}
 
 /* Ticket Stub — Two honest columns instead of one stacked one: identity and the promise fill the left field under a torn hairline, while a wide accent stub bleeds off the right edge carrying stars, the tap mark and the Google mark as a single action unit — for an independent shop or cafe that wants the brand to lead and the ask to feel like a coupon you tear off. */
 function wTicketStub(f,g){ if(!isWide(f)) return aSplit(f,g);
  return[
  {t:"box",k:"fill",x:.78,y:.5,w:.44,hf:1.14,c:"accent"},
- {t:"box",k:"logo",x:.07,y:.25,s:1,al:"left",lw:28,lh:8},
- {t:"box",k:"name",x:.07,y:.25,s:.95,al:"left"},
- {t:"box",k:"rule",x:.07,y:.41,w:.3,al:"left",dash:1},
- {t:"box",k:"head",x:.07,y:.64,s:.78,w:.42,al:"left"},
- {t:"box",k:"stars",x:.78,y:.24,s:.6,onBand:1},
- {t:"box",k:"tap",x:.78,y:.58,s:1,w:.38,onBand:1,cap:"TAP TO REVIEW",ring:"circle"},
- {t:"box",k:"plat",x:.78,y:.87,s:1,onBand:1,word:"Google",ph:7}]}
+ // both columns start and finish on the same rows, so the stub reads as a
+ // counterpart to the type rather than a taller thing bolted to its side
+ {t:"box",k:"logo",x:.07,y:0.1875,s:1,al:"left",lw:28,lh:8},
+ {t:"box",k:"name",x:.07,y:0.1875,s:.95,al:"left"},
+ {t:"box",k:"rule",x:.07,y:0.5,w:.3,al:"left",dash:1},
+ {t:"box",k:"head",x:.07,y:0.75,s:.78,w:.42,al:"left"},
+ {t:"box",k:"stars",x:.78,y:0.1875,s:.6,onBand:1},
+ {t:"box",k:"tap",x:.78,y:.5,s:1,w:.38,onBand:1,cap:"TAP TO REVIEW",ring:"circle"},
+ {t:"box",k:"plat",x:.78,y:0.8125,s:1,onBand:1,word:"Google",ph:7}]}
 
 /* Crossbar — A full-bleed accent bar runs the whole long axis with the tap mark set inline at its left end and the Google mark at its right, so the bar itself states the entire transaction at arm's length, while the logo holds the top-left corner and the thank-you and stars anchor the bottom edge — for a busy till where the action has to win before the brand does. */
 function wCrossbar(f,g){ if(!isWide(f)) return aFullbleed(f,g);
  return[
  {t:"box",k:"fill",x:.5,y:.52,w:1,hf:.36,c:"accent"},
- {t:"box",k:"logo",x:.06,y:.15,s:1,al:"left",lw:26,lh:8},
- {t:"box",k:"name",x:.06,y:.15,s:.9,al:"left"},
+ {t:"box",k:"logo",x:0.07,y:0.125,s:1,al:"left",lw:26,lh:8},
+ {t:"box",k:"name",x:0.07,y:0.125,s:.9,al:"left"},
  {t:"box",k:"tap",x:.06,y:.52,s:1.05,w:.52,al:"left",onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"inline"},
- {t:"box",k:"plat",x:.94,y:.52,s:1,al:"right",onBand:1,word:"Google",ph:7},
- {t:"text",x:.06,y:.86,s:.45,al:"left",text:"THANK YOU",fw:750,ls:.24},
- {t:"box",k:"stars",x:.94,y:.86,s:.55,al:"right"}]}
+ {t:"box",k:"plat",x:0.93,y:0.5,s:1,al:"right",onBand:1,word:"Google",ph:7},
+ {t:"text",x:0.07,y:0.875,s:.45,al:"left",text:"THANK YOU",fw:750,ls:.24},
+ {t:"box",k:"stars",x:0.93,y:0.875,s:.55,al:"right"}]}
 
 var ARCHETYPES=[["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
@@ -2617,41 +2619,41 @@ function defaults(fmt){
   // takes care of shifting positions into the front face and scaling sizes to
   // match CR80 physical dimensions, so no separate coordinate table is needed.
   if(fmt===7 || fmt===5) return [                                    // CR80 85.6×54 landscape
-   {t:"box",k:"logo", x:.14, y:.48,s:.58,lw:28,lh:10},
-   {t:"box",k:"name", x:.44, y:.26,s:.72,w:.40},
+   {t:"box",k:"logo", x:.14, y:0.5,s:.58,lw:28,lh:10},
+   {t:"box",k:"name", x:.44, y:0.25,s:.72,w:.40},
    {t:"box",k:"stars",x:.44, y:.50,s:.58},
-   {t:"box",k:"head", x:.44, y:.74,s:.56,w:.40},
+   {t:"box",k:"head", x:.44, y:0.75,s:.56,w:.40},
    {t:"box",k:"qr",   x:.90, y:.50,s:.44},
    {t:"box",k:"tap",  x:.72, y:.50,s:.68}];
   if(fmt===3) return [                                    // 3.5×2 landscape
    {t:"box",k:"logo", x:.155,y:.50,s:.62},
-   {t:"box",k:"name", x:.46, y:.30,s:.80},
-   {t:"box",k:"stars",x:.46, y:.53,s:.62},
-   {t:"box",k:"head", x:.46, y:.74,s:.60,w:.42},
+   {t:"box",k:"name", x:.46, y:0.3125,s:.80},
+   {t:"box",k:"stars",x:.46, y:0.5,s:.62},
+   {t:"box",k:"head", x:.46, y:0.75,s:.60,w:.42},
    {t:"box",k:"qr",   x:.905,y:.50,s:.52},
    {t:"box",k:"tap",  x:.715,y:.50,s:.78}];
   if(fmt===2) return [                                    // 4×4 square
-   {t:"box",k:"logo", x:.5,y:.135,s:.80},
-   {t:"box",k:"name", x:.5,y:.255,s:.86},
-   {t:"box",k:"stars",x:.5,y:.345,s:.80},
-   {t:"box",k:"head", x:.5,y:.455,s:.84,w:.80},
-   {t:"box",k:"qr",   x:.5,y:.865,s:.72},
+   {t:"box",k:"logo", x:.5,y:0.125,s:.80},
+   {t:"box",k:"name", x:.5,y:0.25,s:.86},
+   {t:"box",k:"stars",x:.5,y:0.375,s:.80},
+   {t:"box",k:"head", x:.5,y:0.4375,s:.84,w:.80},
+   {t:"box",k:"qr",   x:.5,y:0.875,s:.72},
    {t:"box",k:"tap",  x:.5,y:.655,s:.80}];
   if(isWide(fmt)) return [               // 4×3 and any other landscape stand insert:
    // name block left, tap ring right — the reading order a counter card gets
    // approached in, and it keeps the ring clear of the type at every scale
-   {t:"box",k:"logo", x:.32,y:.24,s:.92,lw:38,lh:13},
-   {t:"box",k:"name", x:.34,y:.30,s:1,  w:.50},
-   {t:"box",k:"stars",x:.34,y:.49,s:.92},
-   {t:"box",k:"head", x:.34,y:.67,s:.86,w:.50},
-   {t:"box",k:"qr",   x:.78,y:.84,s:.52},
+   {t:"box",k:"logo", x:.32,y:0.25,s:.92,lw:38,lh:13},
+   {t:"box",k:"name", x:.34,y:0.3125,s:1,  w:.50},
+   {t:"box",k:"stars",x:.34,y:0.5,s:.92},
+   {t:"box",k:"head", x:.34,y:0.6875,s:.86,w:.50},
+   {t:"box",k:"qr",   x:.78,y:0.8125,s:.52},
    {t:"box",k:"tap",  x:.77,y:.46,s:1}];
   return [                                                // 4×6 / 3×5 portrait
    {t:"box",k:"logo", x:.5,y:.125,s:1},
-   {t:"box",k:"name", x:.5,y:.235,s:1},
-   {t:"box",k:"stars",x:.5,y:.310,s:1},
-   {t:"box",k:"head", x:.5,y:.405,s:1,w:.84},
-   {t:"box",k:"qr",   x:.5,y:.845,s:1},
+   {t:"box",k:"name", x:.5,y:0.25,s:1},
+   {t:"box",k:"stars",x:.5,y:0.3125,s:1},
+   {t:"box",k:"head", x:.5,y:0.375,s:1,w:.84},
+   {t:"box",k:"qr",   x:.5,y:0.875,s:1},
    {t:"box",k:"tap",  x:.5,y:.590,s:1}];
 }
 
@@ -4062,6 +4064,33 @@ function libRead(file){
    Strength is how far from that colour still counts as background; softness is
    the band above it where pixels fade out instead of dropping, which is what
    keeps a curve from turning into a staircase. */
+/* Is the outer border one flat colour? A logo tile or an icon on a white card
+   says yes; a photograph says no. This is the gate that keeps keyOut() away from
+   images that have no background to remove — without it, keying a photo punches
+   holes wherever it happens to match the corners. */
+function flatBorder(img){
+  var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height;
+  if(!W||!H) return false;
+  var w=Math.min(160,W), h=Math.min(160,H);
+  var c=document.createElement('canvas'); c.width=w; c.height=h;
+  var g=c.getContext('2d',{willReadFrequently:true});
+  g.drawImage(img,0,0,w,h);
+  var d; try{ d=g.getImageData(0,0,w,h) }catch(err){ return false }
+  var px=d.data, sm=[], i;
+  function at(x,y){ var o=(y*w+x)*4; return [px[o],px[o+1],px[o+2],px[o+3]] }
+  for(i=0;i<w;i++){ sm.push(at(i,0)); sm.push(at(i,h-1)); }
+  for(i=0;i<h;i++){ sm.push(at(0,i)); sm.push(at(w-1,i)); }
+  var op=sm.filter(function(p){ return p[3]>8 });
+  if(op.length < sm.length*.9) return false;        // already has transparency
+  var m=[0,0,0], j;
+  for(j=0;j<3;j++){ var t=0; op.forEach(function(p){t+=p[j]}); m[j]=t/op.length }
+  var far=0;
+  op.forEach(function(p){
+    var dr=p[0]-m[0], dg=p[1]-m[1], db=p[2]-m[2];
+    if(Math.sqrt(dr*dr+dg*dg+db*db)>30) far++;
+  });
+  return far/op.length < .06;                        // 94%+ of the border is one colour
+}
 function keyColour(px, w, h) {
   var pts = [], i, x, y;
   function at(x, y) { var o = (y * w + x) * 4; return [px[o], px[o + 1], px[o + 2], px[o + 3]] }
@@ -5417,10 +5446,11 @@ $('dockToggle').addEventListener('click',function(){
 $('dockFile').addEventListener('change',function(e){
   var files=[].slice.call(e.target.files||[]); e.target.value='';
   if(!files.length) return;
-  var left=files.length, added=0, bad=[];
+  var left=files.length, added=0, keyed=0, bad=[];
   files.forEach(function(f){ dockIngest(f,function(ok,why){
-    if(ok) added++; else bad.push(f.name+(why?' ('+why+')':''));
-    if(!--left){ dockDraw(); paint(); dockReport(added,bad); }
+    if(ok){ added++; if(why==='keyed') keyed++; }
+    else bad.push(f.name+(why?' ('+why+')':''));
+    if(!--left){ dockDraw(); paint(); dockReport(added,bad,keyed); }
   }) });
 });
 /* A file the browser cannot decode used to be added anyway, which is how a tile
@@ -5429,10 +5459,11 @@ $('dockFile').addEventListener('change',function(e){
    the file picker accepts it under image/* and Chrome then refuses to decode it —
    but a truncated download or a renamed non-image does the same. Nothing enters
    the set now unless it actually decoded, and anything rejected is named. */
-function dockReport(added,bad){
+function dockReport(added,bad,keyed){
   var n=$('dockNote'); if(!n) return;
+  var kn = keyed ? ' Background removed on '+keyed+'.' : '';
   if(!bad.length){
-    n.textContent = added ? (added+' added.') : '';
+    n.textContent = added ? (added+' added.'+kn) : '';
     n.classList.remove('bad');
   }else{
     n.textContent = (added?added+' added. ':'')+
@@ -5465,9 +5496,23 @@ function dockIngest(file,cb){
       // decode must succeed AND produce real pixels before it joins the set
       im.onload=function(){
         if(!im.naturalWidth || !im.naturalHeight) return cb(false,'zero size');
-        libAddTo(cat,file.name,{u:String(r.result),
-          ar:+(im.naturalWidth/im.naturalHeight).toFixed(3)});
-        cb(true);
+        var ar=+(im.naturalWidth/im.naturalHeight).toFixed(3);
+        // A mark saved on a white card — the usual "review us on Google" tile, or a
+        // tap icon exported from a slide — arrives as an opaque rectangle, and
+        // placed on the card that rectangle is exactly what you see: a white box
+        // sitting on the design with a hard edge. Key a FLAT border out on the way
+        // in so it lands as artwork, not as a box. Only when the border really is
+        // flat, so a photograph is never punched through, and only when the result
+        // is plausible — clearing under 4% means there was no background to remove,
+        // over 98.5% means nothing but background was there to begin with.
+        var keyed=null;
+        if(flatBorder(im)){
+          var k=keyOut(im,42,26);
+          if(k && k.cleared>.04 && k.cleared<.985) keyed=k.src;
+        }
+        var e=libAddTo(cat,file.name,{u:keyed||String(r.result), ar:ar});
+        if(keyed){ e.raw=String(r.result); e.keyed=1; }   // Alt-click a tile to put the box back
+        cb(true, keyed?'keyed':null);
       };
       im.onerror=function(){ cb(false,'unsupported format') };
       im.src=String(r.result);
