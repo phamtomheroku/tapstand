@@ -900,6 +900,13 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <button class="btn solid" id="printBtn" type="button">Card PDF · trim size</button>
                 <button class="btn solid" id="sheetPdfBtn" type="button">Sheet PDF · N-up</button>
               </div>
+              <div class="row2">
+                <button class="btn" id="copyImg" type="button"
+                  title="Copy as a PNG you can paste anywhere (⇧⌘C)">Copy image</button>
+                <button class="btn" id="saveImg" type="button"
+                  title="Download the same PNG">Save PNG</button>
+              </div>
+              <span class="libnote" id="copyNote"></span>
               <div class="row2" style="align-items:center">
                 <select id="sheetPaper" class="btn" title="paper size for the sheet PDF"
                   style="padding:8px 10px">
@@ -4806,12 +4813,141 @@ function redo(){ if(!REDO.length)return; UNDO.push(snap()); restore(REDO.pop());
 $('undoBtn').addEventListener('click',undo);
 $('redoBtn').addEventListener('click',redo);
 
+/* ============ 3b. copy the design as an image ============
+   A PDF is the thing you send a printer; a PNG on the clipboard is the thing you
+   paste into a message, an email, a listing or a browser to show somebody the
+   card. Built without a rasteriser library because this file stays self-contained:
+   the card is cloned, every computed style is inlined onto the clone (an external
+   stylesheet does not reach inside <foreignObject>), and the result is drawn to a
+   canvas through an SVG data URI. Every image the card uses is already a data URI,
+   so the canvas never taints and toBlob() works.
+
+   With layers selected it copies just those, cropped to their bounds plus a small
+   margin; with nothing selected it copies the whole card. */
+function cardPNG(scale,cb){
+  var r=card.getBoundingClientRect();
+  var W=Math.round(r.width), H=Math.round(r.height);
+  // crop to the selection when there is one — "copy the images selected"
+  var sel=(typeof selected==='function') ? selected() : [];
+  var box=null;
+  if(sel.length){
+    var L=1e9,T=1e9,R=-1e9,B=-1e9;
+    sel.forEach(function(o){
+      var n=card.querySelector('.lay[data-id="'+o.id+'"]'); if(!n) return;
+      var b=n.getBoundingClientRect();
+      L=Math.min(L,b.left); T=Math.min(T,b.top); R=Math.max(R,b.right); B=Math.max(B,b.bottom);
+    });
+    if(R>L&&B>T){
+      var pad=Math.round(Math.min(W,H)*.03);
+      box={x:Math.max(0,Math.round(L-r.left)-pad), y:Math.max(0,Math.round(T-r.top)-pad),
+           w:0, h:0};
+      box.w=Math.min(W-box.x, Math.round(R-L)+pad*2);
+      box.h=Math.min(H-box.y, Math.round(B-T)+pad*2);
+    }
+  }
+  function inlineStyles(src,dst){
+    var cs=getComputedStyle(src), out='';
+    for(var i=0;i<cs.length;i++){ var k=cs[i]; out+=k+':'+cs.getPropertyValue(k)+';' }
+    dst.setAttribute('style',out);
+    var a=src.children, c=dst.children;
+    for(var j=0;j<a.length && j<c.length;j++) inlineStyles(a[j],c[j]);
+  }
+  // editor-only furniture must not appear in the exported image
+  var hide=[];
+  card.querySelectorAll('.hnd,.guide,.grid,.ov,.disc,.disclab').forEach(function(n){
+    hide.push([n,n.style.display]); n.style.display='none';
+  });
+  // With a selection, isolate it: crop alone still catches whatever else sits in
+  // the crop rectangle, so copying one mark would drag in a slice of the line
+  // under it. Hiding the rest is what makes "copy what I selected" mean it.
+  if(box){
+    var keep={}; sel.forEach(function(o){ keep[o.id]=1 });
+    card.querySelectorAll('.lay').forEach(function(n){
+      if(keep[n.dataset.id]) return;
+      hide.push([n,n.style.display]); n.style.display='none';
+    });
+  }
+  var wasSel=card.querySelectorAll('.lay.sel');
+  wasSel.forEach(function(n){ n.classList.remove('sel') });
+
+  var clone=card.cloneNode(true);
+  inlineStyles(card,clone);
+
+  hide.forEach(function(h){ h[0].style.display=h[1] });
+  wasSel.forEach(function(n){ n.classList.add('sel') });
+
+  clone.style.margin='0'; clone.style.transform='none'; clone.style.boxShadow='none';
+  var html=new XMLSerializer().serializeToString(clone);
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
+    '<foreignObject width="100%" height="100%">'+
+    '<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+W+'px;height:'+H+'px">'+
+    html+'</div></foreignObject></svg>';
+
+  var im=new Image();
+  im.onload=function(){
+    var k=scale||3;                                  // ~300 dpi off a screen-size card
+    var ow=box?box.w:W, oh=box?box.h:H;
+    var c=document.createElement('canvas');
+    c.width=Math.round(ow*k); c.height=Math.round(oh*k);
+    var x=c.getContext('2d');
+    x.scale(k,k);
+    x.drawImage(im, box?-box.x:0, box?-box.y:0);
+    try{ c.toBlob(function(bl){ cb(bl,ow,oh) },'image/png'); }
+    catch(err){ cb(null,0,0,String(err&&err.message||err)) }
+  };
+  im.onerror=function(){ cb(null,0,0,'the card could not be rendered to an image') };
+  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function copyNote(msg,bad){
+  var n=$('copyNote'); if(!n) return;
+  n.textContent=msg||''; n.classList.toggle('bad',!!bad);
+  clearTimeout(copyNote._t);
+  if(msg && !bad) copyNote._t=setTimeout(function(){ n.textContent='' },4000);
+}
+function imgName(){
+  return (elName.value||'card').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+    +'-'+FORMATS[S.fmt].k.replace(/[^0-9a-z]+/gi,'')+'.png';
+}
+$('copyImg').addEventListener('click',function(){
+  copyNote('Rendering…');
+  var many=(typeof selected==='function'?selected():[]).length;
+  cardPNG(3,function(bl,w,h,err){
+    if(!bl){ copyNote(err||'Could not render the image.',true); return }
+    if(!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem)){
+      // older browser, or a context the clipboard API is not offered in
+      dlBlob(bl); copyNote('This browser will not write images to the clipboard — downloaded it instead.',true);
+      return;
+    }
+    var item={}; item[bl.type]=bl;
+    navigator.clipboard.write([new ClipboardItem(item)]).then(function(){
+      copyNote((many?many+' selected layer'+(many>1?'s':''):'Card')+
+               ' copied — '+Math.round(w*3)+' × '+Math.round(h*3)+' px. Paste anywhere.');
+    },function(e){
+      dlBlob(bl);
+      copyNote('Clipboard blocked ('+(e&&e.name||'denied')+') — downloaded the PNG instead.',true);
+    });
+  });
+});
+function dlBlob(bl){
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(bl); a.download=imgName(); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href) },1000);
+}
+$('saveImg').addEventListener('click',function(){
+  copyNote('Rendering…');
+  cardPNG(3,function(bl,w,h,err){
+    if(!bl){ copyNote(err||'Could not render the image.',true); return }
+    dlBlob(bl); copyNote('Saved '+Math.round(w*3)+' × '+Math.round(h*3)+' px PNG.');
+  });
+});
+
 /* ============ 4. keyboard ============ */
 document.addEventListener('keydown',function(e){
   var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
   var meta=e.metaKey||e.ctrlKey;
   if(meta && e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
   if(meta && e.key.toLowerCase()==='d'){ e.preventDefault(); dupLayer(); return; }
+  if(meta && e.shiftKey && e.key.toLowerCase()==='c'){ e.preventDefault(); $('copyImg').click(); return; }
   if(meta && e.key.toLowerCase()==='a'){          // everything you could move
     e.preventDefault();
     S.multi=S.stack.filter(function(L){ return !L.locked && !L.hidden }).map(function(L){ return L.id });
