@@ -4296,6 +4296,11 @@ fmtEl.addEventListener('click',function(e){
   S.fmt=+b.dataset.f; keepPlateInTrim(); S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
   Array.prototype.forEach.call(fmtEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
+  // Which compositions belong depends on the trim, so the row has to be rebuilt
+  // here too. keepPlateInTrim() above only corrects S.plate — without this the
+  // chips still list the other shape's compositions and picking one silently
+  // falls back, which is the exact failure plateFitsTrim() exists to prevent.
+  drawAxes();
   paint();
 });
 [elName,elCopy,elBrand,elBg].forEach(function(el){
