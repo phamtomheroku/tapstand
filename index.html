@@ -380,6 +380,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #card.f4878{aspect-ratio:48/78;width:min(300px,68vw)}
 #card.fcr80{aspect-ratio:85.6/54;width:min(430px,86vw)}
 #card.f57{aspect-ratio:127/178;width:min(360px,78vw)}
+#card.f43{aspect-ratio:102/76;width:min(430px,86vw)}
 #card.f783wrap{aspect-ratio:95.6/64;width:min(430px,86vw)}
 /* Wrap-template guides: dashed fold lines at the 5 mm flap boundary and short
    solid corner-snip lines pointing inward from each corner. Percentages resolve
@@ -1658,7 +1659,8 @@ var FORMATS=[
     fills the whole 95.6 x 64 bounding box -- the flaps carry the same background
     so the wrap reads continuous. Fold guides and corner-snip marks are added by
     the .f783wrap CSS below. */
- {k:"85.6 × 54 mm wrap",cls:"f783wrap",d:"wraps the credit-card tag — 5 mm flap all round to grip the back",mm:95.6,ar:0.6695,tag:3,face:{x:0.0523,y:0.0781,w:0.8954,h:0.8438}}
+ {k:"85.6 × 54 mm wrap",cls:"f783wrap",d:"wraps the credit-card tag — 5 mm flap all round to grip the back",mm:95.6,ar:0.6695,tag:3,face:{x:0.0523,y:0.0781,w:0.8954,h:0.8438}},
+ {k:"102 × 76 mm",cls:"f43",d:"4×3 in — counter stand, landscape",mm:102,ar:.7451}
 ];
 /* ---- the tags actually delivered (Seritag order x49745, 10 of each) ----------
    Two of these ARE the printed surface, so they get their own trim sizes and you
@@ -1903,7 +1905,7 @@ function draftPlate(fmt){
    template with the colours swapped. All tuned for the 4×6; drag from there. ---- */
 
 // 1. Brand wedge across the top, content stepping down out of it.
-function splitPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'pattern');
+function splitPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'pattern',f);
  return[
  {t:"box",k:"split", x:.5,y:.275,s:1.05,w:1},
  {t:"text",text:"TAP TO REVIEW",x:.5,y:.07,s:.6,fw:750,ls:.2,onBand:1},
@@ -1914,7 +1916,7 @@ function splitPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'pat
  {t:"box",k:"qr",    x:.5,y:.935,s:.42}]}
 
 // 2. Ticket stub — dashed tear line, the ring reads as the punch.
-function ticketPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fill');
+function ticketPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fill',f);
  return[
  {t:"box",k:"band",  x:.5,y:.075,s:.5,w:1},
  {t:"text",text:"ADMIT ONE REVIEW",x:.5,y:.062,s:.52,fw:750,ls:.24,onBand:1},
@@ -1927,7 +1929,7 @@ function ticketPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fi
  {t:"box",k:"qr",    x:.5,y:.915,s:.5}]}
 
 // 3. Full brand ground, tap knocked out of it. Loudest of the five.
-function discPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fill');
+function discPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fill',f);
  return[
  {t:"box",k:"fill",  x:.5,y:.5,s:1,w:1},
  {t:"box",k:"lockup",x:.5,y:.13,s:.9,onBand:1},
@@ -1938,7 +1940,7 @@ function discPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'fill
  {t:"box",k:"qr",    x:.5,y:.945,s:.34,onBand:1}]}
 
 // 4. Editorial — vertical rail, everything ranged left off it.
-function railPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'motif');
+function railPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'motif',f);
  return[
  {t:"box",k:"rail",  x:.085,y:.5,s:1},
  {t:"text",text:"REVIEWS",x:.085,y:.5,s:.62,fw:750,ls:.34,onBand:1,rot:1},
@@ -1950,7 +1952,7 @@ function railPlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'moti
  {t:"box",k:"qr",    x:.28,y:.925,s:.42,al:"left"}]}
 
 // 5. Oversized outline type behind the ring.
-function typePlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'pattern');
+function typePlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'pattern',f);
  return[
  {t:"text",text:"THANK\nYOU",x:.5,y:.375,s:4.2,fw:850,ls:-.03,lh:.86,stroke:.2},
  {t:"box",k:"name",  x:.5,y:.085,s:1},
@@ -1963,7 +1965,7 @@ function typePlate(f){ if(isWide(f)) return wideFor(DIRECTIONS[S.dir||0].g,'patt
    The plates all shared one shape: a centred vertical stack. These do not. Each
    is its own geometry — asymmetric, cropped, banded, rotated or radial — because
    composition, not typeface, is what makes two cards read as unrelated. ---- */
-function aFullbleed(f,g){ if(isWide(f)) return wideFor(g,'pattern');
+function aFullbleed(f,g){ if(isWide(f)) return wideFor(g,'pattern',f);
  if(isSq(f)) return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.85},
  {t:"box",k:"fill",   x:.5,y:.795,s:1,w:1,hf:.41},
@@ -1981,7 +1983,7 @@ function aFullbleed(f,g){ if(isWide(f)) return wideFor(g,'pattern');
  {t:"box",k:"tap",    x:.5,y:.955,s:1,w:1,style:"bar",cap:"TAP TO REVIEW",icon:""},
  {t:"box",k:"qr",     x:.86,y:.825,s:.38,onBand:1}]}
 
-function aSplit(f,g){ if(isWide(f)) return wideFor(g,'motif');
+function aSplit(f,g){ if(isWide(f)) return wideFor(g,'motif',f);
  if(isSq(f)) return[   // vertical split — the square's natural cut
  {t:"box",k:"fill",   x:.22,y:.5,s:1,w:.44,hf:1.1},
  {t:"box",k:"motif",  x:.22,y:.36,s:1.05,g:g.motif,onBand:1},
@@ -2001,7 +2003,7 @@ function aSplit(f,g){ if(isWide(f)) return wideFor(g,'motif');
  {t:"box",k:"tap",    x:.5,y:.82,s:1.05,style:"underline",cap:"TAP HERE",icon:""},
  {t:"box",k:"qr",     x:.5,y:.94,s:.42}]}
 
-function aRadial(f,g){ if(isWide(f)) return wideFor(g,'fill');
+function aRadial(f,g){ if(isWide(f)) return wideFor(g,'fill',f);
  if(isSq(f)) return[   // a square is the right shape for this
  {t:"box",k:"hero",   x:.5,y:.5,s:1.25,g:g.hero,op:.45},
  {t:"text",text:"TAP TO LEAVE A REVIEW",x:.5,y:.5,s:.46,fw:750,arc:190,arcR:78},
@@ -2020,7 +2022,7 @@ function aRadial(f,g){ if(isWide(f)) return wideFor(g,'fill');
  {t:"box",k:"head",   x:.5,y:.875,s:.8,w:.76},
  {t:"box",k:"qr",     x:.5,y:.955,s:.34}]}
 
-function aEdge(f,g){ if(isWide(f)) return wideFor(g,'motif');
+function aEdge(f,g){ if(isWide(f)) return wideFor(g,'motif',f);
  if(isSq(f)) return[
  {t:"box",k:"motif",  x:.90,y:.16,s:1.7,g:g.motif,op:.18},
  {t:"box",k:"logo",   x:.09,y:.475,s:.85,lw:42,lh:14,al:"left"},
@@ -2040,7 +2042,7 @@ function aEdge(f,g){ if(isWide(f)) return wideFor(g,'motif');
  {t:"box",k:"tap",    x:.09,y:.925,s:1,style:"bare",cap:"TAP",icon:"",al:"left"},
  {t:"box",k:"qr",     x:.88,y:.93,s:.36}]}
 
-function aGrid(f,g){ if(isWide(f)) return wideFor(g,'fill');
+function aGrid(f,g){ if(isWide(f)) return wideFor(g,'fill',f);
  if(isSq(f)) return[    // four true quadrants
  {t:"box",k:"logo",   x:.08,y:.10,s:.72,lw:34,lh:11,al:"left"},
  {t:"box",k:"name",   x:.08,y:.105,s:.78,al:"left"},
@@ -2064,7 +2066,7 @@ function aGrid(f,g){ if(isWide(f)) return wideFor(g,'fill');
  {t:"box",k:"qr",     x:.92,y:.70,s:.46,al:"right"},
  {t:"text",text:"TAP TO REVIEW · IT TAKES 20 SECONDS",x:.5,y:.93,s:.5,fw:700,ls:.14}]}
 
-function aBanded(f,g){ if(isWide(f)) return wideFor(g,'pattern');
+function aBanded(f,g){ if(isWide(f)) return wideFor(g,'pattern',f);
  if(isSq(f)) return[
  {t:"box",k:"fill",   x:.5,y:.115,s:1,w:1,hf:.23},
  {t:"box",k:"pattern",x:.5,y:.5,s:.9,w:1,hf:1.2,g:g.pat,op:.26},
@@ -2086,7 +2088,7 @@ function aBanded(f,g){ if(isWide(f)) return wideFor(g,'pattern');
  {t:"box",k:"tap",    x:.5,y:.70,s:1.1,cap:"TAP HERE",icon:"",onBand:1},
  {t:"box",k:"qr",     x:.5,y:.92,s:.44}]}
 
-function aDiagonal(f,g){ if(isWide(f)) return wideFor(g,'pattern');
+function aDiagonal(f,g){ if(isWide(f)) return wideFor(g,'pattern',f);
  if(isSq(f)) return[
  {t:"box",k:"pattern",x:.5,y:.5,s:1,w:1,hf:1.2,g:g.pat,op:.5},
  {t:"box",k:"logo",   x:.46,y:.185,s:.8,lw:40,lh:13,rotd:-7},
@@ -2106,7 +2108,7 @@ function aDiagonal(f,g){ if(isWide(f)) return wideFor(g,'pattern');
  {t:"box",k:"tap",    x:.44,y:.70,s:1.15,cap:"TAP HERE",icon:"",rotd:-7},
  {t:"box",k:"qr",     x:.5,y:.93,s:.42,rotd:-7}]}
 
-function aDepth(f,g){ if(isWide(f)) return wideFor(g,'motif');
+function aDepth(f,g){ if(isWide(f)) return wideFor(g,'motif',f);
  if(isSq(f)) return[
  {t:"box",k:"fill",   x:.57,y:.40,s:1,w:.74,hf:.30,op:.25},
  {t:"box",k:"fill",   x:.43,y:.355,s:1,w:.74,hf:.30},
@@ -2147,13 +2149,22 @@ function keepPlateInTrim(){
   for(var i=0;i<PLATES.length;i++) if(plateFitsTrim(i)){ S.plate=i; return }
 }
 function isSq(f){var F=FORMATS[f];return F&&F.ar>=.85&&F.ar<1.2}
-function wideFor(g,kind){
+function wideFor(g,kind,f){
+  // These scales are tuned for a card held in the hand — an 85.6 mm CR80 or a
+  // 89 mm tap card, read at arm's length. A 4×3 counter insert is the same
+  // landscape shape but is read from across a counter, so the same cqw value
+  // renders type that is physically bigger yet still reads as too small for
+  // the distance. Large wide formats get a type bump and a tighter vertical
+  // rhythm so the column fills the card instead of drifting apart in it.
+  var big = FORMATS[f] && FORMATS[f].mm >= 95;
+  var k   = big ? 1.55 : 1;                       // type scale multiplier
+  var ys  = big ? [.28,.50,.70] : [.31,.55,.76];  // name / stars / head
   var L=[
-   {t:"box",k:"logo", x:.055,y:.30,s:.62,lw:30,lh:10,al:"left"},
-   {t:"box",k:"name", x:.055,y:.31,s:.6,w:.44,al:"left"},
-   {t:"box",k:"stars",x:.055,y:.55,s:.44,al:"left"},
-   {t:"box",k:"head", x:.055,y:.76,s:.44,w:.44,al:"left"},
-   {t:"box",k:"tap",  x:.70,y:.5,s:.72,cap:"TAP",icon:""},
+   {t:"box",k:"logo", x:.055,y:ys[0]-.01,s:.62*k,lw:30,lh:10,al:"left"},
+   {t:"box",k:"name", x:.055,y:ys[0],s:.6*k, w:(big?.48:.44),al:"left"},
+   {t:"box",k:"stars",x:.055,y:ys[1],s:.44*k,al:"left"},
+   {t:"box",k:"head", x:.055,y:ys[2],s:.44*k,w:(big?.48:.44),al:"left"},
+   {t:"box",k:"tap",  x:.72,y:.5,s:(big?.92:.72),cap:"TAP",icon:""},
    {t:"box",k:"qr",   x:.895,y:.5,s:.34}];
   if(kind==='fill')    L.unshift({t:"box",k:"fill",   x:.5,y:.5,s:1,w:1,hf:1.1,op:.14});
   if(kind==='pattern') L.unshift({t:"box",k:"pattern",x:.5,y:.5,s:.7,w:1,hf:1.1,g:g.pat,op:.22});
@@ -2615,6 +2626,15 @@ function defaults(fmt){
    {t:"box",k:"head", x:.5,y:.455,s:.84,w:.80},
    {t:"box",k:"qr",   x:.5,y:.865,s:.72},
    {t:"box",k:"tap",  x:.5,y:.655,s:.80}];
+  if(isWide(fmt)) return [               // 4×3 and any other landscape stand insert:
+   // name block left, tap ring right — the reading order a counter card gets
+   // approached in, and it keeps the ring clear of the type at every scale
+   {t:"box",k:"logo", x:.32,y:.24,s:.92,lw:38,lh:13},
+   {t:"box",k:"name", x:.34,y:.30,s:1,  w:.50},
+   {t:"box",k:"stars",x:.34,y:.49,s:.92},
+   {t:"box",k:"head", x:.34,y:.67,s:.86,w:.50},
+   {t:"box",k:"qr",   x:.78,y:.84,s:.52},
+   {t:"box",k:"tap",  x:.77,y:.46,s:1}];
   return [                                                // 4×6 / 3×5 portrait
    {t:"box",k:"logo", x:.5,y:.125,s:1},
    {t:"box",k:"name", x:.5,y:.235,s:1},
