@@ -1,28 +1,31 @@
 {
   "tap": [
     {
-      "file": "hand-phone.svg",
-      "name": "Hand holding phone",
-      "src": "Tap Stand",
-      "lic": "own"
-    },
-    {
       "file": "contactless-hand.png",
       "name": "Contactless hand",
       "src": "Yours",
       "lic": "licensed by you"
     },
     {
+      "file": "hand-phone.svg",
+      "name": "Hand holding phone",
+      "src": "Tap Stand",
+      "lic": "own",
+      "sw": 4.5
+    },
+    {
       "file": "phone-waves.svg",
       "name": "Phone and waves",
       "src": "Tap Stand",
-      "lic": "own"
+      "lic": "own",
+      "sw": 4.5
     },
     {
       "file": "waves.svg",
       "name": "Contactless waves",
       "src": "Tap Stand",
-      "lic": "own"
+      "lic": "own",
+      "sw": 5
     },
     {
       "file": "contactless.svg",
@@ -90,7 +93,7 @@
       "file": "review-us-google.png",
       "name": "Review us on Google",
       "src": "Yours",
-      "lic": "trademark — see README",
+      "lic": "trademark \u2014 see README",
       "asis": true
     }
   ],
