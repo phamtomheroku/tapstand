@@ -2149,8 +2149,11 @@ function plateFitsTrimAt(i,fmt){
   // untagged means it was drawn for an upright card — which is all of them until
   // the wide set below. Offering both everywhere is what left the credit card with
   // 28 names for four arrangements.
-  var wide=(PLATES[i]&&PLATES[i][2])==='wide';
-  return wide===!!isWide(fmt);
+  var tag=(PLATES[i]&&PLATES[i][2]);
+  // A wordless, centred composition has no long axis to respect, so it is right
+  // on both shapes and excluding it from one of them would be arbitrary.
+  if(tag==='any') return true;
+  return (tag==='wide')===!!isWide(fmt);
 }
 function plateFitsTrim(i){ return plateFitsTrimAt(i,S.fmt) }
 /* Changing trim can strand you on a composition drawn for the other shape, which
@@ -2583,7 +2586,47 @@ function wCrossbar(f,g){ if(!isWide(f)) return aFullbleed(f,g);
  {t:"text",x:0.07,y:0.875,s:.45,al:"left",text:"THANK YOU",fw:750,ls:.24},
  {t:"box",k:"stars",x:0.93,y:0.875,s:.55,al:"right"}]}
 
-var ARCHETYPES=[["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
+/* ---- the generic set: brand, no name ---------------------------------------
+   A card that carries the brand's colour, type and mark but never the business's
+   name, and says as little as possible. Two reasons it earns a place beside the
+   named compositions. A shop that does not want its name on a counter card can
+   still have a card that looks like theirs. And a card with no name on it can be
+   printed BEFORE you know whose it is — the destination lives on the tag, which
+   is programmed per business, so a run of these is stock rather than a job, which
+   is the thing that actually makes same-day possible.
+
+   All five are centred and wordless or nearly so, so they hold on an upright 4x6
+   and a landscape credit card alike — hence the 'any' tag rather than a wide and
+   an upright copy of each. Y positions sit on the same 16-row grid as everything
+   else. */
+function gMark(f){                       // the mark, and nothing whatsoever else
+ return[{t:"box",k:"tap",x:.5,y:.5,s:isWide(f)?1.9:1.7,cap:"",lay:"mark"}]}
+
+function gMarkWord(f){                   // the mark and the two words it needs
+ return[{t:"box",k:"tap",x:.5,y:.5,s:isWide(f)?1.35:1.25,cap:"TAP TO REVIEW"}]}
+
+function gStars(f){                      // five stars and the mark: no words at all
+ return[
+ {t:"box",k:"stars",x:.5,y:0.3125,s:isWide(f)?1.1:1.15},
+ {t:"box",k:"tap",  x:.5,y:0.625, s:isWide(f)?1.25:1.15,cap:"",lay:"mark"}]}
+
+function gField(f){                      // the brand colour IS the card
+ return[
+ {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
+ // one grid row up from where these started: with the platform mark at .8125 the
+ // block sat low, leaving twice as much clear above it as below on every trim
+ {t:"box",k:"tap", x:.5,y:0.375,s:isWide(f)?1.5:1.4,onBand:1,cap:"",lay:"mark"},
+ {t:"box",k:"plat",x:.5,y:0.75,s:1,onBand:1,word:"Google",ph:7}]}
+
+function gRule(f){                       // restrained: mark, hairline, platform
+ return[
+ {t:"box",k:"tap", x:.5,y:0.375, s:isWide(f)?1.15:1.05,cap:"",lay:"mark"},
+ {t:"box",k:"rule",x:.5,y:0.5625,w:.34},
+ {t:"box",k:"plat",x:.5,y:0.6875,s:1,word:"Google",ph:7}]}
+
+var ARCHETYPES=[["Mark only",gMark,"any"],["Mark & words",gMarkWord,"any"],
+ ["Stars & mark",gStars,"any"],["Brand field",gField,"any"],["Hairline",gRule,"any"],
+ ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
  ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail]];
