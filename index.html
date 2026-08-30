@@ -339,6 +339,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .dstar:hover{color:var(--accent)}
 .dempty{grid-column:1/-1;background:var(--panel);padding:26px 14px;text-align:center;
   font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;color:var(--ink-3);line-height:1.8}
+.libnote.bad{color:var(--accent);font-weight:600}
 .dockfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 10px;
   border-top:1px solid var(--rule-2)}
 .dockfoot .btn{flex:none;margin:0}
@@ -5280,28 +5281,59 @@ $('dockToggle').addEventListener('click',function(){
 $('dockFile').addEventListener('change',function(e){
   var files=[].slice.call(e.target.files||[]); e.target.value='';
   if(!files.length) return;
-  var left=files.length;
-  files.forEach(function(f){ dockIngest(f,function(){ if(!--left){ dockDraw(); paint(); } }) });
+  var left=files.length, added=0, bad=[];
+  files.forEach(function(f){ dockIngest(f,function(ok,why){
+    if(ok) added++; else bad.push(f.name+(why?' ('+why+')':''));
+    if(!--left){ dockDraw(); paint(); dockReport(added,bad); }
+  }) });
 });
+/* A file the browser cannot decode used to be added anyway, which is how a tile
+   ends up in the library showing nothing: the count goes up, the tile is there,
+   and the artwork is the broken-image glyph. iPhone HEIC is the usual culprit —
+   the file picker accepts it under image/* and Chrome then refuses to decode it —
+   but a truncated download or a renamed non-image does the same. Nothing enters
+   the set now unless it actually decoded, and anything rejected is named. */
+function dockReport(added,bad){
+  var n=$('dockNote'); if(!n) return;
+  if(!bad.length){
+    n.textContent = added ? (added+' added.') : '';
+    n.classList.remove('bad');
+  }else{
+    n.textContent = (added?added+' added. ':'')+
+      "Couldn't read "+bad.join(', ')+
+      ' — the browser could not decode it. HEIC from an iPhone is the usual '+
+      'cause; re-save as PNG, JPEG or SVG.';
+    n.classList.add('bad');
+  }
+  clearTimeout(dockReport._t);
+  if(!bad.length && added) dockReport._t=setTimeout(function(){ n.textContent=''; },4000);
+}
 function dockIngest(file,cb){
-  if(!file || file.type.indexOf('image')!==0) return cb();
+  if(!file || file.type.indexOf('image')!==0) return cb(false,'not an image');
   var cat = /logo|wordmark|brand/i.test(file.name) ? 'logo'
           : (libUser[dockFolder] ? dockFolder : 'image');
   var r=new FileReader();
+  r.onerror=function(){ cb(false,'unreadable') };
   if(/svg/.test(file.type)){
     r.onload=function(){
       var txt=String(r.result), v=libParseSVG(txt);
+      if(!v && !/<svg[\s>]/i.test(txt)) return cb(false,'not valid SVG');
       libAddTo(cat,file.name, v || {u:'data:image/svg+xml;base64,'+
         btoa(unescape(encodeURIComponent(txt)))});
-      cb();
+      cb(true);
     };
     r.readAsText(file);
   }else{
     r.onload=function(){
       var im=new Image();
-      im.onload=function(){ libAddTo(cat,file.name,{u:String(r.result),
-        ar:+(im.naturalWidth/im.naturalHeight).toFixed(3)}); cb() };
-      im.onerror=function(){ libAddTo(cat,file.name,{u:String(r.result)}); cb() };
+      // decode must succeed AND produce real pixels before it joins the set
+      im.onload=function(){
+        if(!im.naturalWidth || !im.naturalHeight) return cb(false,'zero size');
+        libAddTo(cat,file.name,{u:String(r.result),
+          ar:+(im.naturalWidth/im.naturalHeight).toFixed(3)});
+        cb(true);
+      };
+      im.onerror=function(){ cb(false,'unsupported format') };
       im.src=String(r.result);
     };
     r.readAsDataURL(file);
