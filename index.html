@@ -5969,14 +5969,15 @@ function buildSheet(q){
   sheet.style.cssText='position:relative;width:'+pw+'mm;height:'+ph+'mm;'+
     'background:#fff;box-sizing:border-box;overflow:hidden';
 
-  var vars=['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'];
+  var vars=['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body','--rad'];
   /* One snapshot per design. A saved card is painted into the live editor, read
      off the DOM, and the editor is put back exactly as it was — the renderer
      stays the single source of truth for what a card looks like, rather than
      there being a second one that only runs at print time. */
   function snap(){
     var o={html:card.innerHTML, cls:card.className,
-           bg:card.style.background, fg:card.style.color, v:{}};
+           bg:card.style.background, fg:card.style.color,
+           rad:card.style.borderRadius, v:{}};
     vars.forEach(function(v){ o.v[v]=card.style.getPropertyValue(v) });
     return o;
   }
@@ -6004,7 +6005,8 @@ function buildSheet(q){
     t.className='tile '+sh.cls;
     t.style.cssText='container-type:inline-size;position:absolute;overflow:hidden;'+
       'left:'+p.x+'mm;top:'+p.y+'mm;width:'+p.w+'mm;height:'+p.h+'mm;'+
-      'background:'+sh.bg+';color:'+sh.fg;
+      'background:'+sh.bg+';color:var(--b-fg);font-family:var(--f-body,inherit)'+
+      (sh.rad?';border-radius:'+sh.rad:'');
     vars.forEach(function(v){ t.style.setProperty(v,sh.v[v]) });
     t.innerHTML=sh.html;
     sheet.appendChild(t);
