@@ -1858,7 +1858,15 @@ var FONTS={
  slab:"Rockwell,'Roboto Slab','Bitstream Charter',Charter,Georgia,'DejaVu Serif',serif",
  mono:"ui-monospace,SFMono-Regular,Menlo,Consolas,'DejaVu Sans Mono',monospace",
  condensed:"'Helvetica Neue Condensed','Arial Narrow','Roboto Condensed','Liberation Sans Narrow','DejaVu Sans Condensed',sans-serif",
- rounded:"'SF Pro Rounded','Varela Round','Trebuchet MS','DejaVu Sans',sans-serif"
+ rounded:"'SF Pro Rounded','Varela Round','Trebuchet MS','DejaVu Sans',sans-serif",
+ /* The face people read Google in. Google Sans / Product Sans is proprietary and
+    cannot be shipped, so this leads with Roboto — Google's own open typeface,
+    Apache 2.0, the system font on Android and what Google products were set in
+    for a decade, which is the thing a customer's eye actually recognises. Where
+    Roboto is absent it lands on the nearest neutral grotesque rather than on
+    something with personality, so the card still reads as the same design.
+    If you have Google Sans licensed, drop the file into Custom type and pick it. */
+ google:"Roboto,'Roboto Flex','Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif"
 };
 var THEMES=[
  {k:"Clean",      disp:"grotesque",body:"grotesque",frame:"solid",   star:"solid",  ring:"circle",tex:"none",   rad:0, up:1,tr:.02},
@@ -1868,7 +1876,12 @@ var THEMES=[
  {k:"Industrial", disp:"condensed",body:"grotesque",frame:"brackets",star:"pill",   ring:"square",tex:"stripes",rad:0, up:1,tr:.07},
  {k:"Soft",       disp:"rounded",  body:"rounded",  frame:"inset",   star:"solid",  ring:"circle",tex:"dots",   rad:5,up:0,tr:0},
  {k:"Press",      disp:"slab",     body:"serif",    frame:"solid",   star:"outline",ring:"hex",   tex:"grain",  rad:0, up:1,tr:.09},
- {k:"Minimal",    disp:"grotesque",body:"grotesque",frame:"none",    star:"none",   ring:"none",  tex:"none",   rad:0, up:0,tr:0}
+ {k:"Minimal",    disp:"grotesque",body:"grotesque",frame:"none",    star:"none",   ring:"none",  tex:"none",   rad:0, up:0,tr:0},
+ /* Set the way Google sets things: Roboto throughout, sentence case rather than
+    caps, tracking left alone, a plain hairline and a round mark. Pairs with the
+    'review us on Google' lockup so the card and the badge read as one system
+    instead of the badge looking pasted on. */
+ {k:"Google",     disp:"google",   body:"google",   frame:"hairline",star:"solid",  ring:"circle",tex:"none",   rad:1.5,up:0,tr:0}
 ];
 function TH(){ return THEMES[S.theme||0] }
 
@@ -2666,8 +2679,26 @@ function gPlaque(f){                     // asymmetric: the courtesy left, mark 
  {t:"box",k:"tap", x:w?.76:.5,y:w?0.4375:0.5625,s:gMarkS(f,w?1:.95,1),cap:"TAP TO REVIEW"},
  {t:"box",k:"plat",x:.07,y:0.8125,s:.6,al:"left",word:"Google",ph:21}]}
 
+function gEndorsed(f){                   // built around the lockup, not under it
+ /* The other four hang the platform badge off the bottom edge. This one makes it
+    the anchor and lets the mark answer it across a divider: tap on one side, the
+    thing you are tapping toward on the other, the courtesy over both. It is the
+    arrangement the badge was drawn for — a card that says review us on Google
+    rather than a card with a Google sticker at the foot. */
+ var w=isWide(f);
+ return[
+ // a rule is drawn as a full-width top border, so a vertical one is that rule
+ // rotated — and its LENGTH is its width. At w:.02 it came out as a dot rather
+ // than a divider.
+ {t:"box",k:"head",x:.5,y:0.1875,s:w?.66:.72,w:.8},
+ // the row sits two rows lower than centre on a wide trim: the courtesy above it
+ // is a single line, so centring the row left a third of the card clear beneath
+ {t:"box",k:"tap", x:w?.30:.5, y:w?0.6875:0.4375,s:gMarkS(f,w?.8:.95,1),cap:"TAP TO REVIEW"},
+ {t:"box",k:"rule",x:.5,       y:w?0.6875:0.625, w:w?.17:.24, rot:w?1:0, op:.45},
+ {t:"box",k:"plat",x:w?.72:.5, y:w?0.6875:0.8125,s:.6,word:"Google",ph:w?21:20}]}
+
 var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
- ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],
+ ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
