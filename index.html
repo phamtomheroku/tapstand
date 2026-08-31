@@ -2599,33 +2599,78 @@ function wCrossbar(f,g){ if(!isWide(f)) return aFullbleed(f,g);
    and a landscape credit card alike — hence the 'any' tag rather than a wide and
    an upright copy of each. Y positions sit on the same 16-row grid as everything
    else. */
-function gMark(f){                       // the mark, and nothing whatsoever else
- return[{t:"box",k:"tap",x:.5,y:.5,s:isWide(f)?1.9:1.7,cap:"",lay:"mark"}]}
+/* Typographic scale shared by the generic set, so the five read as one family:
+   an eyebrow is small, heavy and widely tracked; the instruction is the loudest
+   thing on the card; micro copy is quiet, lightly tracked and sentence case. The
+   earlier version of this set was a mark and one word in a large frame, which
+   reads as unfinished rather than restrained — detail is what separates minimal
+   from empty. Every y sits on the same 16-row grid as the rest of the editor. */
+var GT={
+  eyebrow:{fw:800, ls:.26},        // BEFORE YOU GO
+  lead:   {fw:820, ls:.18},        // TAP TO REVIEW
+  micro:  {fw:500, ls:.04}         // no app needed — hold your phone here
+};
+function gT(kind,f,mul){ var g=GT[kind]; return {fw:g.fw, ls:g.ls, s:(isWide(f)?1:.95)*mul}; }
+/* A mark is sized in cqw — percent of card WIDTH — so on a short trim it eats far
+   more of the card's height than the same number does on a tall one. At s 1.4 the
+   mark is a quarter of a 4x3 but over a third of an 89 x 51 business card, which
+   is what pushed it into the rule beneath it. Cap the height at 30% of the card
+   and the same scale behaves on every shape. */
+function gMarkS(f,s){
+  var ch=100*((FORMATS[f]&&FORMATS[f].ar)||1.5);
+  return Math.min(s, ch*.30/15);
+}
 
-function gMarkWord(f){                   // the mark and the two words it needs
- return[{t:"box",k:"tap",x:.5,y:.5,s:isWide(f)?1.35:1.25,cap:"TAP TO REVIEW"}]}
-
-function gStars(f){                      // five stars and the mark: no words at all
+function gQuiet(f){                      // eyebrow, mark, hairline, platform
+ var t=gT('eyebrow',f,.55);
  return[
- {t:"box",k:"stars",x:.5,y:0.3125,s:isWide(f)?1.1:1.15},
- {t:"box",k:"tap",  x:.5,y:0.625, s:isWide(f)?1.25:1.15,cap:"",lay:"mark"}]}
+ {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
+ {t:"box",k:"tap", x:.5,y:0.4375,s:gMarkS(f,isWide(f)?1.55:1.4),cap:"",lay:"mark"},
+ {t:"box",k:"rule",x:.5,y:0.6875,w:.16},
+ {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:7}]}
 
-function gField(f){                      // the brand colour IS the card
+function gInstruction(f){                // the mark, then what to do, then the caveat
+ var l=gT('lead',f,.92), m=gT('micro',f,.46);
+ return[
+ {t:"box",k:"tap", x:.5,y:0.3125,s:gMarkS(f,isWide(f)?1.2:1.15),cap:"",lay:"mark"},
+ {t:"text",x:.5,y:0.5625,s:l.s,fw:l.fw,ls:l.ls,text:"TAP TO REVIEW"},
+ {t:"text",x:.5,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,w:.72,lh:1.35,nocaps:1,
+  text:"No app needed — hold your phone to the mark"},
+ {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:6.5}]}
+
+function gRated(f){                      // eyebrow, stars, mark, platform
+ var t=gT('eyebrow',f,.52);
+ return[
+ {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"YOUR REVIEW MATTERS"},
+ {t:"box",k:"stars",x:.5,y:0.3125,s:isWide(f)?.95:1},
+ {t:"box",k:"tap",  x:.5,y:0.5625,s:gMarkS(f,isWide(f)?1.2:1.1),cap:"",lay:"mark"},
+ {t:"box",k:"plat", x:.5,y:0.8125,s:.6,word:"Google",ph:6.5}]}
+
+function gField(f){                      // the brand colour is the card
+ var t=gT('eyebrow',f,.52);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
- // one grid row up from where these started: with the platform mark at .8125 the
- // block sat low, leaving twice as much clear above it as below on every trim
- {t:"box",k:"tap", x:.5,y:0.375,s:isWide(f)?1.5:1.4,onBand:1,cap:"",lay:"mark"},
- {t:"box",k:"plat",x:.5,y:0.75,s:1,onBand:1,word:"Google",ph:7}]}
+ {t:"text",x:.5,y:0.1875,s:t.s,fw:t.fw,ls:t.ls,onBand:1,text:"ONE TAP"},
+ {t:"box",k:"tap", x:.5,y:0.4375,s:gMarkS(f,isWide(f)?1.4:1.3),onBand:1,cap:"",lay:"mark"},
+ {t:"box",k:"rule",x:.5,y:0.625,w:.14,onBand:1},
+ {t:"box",k:"plat",x:.5,y:0.75,s:.6,onBand:1,word:"Google",ph:7}]}
 
-function gRule(f){                       // restrained: mark, hairline, platform
+function gPlaque(f){                     // asymmetric: type left, mark right
+ var w=isWide(f), t=gT('eyebrow',f,.5), l=gT('lead',f,.8), m=gT('micro',f,.44);
  return[
- {t:"box",k:"tap", x:.5,y:0.375, s:isWide(f)?1.15:1.05,cap:"",lay:"mark"},
- {t:"box",k:"rule",x:.5,y:0.5625,w:.34},
- {t:"box",k:"plat",x:.5,y:0.6875,s:1,word:"Google",ph:7}]}
+ // one row up from where this started: the platform sat at .875 and left only 5%
+ // clear at the foot against 17% at the head, which reads as sliding off the card
+ {t:"text",x:.07,y:0.125, s:t.s,fw:t.fw,ls:t.ls,al:"left",text:"TELL US HOW WE DID"},
+ {t:"box",k:"rule",x:.07,y:0.1875,w:.26,al:"left"},
+ {t:"text",x:.07,y:0.375,s:l.s,fw:l.fw,ls:l.ls,al:"left",w:.44,lh:1.2,
+  text:"TAP TO\nREVIEW"},
+ {t:"box",k:"tap", x:w?.76:.5,y:w?0.4375:0.625,s:w?1.25:1.15,cap:"",lay:"mark"},
+ {t:"text",x:.07,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,al:"left",w:.44,nocaps:1,
+  text:"Takes about 20 seconds"},
+ {t:"box",k:"plat",x:.07,y:0.8125,s:.6,al:"left",word:"Google",ph:6.5}]}
 
-var ARCHETYPES=[["Mark only",gMark,"any"],["Mark & words",gMarkWord,"any"],
- ["Stars & mark",gStars,"any"],["Brand field",gField,"any"],["Hairline",gRule,"any"],
+var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
+ ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
@@ -3425,7 +3470,10 @@ function layerCSS(L,M,ctx,th,brand,i){
   if(L.starCol) css+='--b-star:'+L.starCol+';';
   if(L.t==='text' || L.k==='name' || L.k==='lockup'){
     css+='font-family:'+((L.fontFamily && fontStack(L.fontFamily)) || 'var(--f-disp)')+';';
-    if(th.up) css+='text-transform:uppercase;';
+    // A theme that sets everything in caps is right for a headline and wrong for a
+    // supporting line — an eyebrow in caps above micro copy in sentence case is the
+    // contrast that reads as typeset rather than shouted. nocaps opts a layer out.
+    if(th.up && !L.nocaps) css+='text-transform:uppercase;';
     if(th.tr) css+='letter-spacing:'+th.tr+'em;';
   }
   if(L.op!=null) css+='opacity:'+L.op+';';
