@@ -6047,6 +6047,12 @@ function buildSheet(q){
       'body.sheetprinting{font-size:0!important;line-height:0!important}'+
       'body.sheetprinting>*{display:none!important}'+
       'body.sheetprinting>#sheetPrint{display:block!important;position:relative!important;'+
+        /* font-size and line-height INHERIT, and the rule above zeroes both on
+           body to stop stray whitespace nodes offsetting the sheet. Left alone
+           they cascade into every card and collapse each text layer's lines onto
+           each other — a two-line 'TAP TO REVIEW' prints as one jumbled line.
+           Put the editor's own inherited context back at the sheet root. */
+        'font-size:medium!important;line-height:1.6!important;'+
         'width:'+pw+'mm!important;height:'+ph+'mm!important;margin:0!important;'+
         /* the preview parks the sheet with a fixed offset and a scale; print has
            to see it at true size, at the origin, with no drop shadow */
