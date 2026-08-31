@@ -2616,53 +2616,55 @@ function gT(kind,f,mul){ var g=GT[kind]; return {fw:g.fw, ls:g.ls, s:(isWide(f)?
    mark is a quarter of a 4x3 but over a third of an 89 x 51 business card, which
    is what pushed it into the rule beneath it. Cap the height at 30% of the card
    and the same scale behaves on every shape. */
-function gMarkS(f,s){
+function gMarkS(f,s,withCap){
   var ch=100*((FORMATS[f]&&FORMATS[f].ar)||1.5);
-  return Math.min(s, ch*.30/15);
+  // A captioned mark is not 15 units tall, it is the mark plus the gap plus the
+  // words — about 20.3. Measuring only the mark left the block overshooting the
+  // head of a short card, 2% clear on an 85.6 x 54 against 12% at the foot.
+  return Math.min(s, ch*.30/(withCap?20.3:15));
 }
 
-function gQuiet(f){                      // nothing raised: mark, a courtesy, a rule
+function gQuiet(f){                      // mark and its words, a courtesy, a rule
  var w=isWide(f);
  return[
- {t:"box",k:"tap", x:.5,y:0.25,  s:gMarkS(f,w?1.4:1.3),cap:"",lay:"mark"},
- {t:"box",k:"head",x:.5,y:0.5,   s:w?.82:.86,w:.76},
- {t:"box",k:"rule",x:.5,y:0.6875,w:.14},
- {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:7}]}
+ {t:"box",k:"tap", x:.5,y:0.25,  s:gMarkS(f,w?1.15:1.1,1),cap:"TAP TO REVIEW"},
+ {t:"box",k:"head",x:.5,y:0.5,   s:w?.78:.82,w:.76},
+ {t:"box",k:"rule",x:.5,y:0.625, w:.14},
+ {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:21}]}
 
-function gInstruction(f){                // what to do, then the courtesy under it
- var w=isWide(f), l=gT('lead',f,.8);
+function gInstruction(f){                // the mark says it; the courtesy softens it
+ var w=isWide(f), m=gT('micro',f,.44);
  return[
- {t:"box",k:"tap", x:.5,y:0.25,   s:gMarkS(f,w?1.2:1.15),cap:"",lay:"mark"},
- {t:"text",x:.5,y:0.4375,s:l.s,fw:l.fw,ls:l.ls,text:"TAP TO REVIEW"},
- {t:"box",k:"head",x:.5,y:0.5625, s:w?.72:.76,w:.76},
- {t:"box",k:"plat",x:.5,y:0.8125, s:.6,word:"Google",ph:6.5}]}
+ {t:"box",k:"tap", x:.5,y:0.25,   s:gMarkS(f,w?1.3:1.25,1),cap:"TAP TO REVIEW"},
+ {t:"box",k:"head",x:.5,y:0.5,    s:w?.72:.76,w:.76},
+ {t:"text",x:.5,y:0.625,s:m.s,fw:m.fw,ls:m.ls,w:.72,nocaps:1,
+  text:"No app needed"},
+ {t:"box",k:"plat",x:.5,y:0.8125, s:.6,word:"Google",ph:21}]}
 
-function gRated(f){                      // stars, the courtesy, the mark
+function gRated(f){                      // stars, the courtesy, then the mark
  var w=isWide(f);
  return[
- {t:"box",k:"stars",x:.5,y:0.1875,s:w?.9:.95},
- {t:"box",k:"head", x:.5,y:0.375, s:w?.76:.8,w:.76},
- {t:"box",k:"tap",  x:.5,y:0.625, s:gMarkS(f,w?1.15:1.1),cap:"",lay:"mark"},
- {t:"box",k:"plat", x:.5,y:0.8125,s:.6,word:"Google",ph:6.5}]}
+ {t:"box",k:"stars",x:.5,y:0.125, s:w?.85:.9},
+ {t:"box",k:"head", x:.5,y:0.3125,s:w?.72:.76,w:.76},
+ {t:"box",k:"tap",  x:.5,y:0.5625,s:gMarkS(f,w?1.05:1,1),cap:"TAP TO REVIEW"},
+ {t:"box",k:"plat", x:.5,y:0.8125,s:.6,word:"Google",ph:21}]}
 
 function gField(f){                      // the brand colour is the card
  var w=isWide(f);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
- {t:"box",k:"head",x:.5,y:0.25,  s:w?.78:.82,w:.74,onBand:1},
- {t:"box",k:"tap", x:.5,y:0.5,   s:gMarkS(f,w?1.3:1.2),onBand:1,cap:"",lay:"mark"},
- {t:"box",k:"plat",x:.5,y:0.75,  s:.6,onBand:1,word:"Google",ph:7}]}
+ {t:"box",k:"head",x:.5,y:0.1875,s:w?.74:.78,w:.74,onBand:1},
+ {t:"box",k:"tap", x:.5,y:0.4375,s:gMarkS(f,w?1.15:1.1,1),onBand:1,cap:"TAP TO REVIEW"},
+ {t:"box",k:"plat",x:.5,y:0.75,  s:.6,onBand:1,word:"Google",ph:21}]}
 
 function gPlaque(f){                     // asymmetric: the courtesy left, mark right
- var w=isWide(f), t=gT('eyebrow',f,.5), m=gT('micro',f,.44);
+ var w=isWide(f), t=gT('eyebrow',f,.5);
  return[
  {t:"text",x:.07,y:0.125, s:t.s,fw:t.fw,ls:t.ls,al:"left",text:"BEFORE YOU GO"},
  {t:"box",k:"rule",x:.07,y:0.1875,w:.26,al:"left"},
- {t:"box",k:"head",x:.07,y:w?0.4375:0.375,s:w?.74:.78,w:w?.46:.7,al:"left"},
- {t:"box",k:"tap", x:w?.78:.5,y:w?0.4375:0.625,s:gMarkS(f,w?1.15:1.1),cap:"",lay:"mark"},
- {t:"text",x:.07,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,al:"left",w:.5,nocaps:1,
-  text:"Takes about 20 seconds"},
- {t:"box",k:"plat",x:.07,y:0.8125,s:.6,al:"left",word:"Google",ph:6.5}]}
+ {t:"box",k:"head",x:.07,y:w?0.4375:0.3125,s:w?.7:.76,w:w?.44:.7,al:"left"},
+ {t:"box",k:"tap", x:w?.76:.5,y:w?0.4375:0.5625,s:gMarkS(f,w?1:.95,1),cap:"TAP TO REVIEW"},
+ {t:"box",k:"plat",x:.07,y:0.8125,s:.6,al:"left",word:"Google",ph:21}]}
 
 var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],
@@ -3075,14 +3077,25 @@ function fitInside(cx,cy,w,h,W,H,pad){
    it falls back to the word, which is the safest thing to actually print. */
 function platMark(L,mc,s,hCqw,capCqw){
   var knock = S.platImgMode==='tint' ? ';filter:brightness(0) saturate(0)' : '';
-  var e = S.platLib ? libGet('platform',S.platLib) : null;
+  // Same fallback the tap mark uses: nothing chosen means the first entry in the
+  // platform set, so the shipped 'review us on Google' lockup is what a card gets
+  // by default rather than the bare word.
+  var e = S.platLib ? libGet('platform',S.platLib) : (libSet('platform')[0]||null);
   if(e){
     // height drives it; if that makes it wider than its box, fit the width instead
     // and give the height back, so the mark is never squashed and never overflows
     var hh=hCqw, ww=hh*(e.ar||1);
     if(ww>capCqw){ ww=capCqw; hh=ww/(e.ar||1) }
-    return '<div style="height:'+hh+'cqw;width:'+ww+'cqw'+knock+'">'+
+    var art='<div style="height:'+hh+'cqw;width:'+ww+'cqw'+knock+'">'+
       libArt(e,mc,'height:100%;width:100%',true)+'</div>';
+    /* A full-colour trademark on a flooded brand panel is unreadable — the grey in
+       the Google lockup all but vanishes on a dark ground — and recolouring it is
+       exactly what the brand terms forbid. So give it the white it was drawn for:
+       a padded chip, which is how these marks are meant to sit on colour anyway. */
+    if(L.onBand && !knock && libOwnPaint(e))
+      return '<div style="background:#fff;border-radius:'+(1.6*s)+'cqw;padding:'+
+        (1.9*s)+'cqw '+(2.4*s)+'cqw;display:flex">'+art+'</div>';
+    return art;
   }
   if(S.platImg) return '<img src="'+S.platImg+'" alt="" style="height:'+hCqw+
     'cqw;max-width:'+capCqw+'cqw;object-fit:contain;display:block'+knock+'">';
