@@ -2621,51 +2621,46 @@ function gMarkS(f,s){
   return Math.min(s, ch*.30/15);
 }
 
-function gQuiet(f){                      // eyebrow, mark, hairline, platform
- var t=gT('eyebrow',f,.55);
+function gQuiet(f){                      // nothing raised: mark, a courtesy, a rule
+ var w=isWide(f);
  return[
- {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
- {t:"box",k:"tap", x:.5,y:0.4375,s:gMarkS(f,isWide(f)?1.55:1.4),cap:"",lay:"mark"},
- {t:"box",k:"rule",x:.5,y:0.6875,w:.16},
+ {t:"box",k:"tap", x:.5,y:0.25,  s:gMarkS(f,w?1.4:1.3),cap:"",lay:"mark"},
+ {t:"box",k:"head",x:.5,y:0.5,   s:w?.82:.86,w:.76},
+ {t:"box",k:"rule",x:.5,y:0.6875,w:.14},
  {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:7}]}
 
-function gInstruction(f){                // the mark, then what to do, then the caveat
- var l=gT('lead',f,.92), m=gT('micro',f,.46);
+function gInstruction(f){                // what to do, then the courtesy under it
+ var w=isWide(f), l=gT('lead',f,.8);
  return[
- {t:"box",k:"tap", x:.5,y:0.3125,s:gMarkS(f,isWide(f)?1.2:1.15),cap:"",lay:"mark"},
- {t:"text",x:.5,y:0.5625,s:l.s,fw:l.fw,ls:l.ls,text:"TAP TO REVIEW"},
- {t:"text",x:.5,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,w:.72,lh:1.35,nocaps:1,
-  text:"No app needed — hold your phone to the mark"},
- {t:"box",k:"plat",x:.5,y:0.8125,s:.6,word:"Google",ph:6.5}]}
+ {t:"box",k:"tap", x:.5,y:0.25,   s:gMarkS(f,w?1.2:1.15),cap:"",lay:"mark"},
+ {t:"text",x:.5,y:0.4375,s:l.s,fw:l.fw,ls:l.ls,text:"TAP TO REVIEW"},
+ {t:"box",k:"head",x:.5,y:0.5625, s:w?.72:.76,w:.76},
+ {t:"box",k:"plat",x:.5,y:0.8125, s:.6,word:"Google",ph:6.5}]}
 
-function gRated(f){                      // eyebrow, stars, mark, platform
- var t=gT('eyebrow',f,.52);
+function gRated(f){                      // stars, the courtesy, the mark
+ var w=isWide(f);
  return[
- {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"YOUR REVIEW MATTERS"},
- {t:"box",k:"stars",x:.5,y:0.3125,s:isWide(f)?.95:1},
- {t:"box",k:"tap",  x:.5,y:0.5625,s:gMarkS(f,isWide(f)?1.2:1.1),cap:"",lay:"mark"},
+ {t:"box",k:"stars",x:.5,y:0.1875,s:w?.9:.95},
+ {t:"box",k:"head", x:.5,y:0.375, s:w?.76:.8,w:.76},
+ {t:"box",k:"tap",  x:.5,y:0.625, s:gMarkS(f,w?1.15:1.1),cap:"",lay:"mark"},
  {t:"box",k:"plat", x:.5,y:0.8125,s:.6,word:"Google",ph:6.5}]}
 
 function gField(f){                      // the brand colour is the card
- var t=gT('eyebrow',f,.52);
+ var w=isWide(f);
  return[
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
- {t:"text",x:.5,y:0.1875,s:t.s,fw:t.fw,ls:t.ls,onBand:1,text:"ONE TAP"},
- {t:"box",k:"tap", x:.5,y:0.4375,s:gMarkS(f,isWide(f)?1.4:1.3),onBand:1,cap:"",lay:"mark"},
- {t:"box",k:"rule",x:.5,y:0.625,w:.14,onBand:1},
- {t:"box",k:"plat",x:.5,y:0.75,s:.6,onBand:1,word:"Google",ph:7}]}
+ {t:"box",k:"head",x:.5,y:0.25,  s:w?.78:.82,w:.74,onBand:1},
+ {t:"box",k:"tap", x:.5,y:0.5,   s:gMarkS(f,w?1.3:1.2),onBand:1,cap:"",lay:"mark"},
+ {t:"box",k:"plat",x:.5,y:0.75,  s:.6,onBand:1,word:"Google",ph:7}]}
 
-function gPlaque(f){                     // asymmetric: type left, mark right
- var w=isWide(f), t=gT('eyebrow',f,.5), l=gT('lead',f,.8), m=gT('micro',f,.44);
+function gPlaque(f){                     // asymmetric: the courtesy left, mark right
+ var w=isWide(f), t=gT('eyebrow',f,.5), m=gT('micro',f,.44);
  return[
- // one row up from where this started: the platform sat at .875 and left only 5%
- // clear at the foot against 17% at the head, which reads as sliding off the card
- {t:"text",x:.07,y:0.125, s:t.s,fw:t.fw,ls:t.ls,al:"left",text:"TELL US HOW WE DID"},
+ {t:"text",x:.07,y:0.125, s:t.s,fw:t.fw,ls:t.ls,al:"left",text:"BEFORE YOU GO"},
  {t:"box",k:"rule",x:.07,y:0.1875,w:.26,al:"left"},
- {t:"text",x:.07,y:0.375,s:l.s,fw:l.fw,ls:l.ls,al:"left",w:.44,lh:1.2,
-  text:"TAP TO\nREVIEW"},
- {t:"box",k:"tap", x:w?.76:.5,y:w?0.4375:0.625,s:w?1.25:1.15,cap:"",lay:"mark"},
- {t:"text",x:.07,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,al:"left",w:.44,nocaps:1,
+ {t:"box",k:"head",x:.07,y:w?0.4375:0.375,s:w?.74:.78,w:w?.46:.7,al:"left"},
+ {t:"box",k:"tap", x:w?.78:.5,y:w?0.4375:0.625,s:gMarkS(f,w?1.15:1.1),cap:"",lay:"mark"},
+ {t:"text",x:.07,y:0.6875,s:m.s,fw:m.fw,ls:m.ls,al:"left",w:.5,nocaps:1,
   text:"Takes about 20 seconds"},
  {t:"box",k:"plat",x:.07,y:0.8125,s:.6,al:"left",word:"Google",ph:6.5}]}
 
