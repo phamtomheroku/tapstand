@@ -4165,6 +4165,7 @@ function stageDraw(){
   $('libZoomV').textContent=Math.round(d.z*100)+'%';
 }
 function stageClose(){
+  var solo=stage&&stage.solo;
   stage=null;
   libGrid.hidden=false; $('libStage').hidden=true;
   $('libPick').hidden=false;
@@ -4175,6 +4176,73 @@ function stageClose(){
   $('libCutStat').textContent='';
   $('libPrev').removeAttribute('src');
   $('libNote').textContent=LIB_HINT[libCat]||'';
+  libSearch.hidden=false;
+  $('libStageAdd').textContent='Add to library';
+  /* Opened on its own there is no grid behind it to fall back to, so backing out
+     of the picture means backing out of the sheet. Reading solo off the old stage
+     before it was cleared keeps this from bouncing off closeLib and back. */
+  if(solo) closeLib();
+}
+/* A square frame is the right way to PLACE a picture and the wrong way to store
+   one: a wide logo centred in it comes out padded with transparency and then
+   sits small inside whatever box it is later given. Crop back to the pixels that
+   actually carry something. */
+function trimAlpha(c){
+  var g=c.getContext('2d',{willReadFrequently:true}), d;
+  try{ d=g.getImageData(0,0,c.width,c.height) }catch(err){ return c }
+  var px=d.data, w=c.width, h=c.height, x, y;
+  var x0=w, y0=h, x1=-1, y1=-1;
+  for(y=0;y<h;y++) for(x=0;x<w;x++){
+    if(px[(y*w+x)*4+3]>6){
+      if(x<x0)x0=x; if(x>x1)x1=x;
+      if(y<y0)y0=y; if(y>y1)y1=y;
+    }
+  }
+  if(x1<x0||y1<y0) return c;                      // nothing opaque — leave it be
+  if(x0===0&&y0===0&&x1===w-1&&y1===h-1) return c; // already tight
+  var o=document.createElement('canvas');
+  o.width=x1-x0+1; o.height=y1-y0+1;
+  o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);
+  return o;
+}
+/* Every picture that lands on the card goes through the same frame the library
+   uses. Before this only the library had one: a logo, a tap mark or a platform
+   mark was read straight to a data URL and applied sight unseen, which is how an
+   opaque white tile ends up printed as a white box on the card. */
+function editImage(file,opts){
+  if(!file || file.type.indexOf('image')!==0) return false;
+  var r=new FileReader();
+  r.onload=function(){
+    var src=String(r.result), im=new Image();
+    im.onload=function(){
+      if(!im.naturalWidth || !im.naturalHeight){ alert('That image would not open.'); return }
+      stageSolo(opts,src,im);
+    };
+    im.onerror=function(){ alert('That image would not open.') };
+    im.src=src;
+  };
+  r.readAsDataURL(file);
+  return true;                                // local only — nothing leaves the page
+}
+function stageSolo(opts,src,im){
+  if(stage) stageClose();
+  libOpener=null; libLayer=null;
+  libModal.hidden=false;
+  stageOpen(libCat,opts.name||'image','raster',{disp:src},
+            im.naturalWidth,im.naturalHeight);
+  stage.img=im;
+  stage.orig={src:src, img:im};              // Compare and the sliders work off this
+  stage.done=opts.done;
+  stage.solo=true;
+  $('libTitle').textContent=opts.title||'Place the image';
+  $('libStageAdd').textContent=opts.addLabel||'Use image';
+  $('libNote').textContent='Drag to move it, the slider to size it. What sits inside the frame is what gets used.';
+  libSearch.hidden=true;                     // nothing to search — there is no grid
+  stageWarn();
+  /* An opaque tile is the common case on this path — a logo on white, a badge
+     grabbed off a slide. When the border really is one flat colour, arrive with
+     the cut already made rather than hiding the fix behind a checkbox. */
+  if(flatBorder(im)){ $('libCut').checked=true; stageCutApply(); }
 }
 /* What the frame shows is what gets stored. A vector keeps its vector-ness by
    having the frame written out as a new viewBox; a raster is redrawn through a
@@ -4183,6 +4251,20 @@ function stageCommit(){
   if(!stage) return;
   var d=stage, w=d.natW*d.fit*d.z, h=d.natH*d.fit*d.z;
   var x=(FRAME-w)/2+d.ox, y=(FRAME-h)/2+d.oy, e;
+  /* Opened for somewhere other than the library — the logo well, a tap mark, a
+     platform mark. Those want a picture, not a library tile, so the frame is
+     rendered out and handed straight to whoever asked for it. */
+  if(d.done){
+    var N=1024, dk=N/FRAME, dc=document.createElement('canvas');
+    dc.width=dc.height=N;
+    var dg=dc.getContext('2d'); dg.imageSmoothingQuality='high';
+    dg.drawImage(d.img, x*dk, y*dk, w*dk, h*dk);
+    var out=trimAlpha(dc).toDataURL('image/png');
+    var fn=d.done;
+    stageClose();                       // close first: fn repaints the card
+    fn(out);
+    return;
+  }
   if(d.kind==='svg'){
     var vb=d.payload.vb.trim().split(/[\s,]+/).map(Number);
     var ux=vb[2]/w, uy=vb[3]/h;                      // user units per stage px
@@ -4549,9 +4631,8 @@ function setLogo(src){
   applyLogoName(); paint();
 }
 function readImg(file){
-  if(!file || file.type.indexOf('image')!==0) return false;
-  var r=new FileReader(); r.onload=function(){setLogo(r.result)}; r.readAsDataURL(file);
-  return true;                                // local only — nothing leaves the page
+  return editImage(file,{title:'Place the logo', addLabel:'Use logo', name:'logo',
+    done:function(src){ if(typeof pushUndo==='function') pushUndo(); setLogo(src) }});
 }
 // a logo usually carries the business name already, so the text version steps aside
 function applyLogoName(){
@@ -4601,9 +4682,8 @@ function setTapImg(src){
   paint();
 }
 function readTap(file){
-  if(!file || file.type.indexOf('image')!==0) return false;
-  var r=new FileReader(); r.onload=function(){setTapImg(r.result)}; r.readAsDataURL(file);
-  return true;
+  return editImage(file,{title:'Place the tap mark', addLabel:'Use tap mark', name:'tap mark',
+    done:function(src){ if(typeof pushUndo==='function') pushUndo(); setTapImg(src) }});
 }
 var tapDrop=$('tapDrop');
 $('tapFile').addEventListener('change',function(e){ readTap(e.target.files&&e.target.files[0]); e.target.value=''; });
@@ -4642,9 +4722,8 @@ function platPreview(){
                                              : 'DROP A GOOGLE / YELP / PLATFORM LOGO';
 }
 function readPlat(file){
-  if(!file || file.type.indexOf('image')!==0) return false;
-  var r=new FileReader(); r.onload=function(){setPlatImg(r.result)}; r.readAsDataURL(file);
-  return true;
+  return editImage(file,{title:'Place the platform mark', addLabel:'Use platform mark', name:'platform mark',
+    done:function(src){ if(typeof pushUndo==='function') pushUndo(); setPlatImg(src) }});
 }
 var platDrop=$('platDrop');
 $('platFile').addEventListener('change',function(e){ readPlat(e.target.files&&e.target.files[0]); e.target.value=''; });
