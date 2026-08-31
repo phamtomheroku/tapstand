@@ -93,11 +93,59 @@
       "file": "review-us-google.png",
       "name": "Review us on Google",
       "src": "Yours",
-      "lic": "trademark \u2014 see README",
+      "lic": "trademark — see README",
       "asis": true
     }
   ],
   "motif": [
+    {
+      "file": "stars-solid-5.svg",
+      "name": "Five stars, solid",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "stars-solid-5-tight.svg",
+      "name": "Five stars, tight",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "stars-outline-5.svg",
+      "name": "Five stars, outline",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "stars-outline-5-tight.svg",
+      "name": "Five stars, outline tight",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "stars-half-5.svg",
+      "name": "Four and a half stars",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "stars-solid-4.svg",
+      "name": "Four stars, solid",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "star-single.svg",
+      "name": "Star",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
+    {
+      "file": "star-single-outline.svg",
+      "name": "Star, outline",
+      "src": "Tap Stand",
+      "lic": "own"
+    },
     {
       "file": "coffee.svg",
       "name": "Coffee",

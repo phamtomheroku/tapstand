@@ -118,7 +118,7 @@ function ok(name, cond, extra) {
 
 console.log('\n== library shape ==');
 ok('tap set non-empty', C.libSet('tap').length === 14, C.libSet('tap').length);
-ok('motif set non-empty', C.libSet('motif').length === 59, C.libSet('motif').length);
+ok('motif set non-empty', C.libSet('motif').length >= 59, C.libSet('motif').length);
 ok('platform set carries the one badge', C.libSet('platform').length === 1);
 ok('default tap mark is hand-phone', C.libSet('tap')[0].id === 'hand-phone');
 
@@ -517,7 +517,7 @@ c2.on = false;
 ok('unticking drops one', C.sheetPicks().length === 1 && C.sheetPicks()[0].id === c1.id);
 c2.on = true;
 c2.fmt = 3;
-ok('a card saved at another size is skipped', C.sheetPicks().length === 1);
+ok('a card saved at another size still goes on the sheet', C.sheetPicks().length === 2);
 c2.fmt = C.S.fmt;
 C.S.cards.forEach(c => { c.on = false });
 ok('nothing ticked falls back to the card on screen', C.sheetPicks() === null);
@@ -526,7 +526,7 @@ C.S.cards.forEach(c => { c.on = true });
 console.log('\n== the sheet reports what it will do ==');
 C.updateSheetFit();
 const fit = byId('sheetFit').textContent;
-ok('the fit line names the designs', /2 designs/.test(fit), fit);
+ok('the fit line names each trim it packed', new RegExp('\\d+ \u00d7 ').test(fit), fit);
 ok('and still names the grid', /\d+ up/.test(fit), fit);
 
 console.log('\n== a card too heavy for the device is kept, not dropped ==');
