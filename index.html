@@ -5767,7 +5767,7 @@ function shelfDraw(){
     box.innerHTML='<div class="cempty">NOTHING SAVED YET &mdash; SAVE THIS CARD TO START A RUN</div>';
   }else{
     box.innerHTML=S.cards.map(function(c){
-      var f=FORMATS[c.fmt]||{k:'?'}, off=c.fmt!==S.fmt;
+      var f=FORMATS[c.fmt]||{k:'?'}, off=!c.on;
       return '<div class="crow'+(off?' off':'')+'" data-id="'+esc(c.id)+'">'+
         '<label class="cpick" title="include on the sheet PDF">'+
           '<input type="checkbox" data-a="on"'+(c.on?' checked':'')+'></label>'+
@@ -5780,11 +5780,12 @@ function shelfDraw(){
       '</div>';
     }).join('');
   }
-  var n=S.cards.filter(function(c){return c.on&&c.fmt===S.fmt}).length;
-  var wrong=S.cards.filter(function(c){return c.on&&c.fmt!==S.fmt}).length;
+  var n=S.cards.filter(function(c){return c.on}).length;
+  var sizes={}, ns=0;
+  S.cards.forEach(function(c){ if(c.on && !sizes[c.fmt]){ sizes[c.fmt]=1; ns++ } });
   $('shelfNote').innerHTML = !S.cards.length ? ''
     : n+' ticked for the sheet'+
-      (wrong?' &middot; '+wrong+' skipped, saved at another size':'')+
+      (ns>1?' &middot; '+ns+' sizes, packed onto the one sheet':'')+
       (S.cardSkip.length?' &middot; '+S.cardSkip.length+' too big to keep on this device':'');
   updateSheetFit();
 }
@@ -5865,34 +5866,84 @@ $('printBtn').addEventListener('click',exportPDF);
    craft knife has something to line up on. */
 var PAPERS={letter:[215.9,279.4], a4:[210,297]};
 function packSheet(){
-  var f=FORMATS[S.fmt];
-  var cw=+f.mm.toFixed(2), ch=+(f.mm*(f.ar||1.5)).toFixed(2);
   var p=PAPERS[$('sheetPaper').value]||PAPERS.letter;
-  var M=6, G=3;
+  var M=6, G=3, items=sheetItems();
   function fit(pw,ph){
-    var cols=Math.floor((pw-2*M+G)/(cw+G));
-    var rows=Math.floor((ph-2*M+G)/(ch+G));
-    return {pw:pw,ph:ph,cols:Math.max(0,cols),rows:Math.max(0,rows),cw:cw,ch:ch,M:M,G:G};
+    var pl=shelfPack(items,pw,ph,M,G), seen={}, u=0;
+    pl.forEach(function(t){ var k=t.c?t.c.id:''; if(!seen[k]){ seen[k]=1; u++ } });
+    return {pw:pw,ph:ph,M:M,G:G,place:pl,n:pl.length,uniq:u};
   }
   var a=fit(p[0],p[1]), b=fit(p[1],p[0]);
-  var pick=(a.cols*a.rows>=b.cols*b.rows)?a:b;
-  pick.n=pick.cols*pick.rows;
-  return pick;
+  return (a.uniq>b.uniq || (a.uniq===b.uniq && a.n>=b.n)) ? a : b;
 }
-/* Which cards go on the sheet: whatever is ticked on the shelf and was saved at
-   the size the sheet is being packed for. Nothing ticked means what you are
-   looking at, which is what the button did before there was a shelf. */
+/* The trim box of a format, in millimetres. */
+function tileMM(fi){
+  var f=FORMATS[fi]||FORMATS[0];
+  return {w:+f.mm.toFixed(2), h:+(f.mm*(f.ar||1.5)).toFixed(2)};
+}
+/* What the sheet is being asked to carry: one entry per ticked card, each at its
+   OWN trim, so a run of credit-card stickers and a run of 4x3 counter cards go on
+   the same printout. Tallest first, so equal-height cards land in the same band
+   and a guillotine can still take one straight pass across that row. */
+function sheetItems(){
+  var picks=sheetPicks(), src, t;
+  if(picks) src=picks.map(function(c){ var m=tileMM(c.fmt); return {c:c,w:m.w,h:m.h} });
+  else { t=tileMM(S.fmt); src=[{c:null,w:t.w,h:t.h}]; }
+  return src.slice().sort(function(a,b){ return b.h-a.h || b.w-a.w });
+}
+/* Shelf packing: fill a row left to right, drop to a new row when the next card
+   will not fit, keep going until the sheet is full. One of each is placed FIRST,
+   so every ticked card is guaranteed to appear even when the sheet is tight; only
+   then does it cycle round topping the sheet up. The cost of mixing trims on one
+   sheet is that a row is only as dense as its tallest card. */
+function shelfPack(items,pw,ph,M,G){
+  var out=[], shelves=[], bottom=M;
+  /* First fit across every OPEN row, not just the newest. This is what lets a
+     credit-card sticker drop into the space beside a 4x3 counter card instead of
+     being pushed to a row of its own — with one open row the tall cards each hog
+     a band and the short ones fall off the bottom of the sheet. A row's height is
+     fixed by the first card on it, so nothing below ever has to shift down. */
+  function put(it){
+    for(var i=0;i<shelves.length;i++){
+      var sh=shelves[i];
+      if(it.h<=sh.h && sh.x+it.w<=pw-M){
+        out.push({c:it.c,x:+sh.x.toFixed(2),y:+sh.y.toFixed(2),w:it.w,h:it.h});
+        sh.x+=it.w+G; return true;
+      }
+    }
+    if(it.w>pw-2*M) return false;                     // never fits this sheet
+    var y=shelves.length?bottom+G:M;
+    if(y+it.h>ph-M) return false;                     // no rows left
+    shelves.push({y:y,h:it.h,x:M+it.w+G});
+    out.push({c:it.c,x:M,y:+y.toFixed(2),w:it.w,h:it.h});
+    bottom=y+it.h; return true;
+  }
+  items.forEach(put);                                 // one of each first
+  for(var g=0; g<400; g++){                           // then top the sheet up
+    var any=false;
+    for(var i=0;i<items.length;i++) if(put(items[i])) any=true;
+    if(!any) break;
+  }
+  return out;
+}
+/* Which cards go on the sheet: whatever is ticked on the shelf, at whatever size
+   each of them was saved. Nothing ticked means what you are looking at, which is
+   what the button did before there was a shelf. */
 function sheetPicks(){
-  var on=(S.cards||[]).filter(function(c){ return c.on && c.fmt===S.fmt });
+  var on=(S.cards||[]).filter(function(c){ return c.on });
   return on.length ? on : null;
 }
 function updateSheetFit(){
   var q=packSheet();
-  if(q.n<1){ $('sheetFit').textContent='card larger than sheet'; return; }
-  var picks=sheetPicks(), d=picks?picks.length:1;
-  var each=Math.floor(q.n/d), spare=q.n-each*d;
-  $('sheetFit').textContent = q.n+' up · '+q.cols+' × '+q.rows+
-    (picks ? ' · '+d+' design'+(d>1?'s':'')+' × '+each+(spare?' (+'+spare+')':'') : '') +
+  if(q.n<1){ $('sheetFit').textContent='nothing fits this sheet'; return; }
+  var tally={}, order=[];
+  q.place.forEach(function(p){
+    var k=FORMATS[p.c?p.c.fmt:S.fmt].k;
+    if(tally[k]==null){ tally[k]=0; order.push(k) }
+    tally[k]++;
+  });
+  $('sheetFit').textContent = q.n+' up · '+
+    order.map(function(k){ return tally[k]+' × '+k }).join(' · ')+
     ' at '+q.pw+' × '+q.ph+' mm';
 }
 $('sheetPaper').addEventListener('change',updateSheetFit);
@@ -5903,7 +5954,7 @@ $('formats').addEventListener('click',updateSheetFit);
    for a snapshot, or the first one prints in the fallback. */
 function exportSheet(){
   var q=packSheet();
-  if(q.n<1){ alert('The '+FORMATS[S.fmt].k+' card is larger than the sheet — use Card PDF, or pick A4/Letter that fits.'); return; }
+  if(q.n<1){ alert('None of the ticked cards fit on this sheet — use Card PDF, or pick A4/Letter that fits.'); return; }
   var picks=sheetPicks();
   var ready = picks
     ? Promise.all(picks.map(function(c){ return registerAllFaces(c.d.userFonts||[]) }))
@@ -5911,21 +5962,12 @@ function exportSheet(){
   ready.then(function(){ buildSheet(q) }, function(){ buildSheet(q) });
 }
 function buildSheet(q){
-  var pw=q.pw, ph=q.ph, cols=q.cols, rows=q.rows, cw=q.cw, ch=q.ch, M=q.M, G=q.G;
-  // center the block of tiles on the sheet, so the margin is even
-  var gridW=cols*cw+(cols-1)*G, gridH=rows*ch+(rows-1)*G;
-  var offX=(pw-gridW)/2, offY=(ph-gridH)/2;
+  var pw=q.pw, ph=q.ph, place=q.place;
 
   var sheet=document.createElement('div');
   sheet.id='sheetPrint';
   sheet.style.cssText='position:relative;width:'+pw+'mm;height:'+ph+'mm;'+
     'background:#fff;box-sizing:border-box;overflow:hidden';
-
-  var grid=document.createElement('div');
-  grid.style.cssText='position:absolute;left:'+offX+'mm;top:'+offY+'mm;'+
-    'width:'+gridW+'mm;height:'+gridH+'mm;display:grid;gap:'+G+'mm;'+
-    'grid-template-columns:repeat('+cols+','+cw+'mm);'+
-    'grid-template-rows:repeat('+rows+','+ch+'mm)';
 
   var vars=['--b-brand','--b-bg','--b-fg','--b-star','--f-disp','--f-body'];
   /* One snapshot per design. A saved card is painted into the live editor, read
@@ -5938,17 +5980,20 @@ function buildSheet(q){
     vars.forEach(function(v){ o.v[v]=card.style.getPropertyValue(v) });
     return o;
   }
-  var picks=sheetPicks(), shots;
+  var picks=sheetPicks(), shots={};
   if(picks){
     var keep=captureDesign(), keepSel=S.sel;
-    shots=picks.map(function(c){ applyDesign(c.d); resolveLayout(); return snap() });
+    picks.forEach(function(c){ applyDesign(c.d); resolveLayout(); shots[c.id]=snap() });
     applyDesign(keep); S.sel=keepSel; resolveLayout();
   }else{
-    shots=[snap()];
+    shots['']=snap();
   }
 
-  for(var i=0;i<cols*rows;i++){
-    var sh=shots[i%shots.length];
+  /* Each tile is placed at its own mm box rather than dropped into a uniform
+     grid, because the sheet now carries more than one trim at a time. */
+  place.forEach(function(p){
+    var sh=shots[p.c?p.c.id:''];
+    if(!sh) return;
     var t=document.createElement('div');
     // The card's format class (.f57 etc.) is only for the on-screen aspect-ratio
     // sizing hack — the tile is already an exact mm × mm box, so it does not need it.
@@ -5957,13 +6002,13 @@ function buildSheet(q){
     // carry the format class so wrap templates get their fold guide overlay;
     // the class's own #card-prefixed width/aspect-ratio rules do not match a .tile
     t.className='tile '+sh.cls;
-    t.style.cssText='container-type:inline-size;position:relative;overflow:hidden;'+
-      'width:'+cw+'mm;height:'+ch+'mm;background:'+sh.bg+';color:'+sh.fg;
+    t.style.cssText='container-type:inline-size;position:absolute;overflow:hidden;'+
+      'left:'+p.x+'mm;top:'+p.y+'mm;width:'+p.w+'mm;height:'+p.h+'mm;'+
+      'background:'+sh.bg+';color:'+sh.fg;
     vars.forEach(function(v){ t.style.setProperty(v,sh.v[v]) });
     t.innerHTML=sh.html;
-    grid.appendChild(t);
-  }
-  sheet.appendChild(grid);
+    sheet.appendChild(t);
+  });
 
   // crop marks — one SVG overlay in mm, 0.15 mm hairlines, 3 mm ticks 0.6 mm off the corner
   var NS='http://www.w3.org/2000/svg';
@@ -5978,15 +6023,20 @@ function buildSheet(q){
     svg.appendChild(l);
   }
   var TK=3, GAP=0.6;
-  for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
-    var x=offX+c*(cw+G), y=offY+r*(ch+G);
-    [[x,y,-1,-1],[x+cw,y,1,-1],[x,y+ch,-1,1],[x+cw,y+ch,1,1]].forEach(function(k){
+  place.forEach(function(p){
+    [[p.x,p.y,-1,-1],[p.x+p.w,p.y,1,-1],[p.x,p.y+p.h,-1,1],[p.x+p.w,p.y+p.h,1,1]]
+    .forEach(function(k){
       tk(k[0]+k[2]*GAP, k[1], k[0]+k[2]*(GAP+TK), k[1]);
       tk(k[0], k[1]+k[3]*GAP, k[0], k[1]+k[3]*(GAP+TK));
     });
-  }
+  });
   sheet.appendChild(svg);
 
+  /* The sheet is SHOWN, not fired straight at the print dialog. Ganging several
+     designs at several trims onto one page is exactly the case where you want to
+     look at the imposition before committing paper to it — and a blind
+     window.print() gives you a modal dialog instead of an answer. Print is still
+     one click away, from inside the preview. */
   document.body.appendChild(sheet);
   $('pageCSS').textContent =
     '@page{size:'+pw+'mm '+ph+'mm;margin:0}'+
@@ -5995,25 +6045,100 @@ function buildSheet(q){
       'body.sheetprinting{font-size:0!important;line-height:0!important}'+
       'body.sheetprinting>*{display:none!important}'+
       'body.sheetprinting>#sheetPrint{display:block!important;position:relative!important;'+
-        'width:'+pw+'mm!important;height:'+ph+'mm!important;margin:0!important}'+
+        'width:'+pw+'mm!important;height:'+ph+'mm!important;margin:0!important;'+
+        /* the preview parks the sheet with a fixed offset and a scale; print has
+           to see it at true size, at the origin, with no drop shadow */
+        'left:auto!important;top:auto!important;transform:none!important;box-shadow:none!important}'+
       'body.sheetprinting>#sheetPrint,body.sheetprinting>#sheetPrint *{'+
         '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}'+
     '}';
-  document.body.classList.add('sheetprinting');
+
   var keepTitle=document.title;
   var slug=(picks&&picks.length>1 ? picks.length+'-designs'
             : (picks?picks[0].n:elName.value)||'tap card')
             .replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-');
-  document.title=slug+'_'+cols+'x'+rows+'-up_'+$('sheetPaper').value;
+  var fileName=slug+'_'+q.n+'-up_'+$('sheetPaper').value;
+
+  /* mm are only real once the browser has measured them */
+  var probe=document.createElement('div');
+  probe.style.cssText='position:absolute;visibility:hidden;width:100mm;height:0';
+  document.body.appendChild(probe);
+  var pxPerMm=probe.getBoundingClientRect().width/100;
+  probe.parentNode.removeChild(probe);
+
+  var ui=document.createElement('div');
+  ui.id='sheetPreviewUI';
+  ui.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(8,8,10,.82);'+
+    'backdrop-filter:blur(2px);overflow:auto';
+  var bar=document.createElement('div');
+  bar.style.cssText='position:fixed;left:0;right:0;top:0;height:56px;z-index:9003;'+
+    'display:flex;align-items:center;gap:10px;padding:0 14px;background:#111216;'+
+    'border-bottom:1px solid rgba(255,255,255,.14);color:#e9e9ee;'+
+    'font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em';
+  var tally={}, order=[];
+  q.place.forEach(function(p){
+    var k=FORMATS[p.c?p.c.fmt:S.fmt].k;
+    if(tally[k]==null){ tally[k]=0; order.push(k) }
+    tally[k]++;
+  });
+  var label=document.createElement('span');
+  label.style.cssText='flex:1;min-width:0;text-transform:uppercase';
+  label.textContent=q.n+' UP \u00b7 '+
+    order.map(function(k){ return tally[k]+' \u00d7 '+k }).join(' \u00b7 ')+
+    ' \u00b7 '+q.pw+' \u00d7 '+q.ph+' MM';
+  var bPrint=document.createElement('button');
+  bPrint.type='button'; bPrint.className='btn solid'; bPrint.textContent='Print / Save as PDF';
+  var bClose=document.createElement('button');
+  bClose.type='button'; bClose.className='btn'; bClose.textContent='Close';
+  bar.appendChild(label); bar.appendChild(bPrint); bar.appendChild(bClose);
+
+  /* Park the sheet over the backdrop, scaled down to whatever the window allows.
+     Scaling by transform rather than by resizing keeps every tile in real mm, so
+     what is measured here is what comes off the printer. */
+  function fitPreview(){
+    var wPx=pw*pxPerMm, hPx=ph*pxPerMm;
+    var k=Math.min((window.innerWidth-56)/wPx,(window.innerHeight-56-40)/hPx,1);
+    if(!(k>0)) k=1;
+    sheet.style.position='fixed';
+    sheet.style.left=Math.max(12,(window.innerWidth-wPx*k)/2)+'px';
+    sheet.style.top=(56+20)+'px';
+    sheet.style.transformOrigin='top left';
+    sheet.style.transform='scale('+k.toFixed(4)+')';
+    sheet.style.zIndex='9002';
+    sheet.style.boxShadow='0 14px 46px rgba(0,0,0,.6)';
+  }
+  fitPreview();
+  window.addEventListener('resize',fitPreview);
+
   var restore=function(){
     document.title=keepTitle;
     document.body.classList.remove('sheetprinting');
+    window.removeEventListener('resize',fitPreview);
+    window.removeEventListener('afterprint',backToPreview);
+    document.removeEventListener('keydown',onKey);
     if(sheet.parentNode) sheet.parentNode.removeChild(sheet);
-    window.removeEventListener('afterprint',restore);
+    if(ui.parentNode) ui.parentNode.removeChild(ui);
+    if(bar.parentNode) bar.parentNode.removeChild(bar);
   };
-  window.addEventListener('afterprint',restore);
-  window.print();
-  setTimeout(restore,1500);
+  function backToPreview(){
+    document.body.classList.remove('sheetprinting');
+    document.title=keepTitle;
+    fitPreview();
+  }
+  function onKey(e){ if(e.key==='Escape') restore() }
+  bClose.addEventListener('click',restore);
+  ui.addEventListener('click',restore);
+  document.addEventListener('keydown',onKey);
+  bPrint.addEventListener('click',function(){
+    /* strip the preview transform for the duration of the print only */
+    document.title=fileName;
+    document.body.classList.add('sheetprinting');
+    window.addEventListener('afterprint',backToPreview);
+    window.print();
+  });
+
+  document.body.appendChild(ui);
+  document.body.appendChild(bar);
 }
 $('sheetPdfBtn').addEventListener('click',exportSheet);
 shelfDraw();
