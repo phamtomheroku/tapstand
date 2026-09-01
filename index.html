@@ -329,6 +329,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .dtile[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent);color:var(--accent)}
 .dart{width:100%;height:46px;display:flex;align-items:center;justify-content:center}
 .dart>*{max-width:100%;max-height:100%}
+/* A miniature carries its own aspect-ratio. Holding it to a flat 46px made an
+   upright card compute a ~114px height and then squashed it into less than half
+   of that, so every style tile was showing a card 2.5x too short — which is most
+   of what makes this shelf look jumbled. An icon still wants the fixed box. */
+.dart.dmini{height:auto;display:block}
+.dart.dmini>*{max-height:none}
 .dname{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;
   color:var(--ink-3);text-align:center;line-height:1.35;word-break:break-word}
 .dtile:hover .dname,.dtile[aria-pressed="true"] .dname{color:var(--accent)}
@@ -349,6 +355,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .mini>div{position:absolute;display:flex;flex-direction:column;align-items:center;
   text-align:center;max-width:92cqw;overflow-wrap:break-word}
 .mini .qrimg{image-rendering:pixelated}
+/* .mini>div above hands every child the layer box model: an absolutely positioned
+   centred column capped at 92cqw. The overlays are siblings of the layers, so left
+   alone that cap holds a full-bleed frame 8% short of the edge. */
+.mini>.tex,.mini>.frame,.mini>.frame2{max-width:none;display:block}
 .ib{background:none;border:none;padding:2px;cursor:pointer;color:var(--ink-3);
   line-height:0;border-radius:2px}
 .ib:hover{color:var(--accent);background:var(--paper)}
@@ -5554,7 +5564,13 @@ function miniCard(stack,over){
     ';background:'+pal.groundCSS+';color:'+ctx.fg+';--b-brand:'+brand+';--b-bg:'+pal.ground+
     ';--b-fg:'+ctx.fg+';--b-star:'+brand+';--rad:'+th.rad+'cqw;border-radius:'+th.rad+'cqw'+
     ';--f-disp:'+(S.dispFont?fontStack(S.dispFont):FONTS[th.disp])+
-    ';--f-body:'+(S.bodyFont?fontStack(S.bodyFont):FONTS[th.body])+'">'+out+'</div>';
+    ';--f-body:'+(S.bodyFont?fontStack(S.bodyFont):FONTS[th.body])+'">'+out+
+    /* The real card carries three static overlay children (index.html #card) and
+       every .fr-* / .tx- rule is written as a DESCENDANT selector against them.
+       A miniature was emitting the classes and none of the children, so the
+       selectors matched nothing and frame and texture — two of the nine things a
+       theme changes — were invisible in every preview in the app. */
+    '<div class="tex"></div><div class="frame"></div><div class="frame2"></div></div>';
 }
 function dockStyleArt(fid,it){
   try{
@@ -5564,16 +5580,26 @@ function dockStyleArt(fid,it){
     if(fid==='dir'){
       var d=DIRECTIONS[it.i], df=d.def||[0,0,S.plate];
       var pl=PLATES[df[2]]||PLATES[S.plate];
-      return miniCard(pl[1](S.fmt),{th:THEMES[df[0]]||PREVIEW.th,
+      /* An archetype composition reads DIRECTIONS[S.dir].g when its stack is BUILT
+         rather than when it is painted, so building one from here — while S.dir is
+         still the card's own direction — dressed every direction tile in the
+         CURRENT direction's pattern, hero and motif. Nine tiles, one terrazzo.
+         Stand in the direction being drawn for as long as it takes to build it. */
+      var keep=S.dir, stack;
+      S.dir=it.i;
+      try{ stack=pl[1](S.fmt) } finally{ S.dir=keep }
+      return miniCard(stack,{th:THEMES[df[0]]||PREVIEW.th,
         pal:(PALETTES[df[1]]||PALETTES[0]).fn(elBrand.value,elBg.value)});
     }
   }catch(err){ return '' }   // a broken plate must not take the whole shelf down
   return '';
 }
 function dockTile(fid,id,name,art,on){
+  // a style tile holds a miniature of the whole card; an asset tile holds one glyph
+  var mini=(fid==='plate'||fid==='theme'||fid==='pal'||fid==='dir');
   return '<button class="dtile" type="button" data-f="'+esc(fid)+'" data-id="'+esc(id)+
     '" aria-pressed="'+(!!on)+'" title="'+esc(name)+'">'+
-    '<span class="dart">'+art+'</span><span class="dname">'+esc(name)+'</span>'+
+    '<span class="dart'+(mini?' dmini':'')+'">'+art+'</span><span class="dname">'+esc(name)+'</span>'+
     '<span class="dstar'+(isFav(fid,id)?' on':'')+'" data-fav="1" aria-hidden="true">'+
     (isFav(fid,id)?'★':'☆')+'</span></button>';
 }
