@@ -382,15 +382,18 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lookfoot .btn{flex:none;margin:0}
 /* a shelf is one direction's worth of finished cards. Sideways, because a row
    that scrolls costs one screenful of rendering however long it is. */
-.shelf{padding:15px 14px 2px}
-.shelfh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0 0 10px;
+.lshelf{padding:15px 14px 2px}
+.lshelfh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0 0 10px;
   font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-2);font-weight:600}
-.shelfsub{font-family:var(--sans);font-size:11.5px;letter-spacing:0;text-transform:none;
+.lshelfsub{font-family:var(--sans);font-size:11.5px;letter-spacing:0;text-transform:none;
   color:var(--ink-3);font-weight:400}
-.shelfrow{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 14px;
-  scroll-snap-type:x proximity}
-.shelfrow>.ltile{flex:0 0 214px;scroll-snap-align:start}
+/* align-items so a tile is never stretched to the row and then made to shrink its
+   own preview to fit; the row takes its height from the tallest card on it */
+.lshelfrow{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;overflow-y:hidden;
+  padding:2px 2px 14px;scroll-snap-type:x proximity}
+.lshelfrow>.ltile{flex:0 0 214px;scroll-snap-align:start}
+.lart{flex:none}
 .lookgrid{display:grid;gap:12px;padding:15px 14px;
   grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
 .lookgrid[hidden]{display:none}
@@ -6225,9 +6228,9 @@ function lookListHTML(){
     var by={}; looks().forEach(function(L){ (by[L.dir]=by[L.dir]||[]).push(L) });
     return DIRECTIONS.map(function(d,di){
       var r=by[di]; if(!r) return '';
-      return '<section class="shelf"><h4 class="shelfh">'+esc(d.k)+
-        '<span class="shelfsub">'+esc(DIR_NOTE[d.k]||'')+'</span></h4>'+
-        '<div class="shelfrow">'+r.map(function(L){
+      return '<section class="lshelf"><h4 class="lshelfh">'+esc(d.k)+
+        '<span class="lshelfsub">'+esc(DIR_NOTE[d.k]||'')+'</span></h4>'+
+        '<div class="lshelfrow">'+r.map(function(L){
           return lookTile('look',L.id,PLATES[L.pl][0],
             THEMES[L.th].k+' \u00b7 '+PALETTES[L.pal].k, lookOn(L));
         }).join('')+'</div></section>';
