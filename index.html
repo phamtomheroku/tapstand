@@ -397,6 +397,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lookgrid{display:grid;gap:12px;padding:15px 14px;
   grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
 .lookgrid[hidden]{display:none}
+.lookgrid-in{padding:0}
 .ltile{position:relative;background:var(--panel);border:1px solid var(--rule-2);
   border-radius:3px;padding:10px;cursor:pointer;font:inherit;color:var(--ink);
   display:flex;flex-direction:column;gap:9px;text-align:left}
@@ -1843,18 +1844,30 @@ function shiftHue(hex,deg){
   else if(h<240)r=[0,X,C];else if(h<300)r=[X,0,C];else r=[C,0,X];
   return _r2h(r.map(function(v){return (v+m)*255}));
 }
+/* The second brand tone. shiftHue(b,150) is the textbook complement and, on a
+   real brand colour, the textbook clash: a pink card printed a block of green
+   beside it, and a composition that fills a third of the card with the accent
+   made that unmissable. The Gradient palette had already found the better move
+   on its own — it shifts 38 degrees, and it is the one palette that never looked
+   wrong. So the second tone is a NEIGHBOUR, deepened enough to still read as its
+   own colour rather than a smudge of the first. */
+function tone2(b,deg,dark){
+  return mix(shiftHue(b, deg==null?40:deg), '#101014', dark==null?.16:dark);
+}
 var PALETTES=[
- {k:"Flat",     fn:function(b,g){return{ground:g,groundCSS:g,brand:b,accent:shiftHue(b,150),tint:mix(b,g,.88)}}},
- {k:"Tinted",   fn:function(b,g){var t=mix(b,g,.9);return{ground:t,groundCSS:t,brand:b,accent:shiftHue(b,150),tint:mix(b,g,.78)}}},
- {k:"Inverted", fn:function(b,g){return{ground:b,groundCSS:b,brand:g,accent:shiftHue(b,150),tint:mix(b,g,.25)}}},
+ {k:"Flat",     fn:function(b,g){return{ground:g,groundCSS:g,brand:b,accent:tone2(b),tint:mix(b,g,.88)}}},
+ {k:"Tinted",   fn:function(b,g){var t=mix(b,g,.9);return{ground:t,groundCSS:t,brand:b,accent:tone2(b),tint:mix(b,g,.78)}}},
+ {k:"Inverted", fn:function(b,g){return{ground:b,groundCSS:b,brand:g,accent:tone2(b),tint:mix(b,g,.25)}}},
  {k:"Gradient", fn:function(b,g){var b2=shiftHue(b,38);
     return{ground:b,groundCSS:'linear-gradient(155deg,'+b+' 0%,'+b2+' 100%)',brand:g,accent:g,tint:mix(b,g,.3)}}},
- {k:"Duotone",  fn:function(b,g){var b2=shiftHue(b,175);
+ /* a duotone wants real contrast, so this one leans further and darker than the
+    accent does — but still to a neighbour, not to the opposite side of the wheel */
+ {k:"Duotone",  fn:function(b,g){var b2=tone2(b,30,.34);
     return{ground:b,groundCSS:'linear-gradient(135deg,'+b+' 0%,'+b+' 46%,'+b2+' 46%,'+b2+' 100%)',
            brand:g,accent:g,tint:mix(b,g,.3)}}},
  {k:"Halo",     fn:function(b,g){var t=mix(b,g,.82);
     return{ground:g,groundCSS:'radial-gradient(circle at 50% 42%,'+t+' 0%,'+g+' 62%)',
-           brand:b,accent:shiftHue(b,150),tint:t}}}
+           brand:b,accent:tone2(b),tint:t}}}
 ];
 
 /* ---- procedural graphics -------------------------------------------------
@@ -6121,20 +6134,35 @@ function lookBuild(){
   var out=[], all=PLATES.map(function(_,i){return i}).filter(plateFitsTrim);
   DIRECTIONS.forEach(function(d,di){
     if(!d.def) return;                        // "All" curates nothing, so it seeds nothing
-    var th=d.th||[S.theme|0], pa=d.pal||[S.pal|0];
-    var pl=(d.pl||all).filter(plateFitsTrim); if(!pl.length) pl=all;
+    var th=(d.th&&d.th.length)?d.th:THEMES.map(function(_,i){return i});
+    var pa=(d.pal&&d.pal.length)?d.pal:PALETTES.map(function(_,i){return i});
+    /* The direction's own compositions first, then everything else that fits the
+       trim. Several whitelists are down to one or two entries once the trim has
+       had its say, and cycling those with a modulo put the SAME card on the shelf
+       four times — Playful, Quiet and Newsprint were each showing two cards twice.
+       Topping the list up keeps the curation where it matters (the front of the
+       shelf) and still fills the row with four different cards. */
+    var pl=(d.pl||[]).filter(plateFitsTrim);
+    all.forEach(function(i){ if(pl.indexOf(i)<0) pl.push(i) });
     if(!pl.length) return;
-    var seen={}, n=0;
-    for(var j=0; j<LOOKS_PER_DIR*3 && n<LOOKS_PER_DIR; j++){
-      var t=j?th[j%th.length]:d.def[0];
-      var p=j?pa[(j+1)%pa.length]:d.def[1];
-      // four directions seed a composition their trim does not offer; the chip rows
-      // never noticed, because the seed was applied without anyone looking
-      var c=j?pl[j%pl.length]:(plateFitsTrimAt(d.def[2],S.fmt)?d.def[2]:pl[0]);
-      var k=t+'/'+p+'/'+c; if(seen[k]) continue; seen[k]=1;
+    var usedC={}, usedTP={}, n=0;
+    function add(c,t,p){
+      if(n>=LOOKS_PER_DIR || c==null) return;
+      if(usedC[c]) return;                    // never the same composition twice
+      var tp=t+'/'+p; if(usedTP[tp]) return;  // nor the same type-and-colour pairing
+      usedC[c]=1; usedTP[tp]=1;
       out.push({id:'L'+di+'-'+n, dir:di, th:t, pal:p, pl:c});
       n++;
     }
+    // the seed is what the direction actually authored — four of them name a
+    // composition their trim does not offer, so it is checked before it is used
+    add(plateFitsTrimAt(d.def[2],S.fmt)?d.def[2]:pl[0], d.def[0], d.def[1]);
+    /* Enumerate the theme x palette cross product rather than stepping both at
+       once: stepping them together repeats after max(len) pairs, so a direction
+       offering three themes and three palettes ran out after three looks instead
+       of the nine it actually has. The composition advances on its own counter. */
+    for(var j=1; n<LOOKS_PER_DIR && j<pl.length+th.length*pa.length+4; j++)
+      add(pl[j%pl.length], th[Math.floor(j/pa.length)%th.length], pa[j%pa.length]);
   });
   return out;
 }
@@ -6165,7 +6193,7 @@ function lookSeed(){
 }
 function lookFresh(){
   var k=lookSeed();
-  if(k!==LOOKSEED){ LOOKART={}; LOOKSEED=k; }
+  if(k!==LOOKSEED){ LOOKART={}; PLATENAMED={}; LOOKSEED=k; }
 }
 function lookArtFor(fid,id){
   var k=fid+'/'+id;
@@ -6236,10 +6264,38 @@ function lookListHTML(){
         }).join('')+'</div></section>';
     }).join('');
   }
+  /* Thirty-odd compositions in one flat grid is a wall. The split that actually
+     matters commercially is whether the card carries the business name: one is a
+     per-client job, the other is a print run that works for anybody. */
+  if(lookTab==='plate'){
+    var named=[], plain=[];
+    dockStyleItems('plate').forEach(function(it){
+      var tile=lookTile('plate',it.id,it.n,lookWhy('plate',it.i),dockOn('plate',it.id));
+      (plateNamed(it.i)?named:plain).push(tile);
+    });
+    return lookGroup('Carries the business name',named)+
+           lookGroup('Wordless \u2014 one print works for anybody',plain);
+  }
   var t = lookTab==='fav' ? lookFavTiles() : lookAxisTiles(lookTab);
   if(!t.length) return '<div class="dempty">NOTHING STARRED YET<br>'+
     'HOVER ANY TILE AND HIT ITS STAR TO KEEP A COPY HERE</div>';
   return '<div class="lookgrid">'+t.join('')+'</div>';
+}
+function lookGroup(title,tiles){
+  if(!tiles.length) return '';
+  return '<section class="lshelf"><h4 class="lshelfh">'+esc(title)+
+    '<span class="lshelfsub">'+tiles.length+'</span></h4>'+
+    '<div class="lookgrid lookgrid-in">'+tiles.join('')+'</div></section>';
+}
+/* Does this composition print the business name? Built once per draw and cached,
+   because it has to construct the stack to find out. */
+var PLATENAMED={};
+function plateNamed(i){
+  if(PLATENAMED[i]!=null) return PLATENAMED[i];
+  var yes=false;
+  try{ yes=PLATES[i][1](S.fmt).some(function(L){ return L.k==='name' && !L.hidden }) }
+  catch(err){ yes=false }
+  PLATENAMED[i]=yes; return yes;
 }
 /* What the card is actually made of, in the words the inspector already uses. */
 function lookIngredients(stack){
