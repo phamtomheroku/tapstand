@@ -349,6 +349,82 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .dockfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 10px;
   border-top:1px solid var(--rule-2)}
 .dockfoot .btn{flex:none;margin:0}
+
+/* ---- the looks browser ---- */
+.lookbtn{width:100%;display:flex;align-items:center;gap:10px;text-align:left;
+  padding:9px 10px;border:1px solid var(--rule);background:var(--panel);
+  color:var(--ink);cursor:pointer;border-radius:3px;font:inherit}
+.lookbtn:hover{border-color:var(--accent);color:var(--accent)}
+.lookbtntxt{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.lookbtnn{font-size:13px;font-weight:600;line-height:1.2}
+.lookbtns{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3);line-height:1.35}
+.lookbtn:hover .lookbtns{color:var(--accent)}
+.lookbtnc{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);flex:none}
+/* three bands, so the tabs and the Done button hold still while the shelves scroll */
+.lookbd{display:flex;flex-direction:column;max-width:min(1180px,96vw);
+  max-height:calc(100vh - 40px);overflow:hidden}
+.lookhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex:none;
+  padding:14px 48px 12px 14px;border-bottom:1px solid var(--rule)}
+.lookhead h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;font-weight:600;
+  text-transform:uppercase;color:var(--ink-2);flex:none;margin:0}
+.looktabs{display:flex;flex-wrap:wrap;gap:4px}
+.ltab{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+  padding:4px 8px;border:1px solid var(--rule);background:transparent;color:var(--ink-2);
+  cursor:pointer;border-radius:2px}
+.ltab:hover{border-color:var(--ink-3)}
+.ltab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ltab .dn{opacity:.55;margin-left:5px}
+.lookbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.lookfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:none;
+  padding:11px 14px;border-top:1px solid var(--rule)}
+.lookfoot .btn{flex:none;margin:0}
+/* a shelf is one direction's worth of finished cards. Sideways, because a row
+   that scrolls costs one screenful of rendering however long it is. */
+.shelf{padding:15px 14px 2px}
+.shelfh{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0 0 10px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:600}
+.shelfsub{font-family:var(--sans);font-size:11.5px;letter-spacing:0;text-transform:none;
+  color:var(--ink-3);font-weight:400}
+.shelfrow{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 14px;
+  scroll-snap-type:x proximity}
+.shelfrow>.ltile{flex:0 0 214px;scroll-snap-align:start}
+.lookgrid{display:grid;gap:12px;padding:15px 14px;
+  grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
+.lookgrid[hidden]{display:none}
+.ltile{position:relative;background:var(--panel);border:1px solid var(--rule-2);
+  border-radius:3px;padding:10px;cursor:pointer;font:inherit;color:var(--ink);
+  display:flex;flex-direction:column;gap:9px;text-align:left}
+.ltile:hover,.ltile:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+.ltile[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);
+  box-shadow:inset 0 0 0 2px var(--accent)}
+/* the box holds the card's ratio before the miniature lands, so filling on scroll
+   never shoves the rest of the shelf sideways */
+.lart{display:block;width:100%;background:var(--paper-2)}
+.lart>.mini{width:100%;box-shadow:0 1px 3px rgba(8,14,17,.18)}
+.lmeta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lname{font-size:12.5px;font-weight:600;line-height:1.25;overflow-wrap:break-word}
+.lsub{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);line-height:1.35;overflow-wrap:break-word}
+.ltile:hover .lsub,.ltile[aria-pressed="true"] .lsub{color:var(--accent)}
+.ldetail{display:grid;gap:20px;padding:15px 14px;grid-template-columns:1fr;align-items:start}
+@media(min-width:820px){.ldetail{grid-template-columns:minmax(0,340px) 1fr}}
+.lback{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+  text-transform:uppercase;background:none;border:0;padding:14px 14px 0;
+  color:var(--ink-3);cursor:pointer}
+.lback:hover{color:var(--accent)}
+.lbig .mini{width:100%;box-shadow:0 2px 12px rgba(8,14,17,.22)}
+.lspec{display:flex;flex-direction:column;gap:15px;min-width:0}
+.lspec h4{margin:0;font-size:19px;font-weight:750;letter-spacing:-.015em;line-height:1.15}
+.lprose{margin:0;font-size:13px;line-height:1.55;color:var(--ink-2);max-width:60ch}
+.lface{font-size:22px;line-height:1.25;color:var(--ink)}
+.lsw{display:flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;width:max-content}
+.lsw i{display:block;width:30px;height:20px}
+.lings{display:flex;flex-wrap:wrap;gap:5px}
+.ling{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);border:1px solid var(--rule-2);border-radius:2px;padding:3px 6px}
 /* a true miniature of the card, rendered by the same code that draws the real one */
 .mini{position:relative;overflow:hidden;container-type:inline-size;width:100%;
   border:1px solid var(--rule-2)}
@@ -815,12 +891,25 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
           <details class="sect" open>
             <summary class="sect-h"><span class="sect-n">04</span>Look</summary>
             <div class="sect-b">
-              <div class="grp"><span class="lbl">Direction — pick this first</span>
-                <div class="chips" id="dirs"></div></div>
-              <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
+              <!-- Four chip rows, each writing one number with no picture attached,
+                   is not a way to choose how a card looks. This says what the card is
+                   wearing and opens the browser. The rows stay underneath, collapsed,
+                   for anyone who already knows the name of the thing they want — and
+                   so that nothing that used to work stopped working. -->
+              <div class="grp"><span class="lbl">Look</span>
+                <button class="lookbtn" id="lookOpen" type="button">
+                  <span class="lookbtntxt">
+                    <span class="lookbtnn" id="lookBtnN">&mdash;</span>
+                    <span class="lookbtns" id="lookBtnS"></span>
+                  </span>
+                  <span class="lookbtnc">Browse</span>
+                </button></div>
               <details class="sub">
-                <summary class="sect-h">Refine — theme &amp; palette</summary>
+                <summary class="sect-h">Pick without previews</summary>
                 <div class="sect-b">
+                  <div class="grp"><span class="lbl">Direction — pick this first</span>
+                    <div class="chips" id="dirs"></div></div>
+                  <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
                   <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
                   <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
                 </div>
@@ -1066,6 +1155,26 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
       <button class="btn" id="libStageCancel" type="button" hidden>Cancel</button>
       <button class="btn solid" id="libStageAdd" type="button" hidden>Add to library</button>
       <span class="libnote" id="libNote"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Looks. Its own sheet, like the icon library above and for the same reason:
+     neither should have to know the other exists. Wider than the library, because
+     the thing being chosen here is a whole card and a card you cannot read is not
+     a choice. -->
+<div class="modal" id="lookModal" hidden>
+  <div class="mbd lookbd" role="dialog" aria-modal="true" aria-labelledby="lookTitle">
+    <button class="mx" id="lookClose" aria-label="Close">&#215;</button>
+    <div class="lookhead">
+      <h3 id="lookTitle">Looks</h3>
+      <div class="looktabs" id="lookTabs" role="tablist" aria-label="What to browse"></div>
+    </div>
+    <div class="lookbody" id="lookBody"></div>
+    <div class="lookfoot">
+      <span class="libnote" id="lookCur"></span>
+      <button class="btn" id="lookRandom" type="button">Surprise me</button>
+      <button class="btn solid" id="lookDone" type="button">Done</button>
     </div>
   </div>
 </div>
@@ -4012,6 +4121,12 @@ function drawAxes(){
   drawRow($('plates'),PLATES,function(x){return x[0]},S.plate,allowPl,'p');
   drawRow($('themes'),THEMES,function(x){return x.k},S.theme,d.th,'t');
   drawRow($('pals'),PALETTES,function(x){return x.k},S.pal,d.pal,'a');
+  // the button in the sidebar says what the card is wearing without opening anything
+  if($('lookBtnN')){
+    $('lookBtnN').textContent=(PLATES[S.plate]||[''])[0]||'Custom';
+    $('lookBtnS').textContent=DIRECTIONS[S.dir|0].k+' \u00b7 '+THEMES[S.theme|0].k+
+      ' \u00b7 '+PALETTES[S.pal|0].k;
+  }
 }
 var dirsEl=$('dirs');
 dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
@@ -5262,6 +5377,9 @@ $('saveImg').addEventListener('click',function(){
 /* ============ 4. keyboard ============ */
 document.addEventListener('keydown',function(e){
   var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return;
+  // A sheet is open over the card: an arrow key nudging a layer, or Backspace
+  // deleting one, behind a dialog you are reading is never what was meant.
+  if(!$('libModal').hidden || !$('lookModal').hidden) return;
   var meta=e.metaKey||e.ctrlKey;
   if(meta && e.key.toLowerCase()==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
   if(meta && e.key.toLowerCase()==='d'){ e.preventDefault(); dupLayer(); return; }
@@ -5970,6 +6088,341 @@ function exportPDF(){
   setTimeout(restore,1500);            // belt and braces if afterprint never fires
 }
 $('printBtn').addEventListener('click',exportPDF);
+
+/* ============ 10b. the looks browser ============
+   Four chip rows asked the user to choose a direction, a composition, a theme and
+   a palette — four axes that mean nothing to somebody who just wants a card that
+   looks good. A LOOK is all four at once: a finished card you can point at. The
+   axes are still here, one level down, for refining what you picked.
+
+   Directions are not shown as a thing to set any more. A direction is a curator —
+   it already names the themes, palettes and compositions that go together — so it
+   is used as a shelf label, which is what it actually is. */
+var DIR_NOTE={
+  Bold:'Loud type, strong colour. Reads across a room.',
+  Premium:'Restrained, serif, a lot of air.',
+  Playful:'Rounded, bright, informal.',
+  Utilitarian:'Plain and legible. Nothing decorative.',
+  Quiet:'Almost nothing on it, and confident about that.',
+  Newsprint:'Editorial. Rules, columns, a printed feel.',
+  Counter:'Built to be read across a counter.',
+  Badge:'The mark does the work; the card frames it.'
+};
+var LOOKS_PER_DIR=4;
+var LOOKS=null;
+/* Built from the direction table rather than authored separately, so there is one
+   source of truth for what goes with what: the seed each direction already names,
+   then a walk through its own whitelists. The palette index is offset by one so
+   the lists do not move in lockstep when they happen to be the same length. */
+function lookBuild(){
+  var out=[], all=PLATES.map(function(_,i){return i}).filter(plateFitsTrim);
+  DIRECTIONS.forEach(function(d,di){
+    if(!d.def) return;                        // "All" curates nothing, so it seeds nothing
+    var th=d.th||[S.theme|0], pa=d.pal||[S.pal|0];
+    var pl=(d.pl||all).filter(plateFitsTrim); if(!pl.length) pl=all;
+    if(!pl.length) return;
+    var seen={}, n=0;
+    for(var j=0; j<LOOKS_PER_DIR*3 && n<LOOKS_PER_DIR; j++){
+      var t=j?th[j%th.length]:d.def[0];
+      var p=j?pa[(j+1)%pa.length]:d.def[1];
+      // four directions seed a composition their trim does not offer; the chip rows
+      // never noticed, because the seed was applied without anyone looking
+      var c=j?pl[j%pl.length]:(plateFitsTrimAt(d.def[2],S.fmt)?d.def[2]:pl[0]);
+      var k=t+'/'+p+'/'+c; if(seen[k]) continue; seen[k]=1;
+      out.push({id:'L'+di+'-'+n, dir:di, th:t, pal:p, pl:c});
+      n++;
+    }
+  });
+  return out;
+}
+function looks(){ if(!LOOKS) LOOKS=lookBuild(); return LOOKS }
+function lookGet(id){ var a=looks(),i;
+  for(i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null }
+/* An archetype composition reads DIRECTIONS[S.dir].g when its stack is BUILT, so a
+   look has to be built standing in its own direction or every card on the shelf
+   wears the current card's pattern. */
+function lookStack(L){
+  var keep=S.dir; S.dir=L.dir;
+  try{ return PLATES[L.pl][1](S.fmt) } finally{ S.dir=keep }
+}
+function lookMini(L){
+  return miniCard(lookStack(L),
+    {th:THEMES[L.th], pal:PALETTES[L.pal].fn(elBrand.value,elBg.value)});
+}
+function lookOn(L){ return S.plate===L.pl && S.theme===L.th && S.pal===L.pal }
+
+/* One cache for every miniature this sheet draws, keyed on the exact set a
+   miniature reads. The sheet is modal, so nothing that feeds it can change while
+   it is open — the cache cannot go stale mid-session, and reopening after a look
+   at the card costs nothing at all. */
+var LOOKART={}, LOOKSEED=null;
+function lookSeed(){
+  return snap()+'|'+S.fmt+'|'+elBrand.value+'|'+elBg.value+'|'+elName.value+'|'+
+    elCopy.value+'|'+(showQR?1:0)+'|'+(S.logo?1:0)+'|'+(S.platLib||'');
+}
+function lookFresh(){
+  var k=lookSeed();
+  if(k!==LOOKSEED){ LOOKART={}; LOOKSEED=k; }
+}
+function lookArtFor(fid,id){
+  var k=fid+'/'+id;
+  if(LOOKART[k]!=null) return LOOKART[k];
+  var out='';
+  try{
+    if(fid==='look'){ var L=lookGet(id); out=L?lookMini(L):'' }
+    else out=dockStyleArt(fid,{id:id, i:+id.slice(1)});
+  }catch(err){ out='' }        // a broken composition must not empty the shelf
+  LOOKART[k]=out; return out;
+}
+
+var lookTab='look', lookDetail=null, lookOpener=null, lookIO=null, lookScroll={};
+var LOOK_TABS=[{id:'look',n:'Looks'},{id:'plate',n:'Compositions'},
+  {id:'theme',n:'Themes'},{id:'pal',n:'Palettes'},{id:'fav',n:'\u2605 Starred'}];
+var LOOK_FIDS={plate:1,theme:1,pal:1,dir:1};
+
+function lookTile(fid,id,name,sub,on){
+  var ar=FORMATS[S.fmt].ar||1.5;
+  return '<button class="ltile" type="button" data-f="'+esc(fid)+'" data-id="'+esc(id)+
+    '" aria-pressed="'+(!!on)+'" title="'+esc(name)+'">'+
+    '<span class="lart" style="aspect-ratio:1/'+ar+'" data-art="'+esc(fid)+':'+esc(id)+'"></span>'+
+    '<span class="lmeta"><span class="lname">'+esc(name)+'</span>'+
+    (sub?'<span class="lsub">'+esc(sub)+'</span>':'')+'</span>'+
+    '<span class="dstar'+(isFav(fid,id)?' on':'')+'" data-fav="1" aria-hidden="true">'+
+    (isFav(fid,id)?'\u2605':'\u2606')+'</span></button>';
+}
+/* Which directions recommend this one. The whitelists are useful as a reason to
+   pick something and harmful as a filter — most compositions and the Google theme
+   are named by no direction at all, so filtering by them would hide more than half
+   the catalogue. This shows the recommendation and hides nothing. */
+function lookWhy(fid,i){
+  var key = fid==='plate'?'pl':(fid==='theme'?'th':'pal'), out=[];
+  DIRECTIONS.forEach(function(d){ if(d[key] && d[key].indexOf(i)>=0) out.push(d.k) });
+  return out.length?out.slice(0,3).join(' \u00b7 '):'';
+}
+function lookAxisTiles(fid){
+  return dockStyleItems(fid).map(function(it){
+    return lookTile(fid,it.id,it.n,lookWhy(fid,it.i),dockOn(fid,it.id));
+  });
+}
+function lookFavTiles(){
+  var out=[];
+  looks().forEach(function(L){ if(isFav('look',L.id))
+    out.push(lookTile('look',L.id,PLATES[L.pl][0],
+      THEMES[L.th].k+' \u00b7 '+PALETTES[L.pal].k,lookOn(L))) });
+  ['plate','theme','pal'].forEach(function(fid){
+    dockStyleItems(fid).forEach(function(it){ if(isFav(fid,it.id))
+      out.push(lookTile(fid,it.id,it.n,lookWhy(fid,it.i),dockOn(fid,it.id))) });
+  });
+  return out;
+}
+function lookTabCount(id){
+  if(id==='look') return looks().length;
+  if(id==='fav')  return lookFavTiles().length;
+  return dockStyleItems(id).length;
+}
+function lookListHTML(){
+  if(lookTab==='look'){
+    var by={}; looks().forEach(function(L){ (by[L.dir]=by[L.dir]||[]).push(L) });
+    return DIRECTIONS.map(function(d,di){
+      var r=by[di]; if(!r) return '';
+      return '<section class="shelf"><h4 class="shelfh">'+esc(d.k)+
+        '<span class="shelfsub">'+esc(DIR_NOTE[d.k]||'')+'</span></h4>'+
+        '<div class="shelfrow">'+r.map(function(L){
+          return lookTile('look',L.id,PLATES[L.pl][0],
+            THEMES[L.th].k+' \u00b7 '+PALETTES[L.pal].k, lookOn(L));
+        }).join('')+'</div></section>';
+    }).join('');
+  }
+  var t = lookTab==='fav' ? lookFavTiles() : lookAxisTiles(lookTab);
+  if(!t.length) return '<div class="dempty">NOTHING STARRED YET<br>'+
+    'HOVER ANY TILE AND HIT ITS STAR TO KEEP A COPY HERE</div>';
+  return '<div class="lookgrid">'+t.join('')+'</div>';
+}
+/* What the card is actually made of, in the words the inspector already uses. */
+function lookIngredients(stack){
+  var seen={}, out=[];
+  stack.forEach(function(L){
+    if(L.hidden) return;
+    // not every layer carries a kind — a plain text layer you added yourself has
+    // none, and KIND_LABEL[undefined] printed the word "undefined" onto the card's
+    // ingredient list
+    var n=KIND_LABEL[L.k] || L.k || (L.t==='text' ? 'Text' : '');
+    if(n && !seen[n]){ seen[n]=1; out.push(n) }
+  });
+  return out;
+}
+function lookDetailHTML(d){
+  var fid=d.f, id=d.id, big='', title='', prose='', extra='';
+  if(fid==='look'){
+    var L=lookGet(id); if(!L) return lookListHTML();
+    var st=lookStack(L), pal=PALETTES[L.pal].fn(elBrand.value,elBg.value);
+    big=lookArtFor('look',id);
+    title=PLATES[L.pl][0];
+    prose=PLATES[L.pl][0]+' composition, '+THEMES[L.th].k+' theme, '+
+          PALETTES[L.pal].k+' palette \u2014 from the '+DIRECTIONS[L.dir].k+' shelf.';
+    extra='<div class="lface" style="font-family:'+FONTS[THEMES[L.th].disp]+'">'+
+            esc(THEMES[L.th].k)+'</div>'+
+          '<div class="lsw"><i style="background:'+pal.ground+'"></i>'+
+            '<i style="background:'+pal.brand+'"></i>'+
+            '<i style="background:'+pal.accent+'"></i>'+
+            '<i style="background:'+pal.tint+'"></i></div>'+
+          '<div class="lings">'+lookIngredients(st).map(function(n){
+            return '<span class="ling">'+esc(n)+'</span>' }).join('')+'</div>';
+  }else{
+    var i=+id.slice(1);
+    big=lookArtFor(fid,id);
+    if(fid==='theme'){
+      var th=THEMES[i]; title=th.k;
+      prose='Type set in '+th.disp+' over '+th.body+'. '+th.frame+' frame, '+
+            th.star+' stars, '+th.ring+' tap ring'+
+            (th.tex!=='none'?', '+th.tex+' texture':'')+'.';
+      extra='<div class="lface" style="font-family:'+FONTS[th.disp]+'">'+esc(th.k)+'</div>';
+    }else if(fid==='pal'){
+      var pa=PALETTES[i].fn(elBrand.value,elBg.value); title=PALETTES[i].k;
+      prose=(pa.groundCSS!==pa.ground?'A gradient ground.':'A flat ground.')+
+            ' Text prints '+contrast(pa.ground)+' on it.';
+      extra='<div class="lsw"><i style="background:'+pa.ground+'"></i>'+
+            '<i style="background:'+pa.brand+'"></i>'+
+            '<i style="background:'+pa.accent+'"></i>'+
+            '<i style="background:'+pa.tint+'"></i></div>';
+    }else{
+      title=PLATES[i][0];
+      var pst=[]; try{ pst=PLATES[i][1](S.fmt) }catch(err){ pst=[] }
+      var named=pst.some(function(L){ return L.k==='name' && !L.hidden });
+      prose=named?'Carries the business name, so it is a per-client job.'
+                 :'No business name on it \u2014 the same print works for anybody.';
+      extra='<div class="lings">'+lookIngredients(pst).map(function(n){
+        return '<span class="ling">'+esc(n)+'</span>' }).join('')+'</div>';
+    }
+    var why=lookWhy(fid,i);
+    if(why) extra+='<p class="lprose">Recommended by '+esc(why)+'.</p>';
+  }
+  return '<button class="lback" type="button">&larr; Back</button>'+
+    '<div class="ldetail"><div class="lbig">'+big+'</div>'+
+    '<div class="lspec"><h4>'+esc(title)+'</h4>'+
+    '<p class="lprose">'+esc(prose)+'</p>'+extra+
+    '<div><button class="btn solid" type="button" data-use="1">Use this</button></div>'+
+    '</div></div>';
+}
+function lookDraw(){
+  lookFresh();
+  $('lookTabs').innerHTML=LOOK_TABS.map(function(t){
+    return '<button class="ltab" type="button" role="tab" data-tab="'+t.id+
+      '" aria-selected="'+(lookTab===t.id)+'">'+t.n+
+      '<span class="dn">'+lookTabCount(t.id)+'</span></button>' }).join('');
+  var b=$('lookBody');
+  b.innerHTML = lookDetail ? lookDetailHTML(lookDetail) : lookListHTML();
+  b.scrollTop = lookDetail ? 0 : (lookScroll[lookTab]||0);
+  $('lookCur').textContent='On the card now \u00b7 '+(PLATES[S.plate]||[''])[0]+' \u00b7 '+
+    THEMES[S.theme|0].k+' \u00b7 '+PALETTES[S.pal|0].k;
+  lookObserve();
+}
+/* Tiles ship empty and fill as they scroll in. Thirty-odd finished cards is more
+   rendering than a laptop should do to open a menu, and about nine are on screen
+   at once. Nothing here is on paint()'s path. */
+function lookObserve(){
+  if(lookIO){ lookIO.disconnect(); lookIO=null }
+  var boxes=[].slice.call($('lookBody').querySelectorAll('.lart[data-art]'));
+  if(!window.IntersectionObserver){ boxes.forEach(lookFill); return }
+  lookIO=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(!en.isIntersecting) return;
+      lookFill(en.target); lookIO.unobserve(en.target);
+    });
+  },{root:$('lookBody'), rootMargin:'260px'});
+  boxes.forEach(function(el){ lookIO.observe(el) });
+  lookPrime();
+}
+/* Whatever is already on screen is filled now, synchronously, rather than waiting
+   to be told about it. An observer only reports once the page is actually being
+   composited, so a background tab or an occluded window would otherwise open this
+   sheet on a grid of empty boxes and keep them empty. The observer still does the
+   real work — everything below the fold, on scroll. */
+function lookPrime(){
+  var body=$('lookBody'), root=body.getBoundingClientRect(), M=260;
+  var boxes=[].slice.call(body.querySelectorAll('.lart[data-art]'));
+  // A root with no size cannot be intersected with, and an observer on a page that
+  // is not being composited never reports either — between them that is an empty
+  // sheet with no way out of it. Draw everything rather than nothing.
+  if(!root.width || !root.height){ boxes.forEach(lookFill); return }
+  boxes.forEach(function(el){
+    var r=el.getBoundingClientRect();
+    if(r.bottom>root.top-M && r.top<root.bottom+M &&
+       r.right>root.left-M && r.left<root.right+M) lookFill(el);
+  });
+}
+/* The observer does the work when it is delivered; this is the floor under it.
+   Already-filled tiles drop out of the [data-art] query, so it settles to one
+   cheap selector call per scroll. */
+$('lookBody').addEventListener('scroll',lookPrime);
+function lookFill(el){
+  var a=el.getAttribute('data-art'); if(!a) return;
+  var i=a.indexOf(':');
+  el.innerHTML=lookArtFor(a.slice(0,i), a.slice(i+1));
+  el.removeAttribute('data-art');
+}
+function openLook(tab,opener){
+  lookTab=tab||'look'; lookDetail=null; lookOpener=opener||null;
+  LOOKS=null;                          // the trim decides what is on the shelves
+  $('lookModal').hidden=false;
+  lookDraw();
+  $('lookClose').focus();
+}
+function closeLook(){
+  var m=$('lookModal'); if(m.hidden) return;
+  if(lookIO){ lookIO.disconnect(); lookIO=null }
+  m.hidden=true;
+  var o=lookOpener; lookOpener=null;
+  if(o && document.contains(o)) o.focus();
+}
+/* One way in, so a whole look and a single axis are undone the same way. The chip
+   rows never called pushUndo and the dock always did, which meant picking the same
+   theme from two places used to mean two different things. */
+function lookUse(fid,id){
+  pushUndo();
+  if(fid==='look'){
+    var L=lookGet(id); if(!L){ UNDO.pop(); return }
+    S.dir=L.dir; S.theme=L.th; S.pal=L.pal; S.plate=L.pl;
+    S.stack=lookStack(L); selectOnly(null);
+  }
+  else if(fid==='plate'){ S.plate=+id.slice(1);
+    S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null) }
+  else if(fid==='theme') S.theme=+id.slice(1);
+  else if(fid==='pal')   S.pal=+id.slice(1);
+  else { UNDO.pop(); return }
+  drawAxes(); paint(); lookDraw();
+}
+$('lookOpen').addEventListener('click',function(){ openLook('look',this) });
+$('lookClose').addEventListener('click',closeLook);
+$('lookDone').addEventListener('click',closeLook);
+$('lookModal').addEventListener('click',function(e){ if(e.target===this) closeLook() });
+$('lookTabs').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-tab]'); if(!b) return;
+  lookScroll[lookTab]=$('lookBody').scrollTop;
+  lookTab=b.dataset.tab; lookDetail=null; lookDraw();
+});
+$('lookBody').addEventListener('click',function(e){
+  if(e.target.closest('.lback')){ lookDetail=null; lookDraw(); return }
+  if(e.target.closest('[data-use]')){ if(lookDetail) lookUse(lookDetail.f,lookDetail.id); return }
+  var t=e.target.closest('.ltile'); if(!t) return;
+  if(e.target.closest('[data-fav]')){
+    e.preventDefault(); e.stopPropagation();
+    toggleFav(t.dataset.f,t.dataset.id); lookDraw(); return;
+  }
+  lookScroll[lookTab]=this.scrollTop;
+  lookDetail={f:t.dataset.f, id:t.dataset.id};
+  lookDraw();
+});
+$('lookRandom').addEventListener('click',function(){
+  var a=looks(); if(a.length) lookUse('look', a[(Math.random()*a.length)|0].id);
+});
+/* Escape backs out one step at a time, the same shape as the library's: out of the
+   card you are looking at, then out of the sheet. */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape' || $('lookModal').hidden) return;
+  e.stopPropagation();
+  if(lookDetail){ lookDetail=null; lookDraw() } else closeLook();
+},true);
 
 /* ============ 11. Sheet PDF — N-up imposition ============
    The card PDF is one design per page at exact trim. On a laser printer with a
