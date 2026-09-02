@@ -2656,7 +2656,10 @@ function wStandingPanel(f,g){ if(!isWide(f)) return aEdge(f,g);
  return[
  {t:"box",k:"fill",x:.16,y:.5,w:.38,hf:1.2},
  {t:"box",k:"tap",x:.16,y:.36,s:1.5,onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"mark"},
- {t:"text",x:.16,y:0.75,s:.62,w:.3,onBand:1,lh:1.1,text:"TAP TO REVIEW",fw:820,ls:.16},
+ // nudged right and narrowed: centred at .16 across .30 the caption reached x .01,
+ // and the frame border owns the outer 2.56%, so its first letter drew underneath
+ // the frame rather than on the band
+ {t:"text",x:.175,y:0.75,s:.62,w:.27,onBand:1,lh:1.1,text:"TAP TO REVIEW",fw:820,ls:.16},
  {t:"box",k:"logo",x:0.93,y:0.1875,s:1,al:"right",lw:30,lh:9},
  {t:"box",k:"name",x:0.93,y:0.1875,s:.95,al:"right"},
  {t:"box",k:"head",x:0.93,y:.5,s:.9,w:.5,al:"right"},
@@ -2690,7 +2693,10 @@ function wFooterBar(f,g){ if(!isWide(f)) return aDiagonal(f,g);
  {t:"box",k:"hero",x:.82,y:.4,s:1.6,g:g.hero,op:.12},
  {t:"text",x:0.07,y:0.0625,s:.32,al:"left",text:"THANKS FOR STOPPING BY",fw:760,ls:.24},
  {t:"box",k:"logo",x:0.07,y:.25,s:1,al:"left",lw:27,lh:8.5},
- {t:"box",k:"name",x:0.07,y:.25,s:.95,al:"left"},
+ // the headline holds the right 42% of this row, so the name has to be bounded to
+ // the left column — unbounded it grew rightward under a long business name and
+ // ran into it. Apex Auto Detail reached x .61 against a headline starting at .51.
+ {t:"box",k:"name",x:0.07,y:.25,s:.95,w:.42,al:"left"},
  {t:"box",k:"stars",x:0.07,y:.5,s:.62,al:"left"},
  {t:"box",k:"head",x:0.93,y:0.3125,s:.72,w:.42,al:"right"},
  {t:"box",k:"plat",x:0.93,y:0.5625,s:1,al:"right",word:"Google",ph:8},
@@ -5529,7 +5535,13 @@ function preflight(){
    applyDesign puts it back. Both the file Save/Load and the card shelf below go
    through these, so there is exactly one definition of what a card IS. */
 function captureDesign(){
-  return {v:1,stack:S.stack,dir:S.dir,plate:S.plate,theme:S.theme,pal:S.pal,fmt:S.fmt,
+  /* plateName as well as plate: an index only means anything against the exact
+     composition list that existed when the file was written, and inserting a
+     single composition renumbers every one after it. The ten cards in cards/
+     were written before six were added at the front and now point six places
+     along. The name survives that; the index stays for older files. */
+  return {v:1,stack:S.stack,dir:S.dir,plate:S.plate,plateName:(PLATES[S.plate]||[])[0]||null,
+    theme:S.theme,pal:S.pal,fmt:S.fmt,
     name:elName.value,copy:elCopy.value,brand:elBrand.value,bg:elBg.value,logo:S.logo,
     userFonts:S.userFonts,dispFont:S.dispFont,bodyFont:S.bodyFont,
     platImg:S.platImg||null,platImgMode:S.platImgMode||'asis',platLib:S.platLib||null,
@@ -5543,7 +5555,16 @@ function captureDesign(){
 /* Returns a promise that settles once any custom faces are registered — the card
    is on screen before then, just in the fallback face. */
 function applyDesign(d){
-  S.stack=d.stack; S.dir=d.dir|0; S.plate=d.plate|0; S.theme=d.theme|0; S.pal=d.pal|0; S.fmt=d.fmt|0;
+  S.stack=d.stack; S.dir=d.dir|0; S.theme=d.theme|0; S.pal=d.pal|0; S.fmt=d.fmt|0;
+  S.plate=d.plate|0;
+  if(d.plateName){                      // name wins wherever it still resolves
+    for(var _p=0;_p<PLATES.length;_p++) if(PLATES[_p][0]===d.plateName){ S.plate=_p; break }
+  }
+  // drawAxes() rebuilds the composition, theme and palette rows but not the format
+  // row, so a loaded card drew at the right trim while the chips still showed the
+  // one you had open before it.
+  Array.prototype.forEach.call($('formats').children,function(c){
+    c.setAttribute('aria-pressed', c.dataset.f===String(S.fmt) ? 'true':'false') });
   elName.value=d.name||''; elBrand.value=d.brand||'#000000'; elBg.value=d.bg||'#ffffff';
   fillCopy(false); if(d.copy){ if([].indexOf.call(elCopy.options,d.copy)<0)
     elCopy.add(new Option(d.copy,d.copy)); elCopy.value=d.copy; }
