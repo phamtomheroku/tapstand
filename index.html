@@ -2648,8 +2648,8 @@ function wBleedRing(f,g){ if(!isWide(f)) return aRadial(f,g);
  {t:"box",k:"tap",x:.94,y:.5,s:2.2,onBand:1,cap:"",ring:"circle",lay:"mark"},
  {t:"box",k:"logo",x:0.07,y:0.1875,s:1,al:"left",onBand:1,lw:30,lh:9},
  {t:"box",k:"name",x:0.07,y:0.1875,s:1,al:"left",onBand:1},
- {t:"text",x:0.07,y:0.5625,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW US ON",fw:800,ls:.14},
- {t:"box",k:"plat",x:0.07,y:0.875,s:1,al:"left",onBand:1,word:"Google",ph:9}]}
+ {t:"text",x:0.07,y:0.5625,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW",fw:800,ls:.14},
+ {t:"box",k:"plat",x:0.07,y:0.8125,s:1,al:"left",onBand:1,word:"Google",ph:9}]}
 
 /* Standing Panel — A hard vertical brand band holds the left third with the mark reversed out of it and the words directly under, leaving the wide right two-thirds white for logo, headline and platform — the split is only possible on a landscape trim and stays restrained enough for a premium counter (bakery, optician, wine shop) where a flooded card would shout. */
 function wStandingPanel(f,g){ if(!isWide(f)) return aEdge(f,g);
@@ -2705,15 +2705,17 @@ function wFooterBar(f,g){ if(!isWide(f)) return aDiagonal(f,g);
 /* Centre Band — A full-bleed accent band across the waist carries the tap mark and its caption inline from the left edge with the platform mark answering it at the right, so the instruction is a sentence read left to right across the long axis rather than a badge in a corner, and the two white stripes above and below hold a matched pair of three-item columns; suits a bolder brand with one strong colour and a short line of copy. */
 function wCentreBand(f,g){ if(!isWide(f)) return aDepth(f,g);
  return[
- {t:"box",k:"fill",x:.5,y:.5,w:1,hf:.52,c:"accent"},
- {t:"box",k:"pattern",x:.5,y:.5,w:1,hf:.52,g:g.pat,op:.14},
+ // the band is sized to what stands on it -- a 13 cqw platform chip and one row
+ // of caption -- rather than to half the card, which left the two floating in it
+ {t:"box",k:"fill",x:.5,y:.5,w:1,hf:.42,c:"accent"},
+ {t:"box",k:"pattern",x:.5,y:.5,w:1,hf:.42,g:g.pat,op:.14},
  {t:"box",k:"logo",x:0.07,y:0.125,s:1,al:"left",lw:24,lh:7},
  {t:"box",k:"name",x:0.07,y:0.125,s:.9,al:"left"},
  {t:"box",k:"stars",x:0.93,y:0.125,s:.58,al:"right"},
  {t:"box",k:"tap",x:.06,y:.5,s:1.05,al:"left",onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"inline"},
  {t:"box",k:"plat",x:0.93,y:.5,s:1,al:"right",onBand:1,word:"Google",ph:7},
  {t:"box",k:"head",x:0.07,y:0.875,s:.46,w:.5,al:"left"},
- {t:"text",x:0.93,y:0.875,s:.3,al:"right",text:"THANK YOU",fw:750,ls:.22}]}
+ {t:"text",x:0.93,y:0.875,s:.3,al:"right",text:"THANK YOU",fw:750,ls:.22,w:.34}]}
 
 /* Ticket Stub — Two honest columns instead of one stacked one: identity and the promise fill the left field under a torn hairline, while a wide accent stub bleeds off the right edge carrying stars, the tap mark and the Google mark as a single action unit — for an independent shop or cafe that wants the brand to lead and the ask to feel like a coupon you tear off. */
 function wTicketStub(f,g){ if(!isWide(f)) return aSplit(f,g);
@@ -2736,7 +2738,7 @@ function wCrossbar(f,g){ if(!isWide(f)) return aFullbleed(f,g);
  {t:"box",k:"logo",x:0.07,y:0.125,s:1,al:"left",lw:26,lh:8},
  {t:"box",k:"name",x:0.07,y:0.125,s:.9,al:"left"},
  {t:"box",k:"tap",x:.06,y:.52,s:1.05,w:.52,al:"left",onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"inline"},
- {t:"box",k:"plat",x:0.93,y:0.5,s:1,al:"right",onBand:1,word:"Google",ph:7},
+ {t:"box",k:"plat",x:0.93,y:0.52,s:1,al:"right",onBand:1,word:"Google",ph:7},
  {t:"text",x:0.07,y:0.875,s:.45,al:"left",text:"THANK YOU",fw:750,ls:.24},
  {t:"box",k:"stars",x:0.93,y:0.875,s:.55,al:"right"}]}
 
@@ -3265,16 +3267,35 @@ function platMark(L,mc,s,hCqw,capCqw){
     // height drives it; if that makes it wider than its box, fit the width instead
     // and give the height back, so the mark is never squashed and never overflows
     var hh=hCqw, ww=hh*(e.ar||1);
+    /* A legibility floor, stated in millimetres rather than cqw. The stacked
+       'review us on Google' lockup carries two lines of small type under the
+       glyph; below about 9 mm of block height that type stops printing legibly,
+       and the plates were given their cqw heights when this layer drew the bare
+       word 'Google' — short, wide and readable at 6 mm. cqw is a percent of the
+       card, so the same number is a different physical size on every trim; the
+       floor has to be converted per trim or it is not a floor at all. Wide
+       wordmarks are exempt: they carry no small type, so height is not what makes
+       them readable. */
+    var trimMM = (FORMATS[S.fmt]&&FORMATS[S.fmt].mm)||100;
+    if((e.ar||1) < 1.4){
+      var floorCqw = 9*100/trimMM;
+      if(hh < floorCqw){ hh = floorCqw; ww = hh*(e.ar||1) }
+    }
     if(ww>capCqw){ ww=capCqw; hh=ww/(e.ar||1) }
     var art='<div style="height:'+hh+'cqw;width:'+ww+'cqw'+knock+'">'+
       libArt(e,mc,'height:100%;width:100%',true)+'</div>';
     /* A full-colour trademark on a flooded brand panel is unreadable — the grey in
        the Google lockup all but vanishes on a dark ground — and recolouring it is
        exactly what the brand terms forbid. So give it the white it was drawn for:
-       a padded chip, which is how these marks are meant to sit on colour anyway. */
-    if(L.onBand && !knock && libOwnPaint(e))
-      return '<div style="background:#fff;border-radius:'+(1.6*s)+'cqw;padding:'+
-        (1.9*s)+'cqw '+(2.4*s)+'cqw;display:flex">'+art+'</div>';
+       a padded chip, which is how these marks are meant to sit on colour anyway.
+       The clear space is a fraction of the mark, not a fixed cqw: a flat pad round
+       a small mark is most of the chip, which is how a 7 cqw lockup ended up in a
+       10.8 cqw white square with the mark swimming in it. */
+    if(L.onBand && !knock && libOwnPaint(e)){
+      var pad = hh*0.12;
+      return '<div style="background:#fff;border-radius:'+(hh*0.14)+'cqw;padding:'+
+        pad+'cqw;display:flex">'+art+'</div>';
+    }
     return art;
   }
   if(S.platImg) return '<img src="'+S.platImg+'" alt="" style="height:'+hCqw+
