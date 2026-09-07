@@ -496,7 +496,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .fr-none     .frame{border:none}
 .fr-brackets .frame::before,.fr-brackets .frame::after,
 .fr-brackets .frame2::before,.fr-brackets .frame2::after{
-  content:"";position:absolute;width:14cqw;height:14cqw;border:1.1cqw solid var(--b-brand)}
+  content:"";position:absolute;width:9.5cqw;height:9.5cqw;border:1.1cqw solid var(--b-brand)}
 .fr-brackets .frame::before{top:3cqw;left:3cqw;border-right:none;border-bottom:none}
 .fr-brackets .frame::after{top:3cqw;right:3cqw;border-left:none;border-bottom:none}
 .fr-brackets .frame2::before{bottom:3cqw;left:3cqw;border-right:none;border-top:none}
@@ -510,10 +510,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .tex{position:absolute;inset:0;pointer-events:none;z-index:60}
 .tx-none .tex{display:none}
 .tx-dots .tex{background-image:radial-gradient(var(--b-brand) 22%,transparent 23%);
-  background-size:3.4cqw 3.4cqw;opacity:.13}
-.tx-stripes .tex{background-image:repeating-linear-gradient(-45deg,var(--b-brand) 0 .9cqw,transparent .9cqw 5cqw);
-  opacity:.11}
-.tx-grain .tex{opacity:.30;mix-blend-mode:multiply;background-size:34cqw 34cqw;
+  background-size:calc(var(--mm,1.17cqw)*2.6) calc(var(--mm,1.17cqw)*2.6);opacity:.10}
+.tx-stripes .tex{background-image:repeating-linear-gradient(-45deg,var(--b-brand) 0 calc(var(--mm,1.17cqw)*.7),transparent calc(var(--mm,1.17cqw)*.7) calc(var(--mm,1.17cqw)*4));
+  opacity:.07}
+.tx-grain .tex{opacity:.18;mix-blend-mode:multiply;background-size:calc(var(--mm,1.17cqw)*5) calc(var(--mm,1.17cqw)*5);
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.55'/></svg>")}
 .grid{position:absolute;inset:0;pointer-events:none;z-index:880;opacity:0;transition:opacity .12s}
 .grid.on{opacity:1}
@@ -2645,7 +2645,7 @@ function wBleedRing(f,g){ if(!isWide(f)) return aRadial(f,g);
  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2},
  // no caption: the ring deliberately bleeds off the right edge, so any words
  // inside it get cut mid-letter, and the type to its left already says it
- {t:"box",k:"tap",x:.94,y:.5,s:2.2,onBand:1,cap:"",ring:"circle",lay:"mark"},
+ {t:"box",k:"tap",x:.94,y:.5,s:1.5,onBand:1,cap:"",ring:"circle",lay:"mark",bleed:1},
  {t:"box",k:"logo",x:0.07,y:0.1875,s:1,al:"left",onBand:1,lw:30,lh:9},
  {t:"box",k:"name",x:0.07,y:0.1875,s:1,al:"left",onBand:1},
  {t:"text",x:0.07,y:0.5625,s:.85,w:.42,al:"left",onBand:1,lh:1.05,text:"TAP TO REVIEW",fw:800,ls:.14},
@@ -2655,7 +2655,7 @@ function wBleedRing(f,g){ if(!isWide(f)) return aRadial(f,g);
 function wStandingPanel(f,g){ if(!isWide(f)) return aEdge(f,g);
  return[
  {t:"box",k:"fill",x:.16,y:.5,w:.38,hf:1.2},
- {t:"box",k:"tap",x:.16,y:.36,s:1.5,onBand:1,cap:"TAP TO REVIEW",ring:"circle",lay:"mark"},
+ {t:"box",k:"tap",x:.17,y:.36,s:1.05,onBand:1,ring:"circle",lay:"mark"},
  // nudged right and narrowed: centred at .16 across .30 the caption reached x .01,
  // and the frame border owns the outer 2.56%, so its first letter drew underneath
  // the frame rather than on the band
@@ -2728,7 +2728,7 @@ function wTicketStub(f,g){ if(!isWide(f)) return aSplit(f,g);
  {t:"box",k:"rule",x:.07,y:0.5,w:.3,al:"left",dash:1},
  {t:"box",k:"head",x:.07,y:0.75,s:.78,w:.42,al:"left"},
  {t:"box",k:"stars",x:.78,y:0.1875,s:.6,onBand:1},
- {t:"box",k:"tap",x:.78,y:.5,s:1,w:.38,onBand:1,cap:"TAP TO REVIEW",ring:"circle"},
+ {t:"box",k:"tap",x:.78,y:.5,s:1,w:.38,onBand:1,ring:"circle",lay:"mark"},
  {t:"box",k:"plat",x:.78,y:0.8125,s:1,onBand:1,word:"Google",ph:7}]}
 
 /* Crossbar — A full-bleed accent bar runs the whole long axis with the tap mark set inline at its left end and the Google mark at its right, so the bar itself states the entire transaction at arm's length, while the logo holds the top-left corner and the thank-you and stars anchor the bottom edge — for a busy till where the action has to win before the brand does. */
@@ -3509,7 +3509,12 @@ function bodyHTML(L,ctx){
       if(rg==='square') rs='border-radius:'+(6*s)+'cqw;';
       if(rg==='hex')    rs='border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);';
       if(rg==='dashed') rs='border-style:dashed;';
-      var ringCap = (L.cap==null ? 'TAP' : L.cap);
+      /* lay:"mark" means the mark on its own, and it was only being honoured on the
+         ringless branch — ask for a ring as well and the caption came back. That is
+         how Standing Panel, which carries its own caption layer, ended up printing
+         "TAP TO REVIEW" twice, once inside the ring and once under it. A plate that
+         asks for the mark alone gets the mark alone, ring or no ring. */
+      var ringCap = (L.lay==='mark' || L.lay==='cap') ? '' : (L.cap==null ? 'TAP' : L.cap);
       /* A ring is allowed to run off the trim — that is the whole point of a plate
          like Bleed Ring. Its CONTENTS are not. The icon sits at the ring's centre,
          so when the ring is centred past the edge the icon is centred past the edge
@@ -3525,7 +3530,13 @@ function bodyHTML(L,ctx){
          the curve. A 1:1 mark is 44% of the diameter and the shipped 1.8:1 marks
          land just inside the cap, so nothing that already fitted moves. */
       var iw=11*s*tapAR(L), ih=11*s, PAD=3.5;
-      var capH = ringCap ? 2.9*s*1.25 : 0;
+      /* The words come OUT of the circle. A ring with a two-line caption stacked
+         under the mark inside it is a circle stuffed with a rectangle: the mark
+         has to shrink to make room, the caption has to break, and the whole thing
+         reads as crowded rather than as a target. The ring holds the mark and the
+         caption sits under the ring, where it has the full width of the card to
+         set on one line. */
+      var capH = 0;
       /* When the ring bleeds off the trim the icon is nudged back inside, which
          leaves it sitting off-centre against the arc. Size it to the part of the
          ring you can actually SEE, not the whole diameter, so it stays clear of
@@ -3543,12 +3554,14 @@ function bodyHTML(L,ctx){
       var inner='display:flex;flex-direction:column;align-items:center;justify-content:center;'+
         'gap:'+(.5*s)+'cqw'+
         (nudge ? ';transform:translate('+nudge[0]+'cqw,'+nudge[1]+'cqw)' : '');
-      return '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+'cqw;border-width:'+
-        (.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
-        '<div style="'+inner+'">'+
-        tapArt(iw, ih)+
-        (ringCap ? '<b style="font-size:'+(2.9*s)+'cqw;color:'+mc+'">'+esc(ringCap)+'</b>' : '')+
-        '</div></div>';
+      var ringHTML = '<div class="tapring" style="width:'+(25*s)+'cqw;height:'+(25*s)+
+        'cqw;border-width:'+(.85*s)+'cqw;border-color:'+mc+';gap:'+(.5*s)+'cqw;'+rs+'">'+
+        '<div style="'+inner+'">'+tapArt(iw, ih)+'</div></div>';
+      if(!ringCap) return ringHTML;
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+
+        (1.8*s)+'cqw">'+ringHTML+'<b style="font-family:var(--f-disp);font-size:'+(3.1*s)+
+        'cqw;letter-spacing:.16em;font-weight:750;line-height:1.18;max-width:'+(25*s)+
+        'cqw;color:'+mc+'">'+esc(ringCap)+'</b></div>';
     case 'qr':
       return '<div style="display:flex;flex-direction:column;align-items:center;width:100%">'+
         '<div class="orline" style="font-size:'+(2.7*s)+'cqw;width:'+(30*s)+'cqw;margin-bottom:'+
@@ -3569,6 +3582,12 @@ function paint(quiet){
   brand=pal.brand; fg=pal.ink;
   var fmt=FORMATS[S.fmt];
   card.className=fmt.cls+' fr-'+th.frame+' tx-'+th.tex;
+  /* One millimetre, expressed in cqw, for this trim. A texture is a property of
+     the MATERIAL, so its tile has a physical size — CSS only has cqw, which is a
+     percent of the card, so the same number was a 1.6 mm dot on the small tag and
+     a 4.3 mm dot on the 5x7, and the grain tiled at 29 mm on a credit card, which
+     is blotches rather than grain. */
+  card.style.setProperty('--mm', (100/(fmt.mm||100))+'cqw');
   /* user-uploaded families override the theme's picks; system fallback is always appended */
   card.style.setProperty('--f-disp', S.dispFont ? fontStack(S.dispFont) : FONTS[th.disp]);
   card.style.setProperty('--f-body', S.bodyFont ? fontStack(S.bodyFont) : FONTS[th.body]);
@@ -3643,10 +3662,43 @@ function paint(quiet){
 
   $('dims').innerHTML='<span><b>'+fmt.k+'</b> trim · '+fmt.d+'</span><span>BLEED 3 MM</span>'+
     '<span>SAFE 5 MM</span><span>QR ≥ 30 MM</span><span>'+S.stack.length+' LAYERS</span>';
+  fitRings();
   drawPanel(); preflight();
   // Rebuilding the inspector mid-keystroke would steal focus out of the textarea,
   // so a live edit repaints the card and leaves its own controls alone.
   if(!quiet) drawInspector();
+}
+
+/* A circle is not a box. The ring's contents were sized against 80% of the ring's
+   DIAMETER, as if the ring were a square — but the mark sits at the centre of an
+   arc, and a rectangle only fits a circle when its half-DIAGONAL does. Every ring
+   on every plate had its mark crossing its own stroke: 1% over on the wide bands,
+   38% on the small ones, which is the "the circles look strange" you can see on
+   the card before you can name it.
+   The rule is hypot(w/2,h/2) <= r. It has to be measured rather than computed in
+   the string builder, because a mark's rendered box depends on artwork this file
+   does not know the proportions of until it is laid out. A ring whose contents
+   already fit gets k = 1 and renders exactly as before. */
+function fitRings(){
+  var rings=card.querySelectorAll('.tapring'), i;
+  for(i=0;i<rings.length;i++){
+    var R=rings[i], inner=R.firstElementChild;
+    if(!inner) continue;
+    var cs=getComputedStyle(R), bw=parseFloat(cs.borderTopWidth)||0;
+    if(!bw) continue;                     // no stroke: no arc to stay inside of
+    // offsetWidth/Height are pre-transform, so this measures the natural stack
+    var w=inner.offsetWidth, h=inner.offsetHeight;
+    if(!w || !h) continue;
+    var rIn=R.clientWidth/2, k;
+    if(cs.clipPath && cs.clipPath!=='none')       // hex: the widest inscribed box
+      k = (rIn*0.74)/Math.hypot(w/2,h/2);         // is narrower than the circle's
+    else if(parseFloat(cs.borderTopLeftRadius) < rIn*0.9)   // a rounded square
+      k = Math.min(R.clientWidth*0.86/w, R.clientHeight*0.86/h);
+    else
+      k = (rIn*0.90)/Math.hypot(w/2,h/2);         // clear space inside the stroke
+    var base=inner.dataset.tf!=null ? inner.dataset.tf : (inner.dataset.tf=inner.style.transform||'');
+    inner.style.transform = k<1 ? (base+' scale('+k.toFixed(4)+')').trim() : base;
+  }
 }
 
 /* ---- auto-fit ---------------------------------------------------------------
@@ -3670,6 +3722,12 @@ var autoFit=true, showQR=false;
 function layerCSS(L,M,ctx,th,brand,i){
   ctx.sMul=M.sMul;
   var css='left:'+(M.x*100)+'%;top:'+(M.y*100)+'%;z-index:'+(100+i)+';';
+  /* .lay caps every layer at 92cqw so a long line cannot run off the trim. A ground
+     panel is the opposite case: it is asked for at w 1.06 precisely so it bleeds,
+     and the cap held it to 92cqw — which is why a 4 cqw strip of the card's texture
+     showed down both sides of every panel and band, reading as the panel being laid
+     on a busy pattern rather than as the card's own surface. */
+  if(BG_KINDS[L.k]) css+='max-width:none;';
   if(M.w!=null) css+='width:'+(M.w*100)+'%;';
   // Anything sitting on the colour band flips to whatever reads against the brand,
   // resolved at paint time so it keeps up when the brand colour changes.
@@ -3736,7 +3794,7 @@ function resolveLayout(){
     }
     // then pull anything that now hangs off the card back inside it
     for(i=0;i<items.length;i++){
-      var it=items[i]; if(it.L._man) continue;
+      var it=items[i]; if(it.L._man || it.L.bleed) continue;
       if(it.right>1-PAD/2 || it.left<PAD/2){        // ran off the sides, not the ends
         var cw=it.L.s==null?1:it.L.s; if(cw>.34){ it.L.s=cw*.9; shrunk=true; }
       }
@@ -3747,7 +3805,7 @@ function resolveLayout(){
     shrunk=false;
     items.forEach(function(it){ it.n.style.top=(it.L.y*100)+'%' });
     if(pass>=1){                        // pushing did not clear it: shrink instead
-      var over=items.filter(function(it){ return !it.L._man && (it.bot>1-PAD||it.top<PAD) });
+      var over=items.filter(function(it){ return !it.L._man && !it.L.bleed && (it.bot>1-PAD||it.top<PAD) });
       over.forEach(function(it){
         var cs=it.L.s==null?1:it.L.s;
         if(cs>.34){ it.L.s=cs*.88; }
