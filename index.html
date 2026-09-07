@@ -2895,8 +2895,8 @@ function hReversedField(f,g){
    al:w?"left":"center",onBand:1},
   {t:"box",k:"head",x:w?.58:.5, y:w?0.5:0.8125,s:w?.6:.56,w:w?.36:.7,
    al:w?"left":"center",onBand:1},
-  {t:"box",k:"tap", x:w?.58:.5, y:w?0.75:0.9375,s:w?.85:1,al:w?"left":"center",
-   onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"tap", x:w?.58:.5, y:w?0.75:0.9375,s:w?.76:1,w:w?.35:null,
+   al:w?"left":"center",onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 function hTwinMarks(f,g){
@@ -2916,13 +2916,76 @@ function hTwinMarks(f,g){
   {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
 }
 
+/* Three more with the badge as the subject, these built around a star row.
+
+   The stars are OUTLINE in all three, and that is the design as much as it is the
+   caution. Five filled stars sitting above "review us on Google" supplies the
+   answer with the question — it reads as "give us five", which is the steering the
+   FTC's 2024 consumer-review rule is aimed at. An empty row reads as a form you
+   have been handed, which is both the honest ask and the stronger image: a thing
+   waiting to be filled pulls, a thing already filled just sits there. */
+
+function hRatingPrompt(f,g){
+ /* The badge is the subject and the empty row under it is what you do about it —
+    a rating widget lifted off a screen and printed at counter size. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat", x:.28,y:.5,     s:1,ph:heroPh(f)},
+  {t:"box",k:"name", x:.60,y:0.1875, s:.8,w:.34,al:"left"},
+  {t:"box",k:"stars",x:.60,y:0.4375, s:.72,al:"left",star:"outline"},
+  {t:"box",k:"head", x:.60,y:0.625,  s:.56,w:.34,al:"left"},
+  {t:"box",k:"tap",  x:.60,y:0.8125, s:.72,w:.33,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"name", x:.5,y:0.125, s:.8,w:.8},
+  {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"stars",x:.5,y:0.6875,s:1.05,star:"outline"},
+  {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hSequence(f,g){
+ /* The card diagrams the action instead of describing it: the mark you tap, the
+    row you fill, the place it lands. Three objects, one line, no sentence needed —
+    which is the only version of this card that works from across a counter. */
+ return isWide(f) ? [
+  {t:"box",k:"tap",  x:.19,y:.44,s:1.02,ring:"circle",lay:"mark"},
+  {t:"box",k:"stars",x:.5, y:.44,s:.64,star:"outline"},
+  {t:"box",k:"plat", x:.81,y:.44,s:1,ph:29},
+  {t:"box",k:"name", x:.5, y:0.875,s:.72,w:.7}
+ ] : [
+  {t:"box",k:"tap",  x:.5,y:0.1875,s:1.3,ring:"circle",lay:"mark"},
+  {t:"box",k:"stars",x:.5,y:0.375, s:1.05,star:"outline"},
+  {t:"box",k:"plat", x:.5,y:0.5625,s:1,ph:52},
+  {t:"box",k:"name", x:.5,y:0.8125,s:.78,w:.8},
+  {t:"box",k:"head", x:.5,y:0.9375,s:.52,w:.74}];
+}
+
+function hMarquee(f,g){
+ /* A star row runs the top edge as a header rule and the badge owns everything
+    under it. The stars are ornament here rather than instruction, so they are
+    wide and thin and the badge is left to do the talking. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill", x:.5,y:0.1875,w:1.06,hf:.24},
+  {t:"box",k:"stars",x:.5,y:0.1875,s:.98,onBand:1,star:"outline"},
+  {t:"box",k:"plat", x:.5,y:.5,s:1,ph:Math.min(26, .40*(100*((FORMATS[f]&&FORMATS[f].ar)||1.5)) - 4)},
+  {t:"box",k:"name", x:.07,y:0.75,s:.66,w:.4,al:"left"},
+  {t:"box",k:"tap",  x:.93,y:0.75,s:.66,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill", x:.5,y:0.0625,w:1.06,hf:.14},
+  {t:"box",k:"stars",x:.5,y:0.0625,s:1.15,onBand:1,star:"outline"},
+  {t:"box",k:"plat", x:.5,y:.5,    s:1,ph:heroPh(f)},
+  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
+  {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
 var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
  ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail],
- ["Endorsement",hEndorsement,"any"],["Reversed Field",hReversedField,"any"],["Twin Marks",hTwinMarks,"any"]];
+ ["Endorsement",hEndorsement,"any"],["Reversed Field",hReversedField,"any"],["Twin Marks",hTwinMarks,"any"],
+ ["Rating Prompt",hRatingPrompt,"any"],["Sequence",hSequence,"any"],["Marquee",hMarquee,"any"]];
 
 /* ---- direction ------------------------------------------------------------
    Chosen first, and it governs the rest: which compositions, themes and palettes
@@ -3512,7 +3575,7 @@ function bodyHTML(L,ctx){
       return '<span style="font-weight:750;font-size:'+(5.4*s)+'cqw;letter-spacing:-.01em;'+
         'line-height:1.16;display:block">'+esc(ctx.name)+'</span>';
     case 'stars':
-      var st=ctx.th.star, sz=(6.4*s);
+      var st=L.star||ctx.th.star, sz=(6.4*s);
       if(st==='none') return '';
       if(st==='single')
         return '<div class="stars">'+STAR.replace('<svg','<svg style="width:'+(sz*2.7)+
