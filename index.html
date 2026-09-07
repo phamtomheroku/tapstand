@@ -2869,13 +2869,14 @@ function hEndorsement(f,g){
  var w=isWide(f), t=gT('eyebrow',f,.46);
  if(w) return[
   {t:"box",k:"plat",x:.27,y:.5,     s:1,ph:heroPh(f)},
-  {t:"box",k:"logo",x:.56,y:0.1875, s:1,al:"left",lw:26,lh:8},
-  {t:"box",k:"name",x:.56,y:0.1875, s:.82,w:.38,al:"left"},
-  {t:"box",k:"rule",x:.56,y:0.3125, w:.16,al:"left",op:.5},
-  {t:"box",k:"head",x:.56,y:0.5,    s:.7,w:.38,al:"left"},
-  {t:"box",k:"tap", x:.56,y:0.75,   s:.82,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"logo",x:.56,y:0.25,   s:1,al:"left",shape:"circle",d:17},
+  {t:"box",k:"name",x:.56,y:0.25,   s:.82,w:.38,al:"left"},
+  {t:"box",k:"rule",x:.56,y:0.4375, w:.16,al:"left",op:.5},
+  {t:"box",k:"head",x:.56,y:0.625,  s:.7,w:.38,al:"left"},
+  {t:"box",k:"tap", x:.56,y:0.8125, s:.82,w:.36,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
   {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
+  {t:"box",k:"logo",x:.5,y:0.1875,s:1,shape:"circle",d:24},
   {t:"box",k:"name",x:.5,y:0.1875,s:.8,w:.8},
   {t:"box",k:"plat",x:.5,y:0.5,   s:1,ph:heroPh(f)},
   {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
@@ -2891,6 +2892,8 @@ function hReversedField(f,g){
   {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
   {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
   {t:"box",k:"plat",x:w?.28:.5, y:w?.5:0.4375, s:1,onBand:1,ph:heroPh(f)},
+  {t:"box",k:"logo",x:w?.58:.5, y:w?0.25:0.75, s:1,al:w?"left":"center",
+   onBand:1,shape:"circle",d:w?18:23},
   {t:"box",k:"name",x:w?.58:.5, y:w?0.25:0.75, s:w?.8:.78,w:w?.36:.78,
    al:w?"left":"center",onBand:1},
   {t:"box",k:"head",x:w?.58:.5, y:w?0.5:0.8125,s:w?.6:.56,w:w?.36:.7,
@@ -2912,6 +2915,7 @@ function hTwinMarks(f,g){
   {t:"box",k:"tap", x:.5,y:0.1875,s:1.45,ring:"circle",lay:"mark"},
   {t:"box",k:"rule",x:.5,y:0.375, w:.16,op:.4},
   {t:"box",k:"plat",x:.5,y:0.5625,s:1,ph:56},
+  {t:"box",k:"logo",x:.5,y:0.8125,s:1,shape:"circle",d:19},
   {t:"box",k:"name",x:.5,y:0.8125,s:.78,w:.8},
   {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
 }
@@ -2931,11 +2935,13 @@ function hRatingPrompt(f,g){
  var w=isWide(f);
  if(w) return[
   {t:"box",k:"plat", x:.28,y:.5,     s:1,ph:heroPh(f)},
-  {t:"box",k:"name", x:.60,y:0.1875, s:.8,w:.34,al:"left"},
+  {t:"box",k:"logo", x:.60,y:0.25,   s:1,al:"left",shape:"circle",d:13},
+  {t:"box",k:"name", x:.60,y:0.25,   s:.8,w:.34,al:"left"},
   {t:"box",k:"stars",x:.60,y:0.4375, s:.72,al:"left",star:"outline"},
   {t:"box",k:"head", x:.60,y:0.625,  s:.56,w:.34,al:"left"},
   {t:"box",k:"tap",  x:.60,y:0.8125, s:.72,w:.33,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
+  {t:"box",k:"logo", x:.5,y:0.125, s:1,shape:"circle",d:21},
   {t:"box",k:"name", x:.5,y:0.125, s:.8,w:.8},
   {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
   {t:"box",k:"stars",x:.5,y:0.6875,s:1.05,star:"outline"},
@@ -2950,11 +2956,13 @@ function hSequence(f,g){
   {t:"box",k:"tap",  x:.19,y:.44,s:1.02,ring:"circle",lay:"mark"},
   {t:"box",k:"stars",x:.5, y:.44,s:.64,star:"outline"},
   {t:"box",k:"plat", x:.81,y:.44,s:1,ph:29},
-  {t:"box",k:"name", x:.5, y:0.875,s:.72,w:.7}
+  {t:"box",k:"logo", x:.5, y:0.8125,s:1,shape:"circle",d:10},
+  {t:"box",k:"name", x:.5, y:0.8125,s:.72,w:.7}
  ] : [
   {t:"box",k:"tap",  x:.5,y:0.1875,s:1.3,ring:"circle",lay:"mark"},
   {t:"box",k:"stars",x:.5,y:0.375, s:1.05,star:"outline"},
   {t:"box",k:"plat", x:.5,y:0.5625,s:1,ph:52},
+  {t:"box",k:"logo", x:.5,y:0.8125,s:1,shape:"circle",d:18},
   {t:"box",k:"name", x:.5,y:0.8125,s:.78,w:.8},
   {t:"box",k:"head", x:.5,y:0.9375,s:.52,w:.74}];
 }
@@ -2968,12 +2976,14 @@ function hMarquee(f,g){
   {t:"box",k:"fill", x:.5,y:0.1875,w:1.06,hf:.24},
   {t:"box",k:"stars",x:.5,y:0.1875,s:.98,onBand:1,star:"outline"},
   {t:"box",k:"plat", x:.5,y:.5,s:1,ph:Math.min(26, .40*(100*((FORMATS[f]&&FORMATS[f].ar)||1.5)) - 4)},
+  {t:"box",k:"logo", x:.07,y:0.75,s:1,al:"left",shape:"circle",d:13},
   {t:"box",k:"name", x:.07,y:0.75,s:.66,w:.4,al:"left"},
   {t:"box",k:"tap",  x:.93,y:0.75,s:.66,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
   {t:"box",k:"fill", x:.5,y:0.0625,w:1.06,hf:.14},
   {t:"box",k:"stars",x:.5,y:0.0625,s:1.15,onBand:1,star:"outline"},
   {t:"box",k:"plat", x:.5,y:.5,    s:1,ph:heroPh(f)},
+  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
   {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
   {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
@@ -3552,18 +3562,36 @@ function bodyHTML(L,ctx){
     case 'plat':
       return platMark(L,mc,s,(L.ph||11)*s,(L.pw||96),gnd);
     case 'logo':
-      var LW=(L.lw||42)*s, LH=(L.lh||15)*s;      // a 2.8:1 slot, not a circle
+      /* Three shapes, because a small business's mark is usually not a wordmark.
+         The default stays the 2.8:1 slot a horizontal logotype wants; 'circle' and
+         'square' are the avatar-shaped spot a monogram, a crest or a roundel wants,
+         and they are what a composition reaches for when the mark is meant to stand
+         in place of the name rather than beside it.
+
+         A logo dropped into a round slot is CONTAINED, not cropped: these are marks
+         with their own margins, and cover would slice the edges off a wide one. Set
+         fill:1 on the layer for a photographic mark that should fill the disc. */
+      var shp=L.shape||'', round = shp==='circle', sq = shp==='square';
+      var LW, LH;
+      if(round || sq){ LW = LH = (L.d||26)*s }
+      else { LW=(L.lw||42)*s; LH=(L.lh||15)*s }
+      var rad = round ? '50%' : (sq ? (2*s)+'cqw' : (1*s)+'cqw');
       if(!ctx.logo && ctx.hasName) return '';    // the name is holding this slot
       if(ctx.logo)
         return '<img src="'+ctx.logo+'" alt="" style="width:'+LW+'cqw;height:'+LH+
-          'cqw;object-fit:contain;object-position:center;display:block'+ctx.logoFx+'">';
+          'cqw;object-fit:'+(L.fill?'cover':'contain')+';object-position:center;'+
+          'border-radius:'+rad+';display:block'+ctx.logoFx+'">';
+      // the empty slot is drawn in the shape it will be filled in, so what you see
+      // before you drop a file is where the file is going to sit
       return '<div style="width:'+LW+'cqw;height:'+LH+'cqw;border:'+(.5*s)+
-        'cqw dashed '+mc+';border-radius:'+(1*s)+'cqw;display:flex;flex-direction:column;'+
+        'cqw dashed '+mc+';border-radius:'+rad+';display:flex;flex-direction:column;'+
         'align-items:center;justify-content:center;gap:'+(.8*s)+'cqw;opacity:.8">'+
-        '<span style="font-family:var(--f-disp);font-weight:750;font-size:'+(3.6*s)+
-        'cqw;letter-spacing:.16em;color:'+mc+'">LOGO</span>'+
-        '<span style="font-family:var(--mono,monospace);font-size:'+(2.1*s)+
-        'cqw;letter-spacing:.08em;color:'+mc+';opacity:.7">PASTE · DROP · CLICK</span></div>';
+        '<span style="font-family:var(--f-disp);font-weight:750;font-size:'+
+        ((round||sq?3.1:3.6)*s)+'cqw;letter-spacing:.16em;color:'+mc+'">LOGO</span>'+
+        (round||sq ? '' :
+         '<span style="font-family:var(--mono,monospace);font-size:'+(2.1*s)+
+         'cqw;letter-spacing:.08em;color:'+mc+';opacity:.7">PASTE · DROP · CLICK</span>')+
+        '</div>';
     case 'logoOld':
       return ctx.logo
        ? '<img src="'+ctx.logo+'" alt="" style="height:'+(13*s)+'cqw;max-width:'+(56*s)+
@@ -3719,6 +3747,14 @@ function bodyHTML(L,ctx){
 }
 
 function paint(quiet){
+  /* "Hide business name when a logo is set" was applied once, at the moment the
+     logo was dropped, to the stack that happened to be loaded. Every later stack
+     came back with the name visible — so choosing a composition after uploading a
+     logo drew both, the wordmark sitting on top of the mark. It is a standing rule
+     about the card, not a one-off edit, so it is enforced wherever the card is
+     drawn. Unticking the box still returns the name, because the rule stops
+     applying, not because the flag was cleared. */
+  if(typeof applyLogoName==='function') applyLogoName();
   var th=TH();
   var name=elName.value||"Your Business",brand=elBrand.value,bg=elBg.value,fg=contrast(bg);
   var pal=PALETTES[S.pal||0].fn(brand,bg);

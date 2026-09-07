@@ -56,6 +56,17 @@ the steering the FTC's 2024 consumer-review rule is aimed at. An empty row reads
 a form you have been handed, which is the honest ask and the better image: a thing
 waiting to be filled pulls, a thing already filled just sits there.
 
+Every one of these six carries a round identity slot sitting exactly where the
+business name sits. Leave the logo well empty and the slot draws nothing, so the
+name holds the spot and the card prints as it always did; drop a logo in and "Hide
+business name when a logo is set" swaps them. One composition therefore serves a
+shop with a wordmark and a shop with a roundel, without a second layout.
+
+The one exception is Twin Marks on a landscape trim. Two marks at equal weight IS
+that composition and they hold the middle band edge to edge; a disc at the foot
+either runs into them or off the trim, and one small enough to fit is not an
+identity, it is a smudge. Its upright version has the height and keeps the slot.
+
 Marquee is really an upright composition. On a landscape trim a star band, a hero
 badge and a foot row do not all fit at hero scale, so the badge there is sized to
 the gap it has rather than to the card.
