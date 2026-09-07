@@ -56,11 +56,25 @@ All three third-party sets are permissively licensed and free for commercial use
 Each entry records its origin in `manifest.json` (`src`, `lic`) and the editor shows
 it on the tile's tooltip.
 
-## platform/ — deliberately empty
+## platform/ — one lockup, supplied by the owner
 
-No review-platform logo is committed here. Each platform's own brand terms rule out
-a third party selling a printed card carrying their mark, and two of the three make
-you accept an agreement to get the file at all:
+`platform/` holds `review-us-google.png` and `review-us-google-reversed.png`. Both
+are the repo owner's own artwork (`"src": "Yours"` in the manifest), not files taken
+from a platform's brand kit, and the note below is why that distinction matters.
+
+The two are one asset in two inks. The lockup is cut out — 72% of its pixels are
+fully transparent and it carries no white at all — so it sits straight on whatever
+is behind it. Its words are Google Grey 700, which is 1.22:1 on a teal band, so the
+reversed copy sets the same words in white and leaves the glyph exactly as drawn.
+The first entry names the second in its `"dark"` key and the page swaps to it when
+the ground's relative luminance is under .38; nothing recolours the glyph itself.
+To regenerate the reversed copy after editing the original, recolour only pixels
+whose channel spread is <= 28 and whose brightest channel is < 190 — that is the
+grey ink and nothing else.
+
+No OTHER review-platform logo is committed here. Each platform's own brand terms
+rule out a third party selling a printed card carrying their mark, and two of the
+three make you accept an agreement to get the file at all:
 
 - **Google** — Partner Marketing Hub, *How to show Google's brand*:
   "(In fact, no Google brand elements at all, including logos and product icons,
@@ -83,5 +97,5 @@ names "marketing materials" and "in-store signage" as approved surfaces for its
 badge. If you get written clearance, drop the file in `platform/`, add it to
 `manifest.json` with `"asis": true`, and re-run the build.
 
-Until then the editor's Platform logos set is empty and the lockup falls back to the
-plain word, or to whatever file the user drops into the well themselves.
+For anything beyond the owner's own lockup, the layer falls back to the plain word,
+or to whatever file the user drops into the well themselves.

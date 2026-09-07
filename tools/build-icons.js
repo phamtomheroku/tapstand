@@ -120,6 +120,7 @@ for (const cat of Object.keys(manifest)) {
     if (item.src) e.from = item.src;
     if (item.lic) e.lic = item.lic;
     if (item.asis) e.asis = 1;
+    if (item.dark) e.dark = item.dark;
 
     lines.push(JSON.stringify(e));
   }

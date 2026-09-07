@@ -94,6 +94,14 @@
       "name": "Review us on Google",
       "src": "Yours",
       "lic": "trademark — see README",
+      "asis": true,
+      "dark": "review-us-google-reversed"
+    },
+    {
+      "file": "review-us-google-reversed.png",
+      "name": "Review us on Google (reversed)",
+      "src": "Yours",
+      "lic": "trademark — see README",
       "asis": true
     }
   ],
