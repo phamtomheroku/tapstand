@@ -2840,12 +2840,89 @@ function gEndorsed(f){                   // built around the lockup, not under i
  {t:"box",k:"rule",x:.5,       y:w?0.6875:0.625, w:w?.17:.24, rot:w?1:0, op:.45},
  {t:"box",k:"plat",x:w?.72:.5, y:w?0.6875:0.8125,s:.6,word:"Google",ph:w?21:20}]}
 
+/* ---- the lockup as the subject ---------------------------------------------
+   Every composition above treats the platform mark as a signature: small, in a
+   bottom corner, the last thing read. These three invert it. The lockup is the
+   largest object on the card and the rest is arranged to serve it.
+
+   That is not decoration, it is what the customer is actually scanning for. They
+   are standing at your counter; they already know whose shop this is, so the name
+   is not the thing they are hunting. They are looking for what they are about to
+   do, and the lockup says it in one object — the platform, the verb and the
+   coloured glyph they have seen ten thousand times.
+
+   Two consequences the small treatments never had to think about. At this size
+   the mark is the card's contrast anchor, so the reversed copy matters: on a
+   flooded panel the auto-swap is what keeps it from being a coloured G floating
+   over nothing. And the mark is portrait, 0.863:1, so on a landscape trim its
+   HEIGHT is what runs out first and it wants a column of its own rather than the
+   middle of the card. */
+
+// The hero size, per trim. cqw is a percent of the card's WIDTH, so a landscape
+// card runs out of height long before an upright one does and the two need
+// different numbers to look like the same decision.
+function heroPh(f){ return isWide(f) ? 38 : 58 }
+
+function hEndorsement(f,g){
+ /* The lockup holds one column and every word answers it from the other, so the
+    card reads across rather than down: what you are doing, then who is asking. */
+ var w=isWide(f), t=gT('eyebrow',f,.46);
+ if(w) return[
+  {t:"box",k:"plat",x:.27,y:.5,     s:1,ph:heroPh(f)},
+  {t:"box",k:"logo",x:.56,y:0.1875, s:1,al:"left",lw:26,lh:8},
+  {t:"box",k:"name",x:.56,y:0.1875, s:.82,w:.38,al:"left"},
+  {t:"box",k:"rule",x:.56,y:0.3125, w:.16,al:"left",op:.5},
+  {t:"box",k:"head",x:.56,y:0.5,    s:.7,w:.38,al:"left"},
+  {t:"box",k:"tap", x:.56,y:0.75,   s:.82,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
+  {t:"box",k:"name",x:.5,y:0.1875,s:.8,w:.8},
+  {t:"box",k:"plat",x:.5,y:0.5,   s:1,ph:heroPh(f)},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hReversedField(f,g){
+ /* The brand floods the card and the lockup is reversed out of it. This is the
+    one composition that depends on the dark-ground copy existing: at signature
+    size a grey word on a brand panel is merely weak, at this size it is the
+    subject of the card and there is nothing else to read. */
+ var w=isWide(f);
+ return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:w?.28:.5, y:w?.5:0.4375, s:1,onBand:1,ph:heroPh(f)},
+  {t:"box",k:"name",x:w?.58:.5, y:w?0.25:0.75, s:w?.8:.78,w:w?.36:.78,
+   al:w?"left":"center",onBand:1},
+  {t:"box",k:"head",x:w?.58:.5, y:w?0.5:0.8125,s:w?.6:.56,w:w?.36:.7,
+   al:w?"left":"center",onBand:1},
+  {t:"box",k:"tap", x:w?.58:.5, y:w?0.75:0.9375,s:w?.85:1,al:w?"left":"center",
+   onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hTwinMarks(f,g){
+ /* Two marks the same size and nothing else competing: the thing you do on the
+    left, the place it goes on the right, a hairline between them standing in for
+    the arrow. The name is a caption to that sentence, not the headline. */
+ return isWide(f) ? [
+  {t:"box",k:"tap", x:.27,y:.4375,s:1.42,ring:"circle",lay:"mark"},
+  {t:"box",k:"rule",x:.5, y:.4375,w:.2,rot:1,op:.4},
+  {t:"box",k:"plat",x:.73,y:.4375,s:1,ph:41},
+  {t:"box",k:"name",x:.5, y:0.875, s:.74,w:.8}
+ ] : [
+  {t:"box",k:"tap", x:.5,y:0.1875,s:1.45,ring:"circle",lay:"mark"},
+  {t:"box",k:"rule",x:.5,y:0.375, w:.16,op:.4},
+  {t:"box",k:"plat",x:.5,y:0.5625,s:1,ph:56},
+  {t:"box",k:"name",x:.5,y:0.8125,s:.78,w:.8},
+  {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
+}
+
 var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
- ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail]];
+ ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail],
+ ["Endorsement",hEndorsement,"any"],["Reversed Field",hReversedField,"any"],["Twin Marks",hTwinMarks,"any"]];
 
 /* ---- direction ------------------------------------------------------------
    Chosen first, and it governs the rest: which compositions, themes and palettes
