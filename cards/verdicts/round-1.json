@@ -1,0 +1,1344 @@
+{
+ "kind": "tapstand.swipes",
+ "version": 1,
+ "round": 1,
+ "judgedAt": "2026-09-08",
+ "trim": "102 x 76 mm",
+ "deck": 135,
+ "brand": "#1F6B7A",
+ "business": "Harbour & Vine",
+ "kept": 65,
+ "dropped": 70,
+ "compositions": [
+  {
+   "name": "Endorsement",
+   "kept": 9,
+   "n": 9,
+   "pct": 1.0
+  },
+  {
+   "name": "Rating Prompt",
+   "kept": 9,
+   "n": 9,
+   "pct": 1.0
+  },
+  {
+   "name": "Split Field",
+   "kept": 8,
+   "n": 9,
+   "pct": 0.889
+  },
+  {
+   "name": "Tint Panel",
+   "kept": 8,
+   "n": 9,
+   "pct": 0.889
+  },
+  {
+   "name": "Twin Marks",
+   "kept": 8,
+   "n": 9,
+   "pct": 0.889
+  },
+  {
+   "name": "Wash",
+   "kept": 7,
+   "n": 9,
+   "pct": 0.778
+  },
+  {
+   "name": "Baseline",
+   "kept": 6,
+   "n": 9,
+   "pct": 0.667
+  },
+  {
+   "name": "Rules",
+   "kept": 5,
+   "n": 9,
+   "pct": 0.556
+  },
+  {
+   "name": "Reversed Field",
+   "kept": 3,
+   "n": 9,
+   "pct": 0.333
+  },
+  {
+   "name": "Marquee",
+   "kept": 2,
+   "n": 9,
+   "pct": 0.222
+  },
+  {
+   "name": "Inset Panel",
+   "kept": 0,
+   "n": 9,
+   "pct": 0.0
+  },
+  {
+   "name": "Oversize",
+   "kept": 0,
+   "n": 9,
+   "pct": 0.0
+  },
+  {
+   "name": "Quiet Pair",
+   "kept": 0,
+   "n": 9,
+   "pct": 0.0
+  },
+  {
+   "name": "Sequence",
+   "kept": 0,
+   "n": 9,
+   "pct": 0.0
+  },
+  {
+   "name": "Corner",
+   "kept": 0,
+   "n": 9,
+   "pct": 0.0
+  }
+ ],
+ "themes": [
+  {
+   "name": "Clean",
+   "kept": 9,
+   "n": 15,
+   "pct": 0.6
+  },
+  {
+   "name": "Editorial",
+   "kept": 9,
+   "n": 15,
+   "pct": 0.6
+  },
+  {
+   "name": "Minimal",
+   "kept": 8,
+   "n": 15,
+   "pct": 0.533
+  },
+  {
+   "name": "Press",
+   "kept": 8,
+   "n": 15,
+   "pct": 0.533
+  },
+  {
+   "name": "Google",
+   "kept": 8,
+   "n": 15,
+   "pct": 0.533
+  },
+  {
+   "name": "Soft",
+   "kept": 7,
+   "n": 15,
+   "pct": 0.467
+  },
+  {
+   "name": "Salon",
+   "kept": 6,
+   "n": 15,
+   "pct": 0.4
+  },
+  {
+   "name": "Industrial",
+   "kept": 6,
+   "n": 15,
+   "pct": 0.4
+  },
+  {
+   "name": "Ticket",
+   "kept": 4,
+   "n": 15,
+   "pct": 0.267
+  }
+ ],
+ "themesExcludingDeadCompositions": [
+  {
+   "name": "Clean",
+   "kept": 9,
+   "n": 10,
+   "pct": 0.9
+  },
+  {
+   "name": "Editorial",
+   "kept": 9,
+   "n": 10,
+   "pct": 0.9
+  },
+  {
+   "name": "Minimal",
+   "kept": 8,
+   "n": 10,
+   "pct": 0.8
+  },
+  {
+   "name": "Press",
+   "kept": 8,
+   "n": 10,
+   "pct": 0.8
+  },
+  {
+   "name": "Google",
+   "kept": 8,
+   "n": 10,
+   "pct": 0.8
+  },
+  {
+   "name": "Soft",
+   "kept": 7,
+   "n": 10,
+   "pct": 0.7
+  },
+  {
+   "name": "Salon",
+   "kept": 6,
+   "n": 10,
+   "pct": 0.6
+  },
+  {
+   "name": "Industrial",
+   "kept": 6,
+   "n": 10,
+   "pct": 0.6
+  },
+  {
+   "name": "Ticket",
+   "kept": 4,
+   "n": 10,
+   "pct": 0.4
+  }
+ ],
+ "families": [
+  {
+   "name": "clean",
+   "kept": 20,
+   "n": 36,
+   "pct": 0.556
+  },
+  {
+   "name": "badge",
+   "kept": 45,
+   "n": 99,
+   "pct": 0.455
+  }
+ ],
+ "groundTreatment": [
+  {
+   "name": "half",
+   "kept": 8,
+   "n": 9,
+   "pct": 0.889
+  },
+  {
+   "name": "tint",
+   "kept": 15,
+   "n": 27,
+   "pct": 0.556
+  },
+  {
+   "name": "paper",
+   "kept": 37,
+   "n": 72,
+   "pct": 0.514
+  },
+  {
+   "name": "flooded",
+   "kept": 5,
+   "n": 27,
+   "pct": 0.185
+  }
+ ],
+ "readings": [
+  "Five compositions were rejected in every one of the nine themes, so those are composition verdicts and not theme verdicts: Corner, Inset Panel, Oversize, Quiet Pair, Sequence.",
+  "Ground treatment is the strongest cross-cutting signal in the pass. Flooding the card with brand scored 5/27 (19%) across three independent compositions, against 51% on paper, 56% on a tint and 8/9 on a half-and-half split. The three worst non-zero compositions are exactly the three flooded ones.",
+  "Raw theme scores (27-60%) understate every theme, because all nine carry the same five dead compositions. Over live compositions only, the spread is 40-90% and only Ticket is genuinely weak.",
+  "Inset Panel (0/9) and Tint Panel (8/9) are the same idea - a panel holding the badge - separated only by whether the surround is flooded or tinted. That pair is the cleanest evidence for the ground finding."
+ ],
+ "cards": [
+  {
+   "id": "baseline-clean",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-editorial",
+   "verdict": -1,
+   "composition": "Baseline",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-google",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-industrial",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-minimal",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-press",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-salon",
+   "verdict": -1,
+   "composition": "Baseline",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-soft",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "baseline-ticket",
+   "verdict": -1,
+   "composition": "Baseline",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-clean",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-editorial",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-google",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-industrial",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-minimal",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-press",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-salon",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-soft",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "corner-ticket",
+   "verdict": -1,
+   "composition": "Corner",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-clean",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-editorial",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-google",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-industrial",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-minimal",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-press",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-salon",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-soft",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "endorsement-ticket",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "inset-panel-clean",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-editorial",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-google",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-industrial",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-minimal",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-press",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-salon",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-soft",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "inset-panel-ticket",
+   "verdict": -1,
+   "composition": "Inset Panel",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-clean",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-editorial",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-google",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-industrial",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-minimal",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-press",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-salon",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-soft",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "marquee-ticket",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "oversize-clean",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-editorial",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-google",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-industrial",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-minimal",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-press",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-salon",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-soft",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "oversize-ticket",
+   "verdict": -1,
+   "composition": "Oversize",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "quiet-pair-clean",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Clean",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-editorial",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Editorial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-google",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Google",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-industrial",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Industrial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-minimal",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Minimal",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-press",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Press",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-salon",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Salon",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-soft",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Soft",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "quiet-pair-ticket",
+   "verdict": -1,
+   "composition": "Quiet Pair",
+   "theme": "Ticket",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "rating-prompt-clean",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-editorial",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-google",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-industrial",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-minimal",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-press",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-salon",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-soft",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "rating-prompt-ticket",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "reversed-field-clean",
+   "verdict": 1,
+   "composition": "Reversed Field",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-editorial",
+   "verdict": 1,
+   "composition": "Reversed Field",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-google",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-industrial",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-minimal",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-press",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-salon",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-soft",
+   "verdict": -1,
+   "composition": "Reversed Field",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "reversed-field-ticket",
+   "verdict": 1,
+   "composition": "Reversed Field",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "flooded"
+  },
+  {
+   "id": "rules-clean",
+   "verdict": 1,
+   "composition": "Rules",
+   "theme": "Clean",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-editorial",
+   "verdict": 1,
+   "composition": "Rules",
+   "theme": "Editorial",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-google",
+   "verdict": 1,
+   "composition": "Rules",
+   "theme": "Google",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-industrial",
+   "verdict": -1,
+   "composition": "Rules",
+   "theme": "Industrial",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-minimal",
+   "verdict": 1,
+   "composition": "Rules",
+   "theme": "Minimal",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-press",
+   "verdict": 1,
+   "composition": "Rules",
+   "theme": "Press",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-salon",
+   "verdict": -1,
+   "composition": "Rules",
+   "theme": "Salon",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-soft",
+   "verdict": -1,
+   "composition": "Rules",
+   "theme": "Soft",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "rules-ticket",
+   "verdict": -1,
+   "composition": "Rules",
+   "theme": "Ticket",
+   "family": "clean",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-clean",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-editorial",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-google",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-industrial",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-minimal",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-press",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-salon",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-soft",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "sequence-ticket",
+   "verdict": -1,
+   "composition": "Sequence",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "split-field-clean",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-editorial",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-google",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-industrial",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-minimal",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-press",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-salon",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-soft",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "split-field-ticket",
+   "verdict": -1,
+   "composition": "Split Field",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "half"
+  },
+  {
+   "id": "tint-panel-clean",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Clean",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-editorial",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Editorial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-google",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Google",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-industrial",
+   "verdict": -1,
+   "composition": "Tint Panel",
+   "theme": "Industrial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-minimal",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Minimal",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-press",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Press",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-salon",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Salon",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-soft",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Soft",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "tint-panel-ticket",
+   "verdict": 1,
+   "composition": "Tint Panel",
+   "theme": "Ticket",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "twin-marks-clean",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Clean",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-editorial",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Editorial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-google",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Google",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-industrial",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Industrial",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-minimal",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Minimal",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-press",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Press",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-salon",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Salon",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-soft",
+   "verdict": 1,
+   "composition": "Twin Marks",
+   "theme": "Soft",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "twin-marks-ticket",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Ticket",
+   "family": "badge",
+   "ground": "paper"
+  },
+  {
+   "id": "wash-clean",
+   "verdict": -1,
+   "composition": "Wash",
+   "theme": "Clean",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-editorial",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Editorial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-google",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Google",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-industrial",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Industrial",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-minimal",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Minimal",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-press",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Press",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-salon",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Salon",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-soft",
+   "verdict": 1,
+   "composition": "Wash",
+   "theme": "Soft",
+   "family": "clean",
+   "ground": "tint"
+  },
+  {
+   "id": "wash-ticket",
+   "verdict": -1,
+   "composition": "Wash",
+   "theme": "Ticket",
+   "family": "clean",
+   "ground": "tint"
+  }
+ ]
+}

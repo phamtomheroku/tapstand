@@ -2924,25 +2924,6 @@ function hEndorsement(f,g){
   {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
-function hReversedField(f,g){
- /* The brand floods the card and the lockup is reversed out of it. This is the
-    one composition that depends on the dark-ground copy existing: at signature
-    size a grey word on a brand panel is merely weak, at this size it is the
-    subject of the card and there is nothing else to read. */
- var w=isWide(f);
- return[
-  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
-  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
-  {t:"box",k:"plat",x:w?.28:.5, y:w?.5:0.4375, s:1,onBand:1,ph:heroPh(f)},
-  {t:"box",k:"logo",x:w?.58:.5, y:w?0.25:0.75, s:1,al:w?"left":"center",
-   onBand:1,shape:"circle",d:w?18:23},
-  {t:"box",k:"name",x:w?.58:.5, y:w?0.25:0.75, s:w?.8:.78,w:w?.36:.78,
-   al:w?"left":"center",onBand:1},
-  {t:"box",k:"head",x:w?.58:.5, y:w?0.5:0.8125,s:w?.6:.56,w:w?.36:.7,
-   al:w?"left":"center",onBand:1},
-  {t:"box",k:"tap", x:w?.58:.5, y:w?0.75:0.9375,s:w?.76:1,w:w?.35:null,
-   al:w?"left":"center",onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
-}
 
 function hTwinMarks(f,g){
  /* Two marks the same size and nothing else competing: the thing you do on the
@@ -2990,24 +2971,6 @@ function hRatingPrompt(f,g){
   {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
-function hSequence(f,g){
- /* The card diagrams the action instead of describing it: the mark you tap, the
-    row you fill, the place it lands. Three objects, one line, no sentence needed —
-    which is the only version of this card that works from across a counter. */
- return isWide(f) ? [
-  {t:"box",k:"tap",  x:.19,y:.44,s:1.02,ring:"circle",lay:"mark"},
-  {t:"box",k:"stars",x:.5, y:.44,s:.64,star:"outline"},
-  {t:"box",k:"plat", x:.81,y:.44,s:1,ph:29},
-  {t:"box",k:"logo", x:.5, y:0.8125,s:1,shape:"circle",d:10},
-  {t:"box",k:"name", x:.5, y:0.8125,s:.72,w:.7}
- ] : [
-  {t:"box",k:"tap",  x:.5,y:0.1875,s:1.3,ring:"circle",lay:"mark"},
-  {t:"box",k:"stars",x:.5,y:0.375, s:1.05,star:"outline"},
-  {t:"box",k:"plat", x:.5,y:0.5625,s:1,ph:52},
-  {t:"box",k:"logo", x:.5,y:0.8125,s:1,shape:"circle",d:18},
-  {t:"box",k:"name", x:.5,y:0.8125,s:.78,w:.8},
-  {t:"box",k:"head", x:.5,y:0.9375,s:.52,w:.74}];
-}
 
 function hMarquee(f,g){
  /* A star row runs the top edge as a header rule and the badge owns everything
@@ -3015,15 +2978,15 @@ function hMarquee(f,g){
     wide and thin and the badge is left to do the talking. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"fill", x:.5,y:0.1875,w:1.06,hf:.24},
-  {t:"box",k:"stars",x:.5,y:0.1875,s:.98,onBand:1,star:"outline"},
+  {t:"box",k:"fill", x:.5,y:0.1875,w:1.06,hf:.24,op:.14},
+  {t:"box",k:"stars",x:.5,y:0.1875,s:.98,star:"outline"},
   {t:"box",k:"plat", x:.5,y:.5,s:1,ph:Math.min(26, .40*(100*((FORMATS[f]&&FORMATS[f].ar)||1.5)) - 4)},
   {t:"box",k:"logo", x:.07,y:0.75,s:1,al:"left",shape:"circle",d:13},
   {t:"box",k:"name", x:.07,y:0.75,s:.66,w:.4,al:"left"},
   {t:"box",k:"tap",  x:.93,y:0.75,s:.66,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"fill", x:.5,y:0.0625,w:1.06,hf:.14},
-  {t:"box",k:"stars",x:.5,y:0.0625,s:1.15,onBand:1,star:"outline"},
+  {t:"box",k:"fill", x:.5,y:0.0625,w:1.06,hf:.14,op:.14},
+  {t:"box",k:"stars",x:.5,y:0.0625,s:1.15,star:"outline"},
   {t:"box",k:"plat", x:.5,y:.5,    s:1,ph:heroPh(f)},
   {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
   {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
@@ -3034,36 +2997,6 @@ function hMarquee(f,g){
    they are what the composition row offers before anything else. Nothing here is
    referenced by position any more — DIRECTIONS names its compositions — so this
    order is presentation and can be changed without repointing anything. */
-/* Five more, and these exist because the first six had a shape in common: the badge
-   held a column on the left and the words answered from the right. That is one good
-   arrangement, not a family. Laid out on a sheet together they read as one card in
-   different colours, which is the opposite of what a shelf of designs is for.
-
-   So these move the badge itself rather than rearranging the type around it —
-   cropped off an edge, reversed out of half the card, answering a headline from a
-   corner, framed inside a panel, or sitting on a rule. Position and scale are what
-   the eye sorts first; changing the copy underneath never was. */
-
-function hOversize(f,g){
- /* The badge cropped by the trim. Nothing on a counter is read whole from six feet
-    away, and a mark this familiar survives losing a third of itself — so it stops
-    being an object placed on the card and becomes the surface the card is printed
-    on. bleed:1 because auto-fit's job is to pull things back inside, and here that
-    is exactly wrong. */
- var w=isWide(f), ch=cardHt(f);
- if(w) return[
-  {t:"box",k:"plat",x:.28,y:.42,    s:1,ph:Math.min(66,ch*.95),bleed:1},
-  {t:"box",k:"logo",x:.66,y:0.25,   s:1,al:"left",shape:"circle",d:15},
-  {t:"box",k:"name",x:.66,y:0.25,   s:.78,w:.28,al:"left"},
-  {t:"box",k:"head",x:.66,y:0.5,    s:.6,w:.28,al:"left"},
-  {t:"box",k:"tap", x:.66,y:0.75,   s:.72,w:.28,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
- return[
-  {t:"box",k:"plat",x:.5,y:0.34,   s:1,ph:Math.min(112,ch*.62),bleed:1},
-  {t:"box",k:"logo",x:.5,y:0.6875, s:1,shape:"circle",d:20},
-  {t:"box",k:"name",x:.5,y:0.6875, s:.8,w:.8},
-  {t:"box",k:"head",x:.5,y:0.8125, s:.56,w:.72},
-  {t:"box",k:"tap", x:.5,y:0.9375, s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
-}
 
 function hSplitField(f,g){
  /* Half the card flooded, half left as paper, and the badge reversed out of the
@@ -3088,49 +3021,7 @@ function hSplitField(f,g){
   {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
-function hCorner(f,g){
- /* The one where the words lead and the badge answers. A shop with something worth
-    saying — a real line, not a slogan — gets to say it at headline size, and the
-    badge sits in the far corner doing what a signature does. Still badge-led in the
-    sense that matters: the badge is the only thing you have to find. */
- var w=isWide(f);
- if(w) return[
-  {t:"box",k:"logo", x:.07,y:0.1875,s:1,al:"left",shape:"circle",d:12},
-  {t:"box",k:"name", x:.07,y:0.1875,s:.7,w:.46,al:"left"},
-  {t:"box",k:"head", x:.07,y:0.4375,s:1.1,w:.5,al:"left"},
-  {t:"box",k:"tap",  x:.07,y:0.8125,s:.76,w:.36,al:"left",cap:"TAP TO REVIEW",lay:"inline"},
-  {t:"box",k:"plat", x:.82,y:0.6875,s:1,ph:26}];
- return[
-  {t:"box",k:"logo", x:.07,y:0.125, s:1,al:"left",shape:"circle",d:17},
-  {t:"box",k:"name", x:.07,y:0.125, s:.78,w:.7,al:"left"},
-  {t:"box",k:"head", x:.07,y:0.375, s:1.15,w:.82,al:"left"},
-  {t:"box",k:"tap",  x:.07,y:0.9375,s:.9,w:.5,al:"left",cap:"TAP TO REVIEW",lay:"inline"},
-  {t:"box",k:"plat", x:.76,y:0.6875,s:1,ph:40}];
-}
 
-function hInsetPanel(f,g){
- /* A paper panel floated on a flooded card, with the badge inside it. This is the
-    only arrangement where the card is flooded and the badge still keeps its own
-    colours, because it is not standing on the brand — it is standing on paper that
-    happens to be surrounded by brand. Reads as a framed sign rather than a print. */
- var w=isWide(f);
- if(w) return[
-  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
-  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
-  {t:"box",k:"fill",   x:.5,y:0.4375,w:.74,hf:.5,c:"ground"},
-  {t:"box",k:"plat",   x:.5,y:0.4375,s:1,ph:25},
-  {t:"box",k:"logo",   x:.07,y:0.8125,s:1,al:"left",onBand:1,shape:"circle",d:12},
-  {t:"box",k:"name",   x:.07,y:0.8125,s:.68,w:.42,al:"left",onBand:1},
-  {t:"box",k:"tap",    x:.93,y:0.8125,s:.68,w:.36,al:"right",onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
- return[
-  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
-  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
-  {t:"box",k:"fill",   x:.5,y:0.4375,w:.84,hf:.5,c:"ground"},
-  {t:"box",k:"plat",   x:.5,y:0.4375,s:1,ph:heroPh(f)},
-  {t:"box",k:"logo",   x:.5,y:0.8125,s:1,onBand:1,shape:"circle",d:20},
-  {t:"box",k:"name",   x:.5,y:0.8125,s:.8,w:.8,onBand:1},
-  {t:"box",k:"tap",    x:.5,y:0.9375,s:.9,onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
-}
 
 function hBaseline(f,g){
  /* Everything hangs off one rule near the top: the name above it, the badge below
@@ -3170,19 +3061,6 @@ function hBaseline(f,g){
    reversed type: at these opacities the ground is still paper and the ink is still
    ink, which is the entire point of the set. */
 
-function cQuietPair(f,g){
- /* The two marks, the same size, nothing else on the card. The most reduced thing
-    in the editor that is still a complete instruction. */
- var w=isWide(f);
- if(w) return[
-  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2,op:.07},
-  {t:"box",k:"tap", x:.28,y:.48,s:1.12,ring:"circle",cap:"TAP TO REVIEW"},
-  {t:"box",k:"plat",x:.74,y:.46,s:1,ph:38}];
- return[
-  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2,op:.07},
-  {t:"box",k:"tap", x:.5,y:0.25, s:1.5,ring:"circle",cap:"TAP TO REVIEW"},
-  {t:"box",k:"plat",x:.5,y:0.6875,s:1,ph:heroPh(f)}];
-}
 
 function cWash(f,g){
  /* The card is the brand colour at a tenth of its strength, and the badge is the
@@ -3233,13 +3111,160 @@ function cTintPanel(f,g){
   {t:"box",k:"tap", x:.5,y:0.8125,s:1.2,cap:"TAP TO REVIEW"}];
 }
 
+/* ---- round 2: built from what survived round 1 --------------------------------
+   135 designs were judged one by one; 65 kept, 70 dropped. cards/verdicts/round-1.json
+   holds the pass. Three things came out of it that these six are built on.
+
+   Flooding the card with brand is out. It scored 5/27 across three independent
+   compositions against 51% on paper, 56% on a tint and 8/9 on a half-and-half split
+   — and the cleanest evidence is a pair: Inset Panel and Tint Panel are the same
+   idea, a panel holding the badge, differing only in whether the surround is flooded
+   or tinted. The flooded one went 0/9 and the tinted one 8/9. So every composition
+   below sits on paper, a tint, or a hard split, and none of them floods.
+
+   The badge leads or the card dies. Corner, which let the words lead and put the
+   badge in the far corner, went 0/9. So did Oversize, which cropped the badge at the
+   trim, and Sequence, which put three objects in a row. None of that is repeated.
+
+   And the winners share a shape: the badge large, in a clearly defined zone — a
+   column, a panel, a field — with the type kept to one side or absent. Endorsement
+   and Rating Prompt were kept in all nine themes; Split Field, Tint Panel and Twin
+   Marks in eight. These six vary those five rather than opening new ground. */
+
+function hEndorsementMirror(f,g){
+ /* Endorsement read right-to-left. It was the only composition besides Rating Prompt
+    kept in every theme, so the cheapest honest question to ask next is whether the
+    side it sits on matters at all, or only the arrangement. */
+ var w=isWide(f), t=gT('eyebrow',f,.46);
+ if(w) return[
+  {t:"box",k:"plat",x:.73,y:.5,     s:1,ph:heroPh(f)},
+  {t:"box",k:"logo",x:.44,y:0.25,   s:1,al:"right",shape:"circle",d:17},
+  {t:"box",k:"name",x:.44,y:0.25,   s:.82,w:.38,al:"right"},
+  {t:"box",k:"rule",x:.44,y:0.4375, w:.16,al:"right",op:.5},
+  {t:"box",k:"head",x:.44,y:0.625,  s:.7,w:.38,al:"right"},
+  {t:"box",k:"tap", x:.44,y:0.8125, s:.82,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
+  {t:"box",k:"logo",x:.5,y:0.1875,s:1,shape:"circle",d:24},
+  {t:"box",k:"name",x:.5,y:0.1875,s:.8,w:.8},
+  {t:"box",k:"plat",x:.5,y:0.5,   s:1,ph:heroPh(f)},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hEndorsementRated(f,g){
+ /* The two compositions that went 9/9 differ by one element: Rating Prompt has an
+    empty star row where Endorsement has a rule. This is Endorsement with the star row
+    as well as the rule, to find out whether the two survivors were being kept for the
+    same reason or for different ones. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat", x:.27,y:.5,     s:1,ph:heroPh(f)},
+  {t:"box",k:"logo", x:.58,y:0.25,   s:1,al:"left",shape:"circle",d:14},
+  {t:"box",k:"name", x:.58,y:0.25,   s:.78,w:.34,al:"left"},
+  {t:"box",k:"stars",x:.58,y:0.4375, s:.7,al:"left",star:"outline"},
+  {t:"box",k:"head", x:.58,y:0.625,  s:.58,w:.34,al:"left"},
+  {t:"box",k:"tap",  x:.58,y:0.8125, s:.74,w:.34,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"logo", x:.5,y:0.125,  s:1,shape:"circle",d:21},
+  {t:"box",k:"name", x:.5,y:0.125,  s:.8,w:.8},
+  {t:"box",k:"plat", x:.5,y:0.4375, s:1,ph:heroPh(f)},
+  {t:"box",k:"stars",x:.5,y:0.6875, s:1.05,star:"outline"},
+  {t:"box",k:"tap",  x:.5,y:0.875,  s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hHalfBand(f,g){
+ /* Split Field's hard edge turned through ninety degrees: brand across the top, paper
+    underneath, the badge reversed out of the colour. The half-and-half ground was the
+    best-scoring treatment in the pass at 8/9, on the strength of one composition —
+    which is thin evidence for a whole treatment, so this asks the same question along
+    the other axis before any more is built on it. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.5,y:0.28,w:1.06,hf:.52},
+  {t:"box",k:"pattern",x:.5,y:0.28,w:1.06,hf:.52,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.28,  s:1,onBand:1,ph:Math.min(26,.34*cardHt(f))},
+  {t:"box",k:"logo", x:.07,y:0.75,  s:1,al:"left",shape:"circle",d:12},
+  {t:"box",k:"name", x:.07,y:0.75,  s:.7,w:.42,al:"left"},
+  {t:"box",k:"tap",  x:.93,y:0.75,  s:.7,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:0.28,w:1.06,hf:.58},
+  {t:"box",k:"pattern",x:.5,y:0.28,w:1.06,hf:.58,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.28,  s:1,onBand:1,ph:heroPh(f)},
+  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
+  {t:"box",k:"head", x:.5,y:0.8125,s:.56,w:.72},
+  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hSpineField(f,g){
+ /* The hard edge again, but the colour is a narrow spine and the badge stands on the
+    paper beside it rather than on the brand. Split Field kept the badge ON the colour;
+    if the edge is what was working rather than the reversal, this scores like it. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill", x:.09,y:.5,w:.24,hf:1.2},
+  {t:"box",k:"plat", x:.47,y:.5,    s:1,ph:Math.min(34,.46*cardHt(f))},
+  {t:"box",k:"logo", x:.93,y:0.25,  s:1,al:"right",shape:"circle",d:13},
+  {t:"box",k:"name", x:.93,y:0.25,  s:.72,w:.25,al:"right"},
+  {t:"box",k:"head", x:.93,y:0.5,   s:.54,w:.25,al:"right"},
+  {t:"box",k:"tap",  x:.93,y:0.75,  s:.68,w:.25,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill", x:.5,y:0.09,w:1.06,hf:.2},
+  {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
+  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hPanelRule(f,g){
+ /* Tint Panel with the fill taken away and a hairline box left in its place. The panel
+    scored 8/9 and the question it leaves open is whether the badge wanted a field of
+    its own or only an edge around it — this costs the card no colour at all to answer. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"rule",x:.5,y:0.1875,w:.8,c:"brand"},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:Math.min(30,.5*cardHt(f)-10)},
+  {t:"box",k:"rule",x:.5,y:0.6875,w:.8,c:"brand"},
+  {t:"box",k:"logo",x:.07,y:0.8125,s:1,al:"left",shape:"circle",d:12},
+  {t:"box",k:"name",x:.07,y:0.8125,s:.66,w:.4,al:"left"},
+  {t:"box",k:"tap", x:.93,y:0.8125,s:.66,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"rule",x:.5,y:0.1875,w:.76,c:"brand"},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"rule",x:.5,y:0.6875,w:.76,c:"brand"},
+  {t:"box",k:"logo",x:.5,y:0.8125,s:1,shape:"circle",d:20},
+  {t:"box",k:"name",x:.5,y:0.8125,s:.8,w:.8},
+  {t:"box",k:"tap", x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hPairStack(f,g){
+ /* Twin Marks turned upright, with the name between the two marks instead of under
+    them. The pair scored 8/9 while the same pair with no name at all scored 0/9, so
+    the name is doing more work here than a caption usually does — this puts it where
+    it cannot be missed. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"tap", x:.22,y:.4375,s:1.3,ring:"circle",lay:"mark"},
+  {t:"box",k:"logo",x:.5, y:0.4375,s:1,shape:"circle",d:15},
+  {t:"box",k:"name",x:.5, y:0.4375,s:.72,w:.24},
+  {t:"box",k:"plat",x:.78,y:.4375,s:1,ph:38},
+  {t:"box",k:"head",x:.5, y:0.875, s:.56,w:.7}];
+ return[
+  {t:"box",k:"tap", x:.5,y:0.1875,s:1.45,ring:"circle",lay:"mark"},
+  {t:"box",k:"logo",x:.5,y:0.4375,s:1,shape:"circle",d:20},
+  {t:"box",k:"name",x:.5,y:0.4375,s:.8,w:.8},
+  {t:"box",k:"plat",x:.5,y:0.6875,s:1,ph:52},
+  {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
- ["Sequence",hSequence,"any"],["Reversed Field",hReversedField,"any"],
+ ["Endorsement Mirror",hEndorsementMirror,"any"],["Endorsement Rated",hEndorsementRated,"any"],
+ ["Half Band",hHalfBand,"any"],["Spine Field",hSpineField,"any"],
+ ["Panel Rule",hPanelRule,"any"],["Pair Stack",hPairStack,"any"],
  ["Twin Marks",hTwinMarks,"any"],["Marquee",hMarquee,"any"],
- ["Oversize",hOversize,"any"],["Split Field",hSplitField,"any"],["Corner",hCorner,"any"],
- ["Inset Panel",hInsetPanel,"any"],["Baseline",hBaseline,"any"],
- ["Quiet Pair",cQuietPair,"any"],["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
+ ["Split Field",hSplitField,"any"],["Baseline",hBaseline,"any"],
+ ["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
@@ -6842,8 +6867,9 @@ var LOOK_TABS=[{id:'browse',n:'Browse all'},{id:'look',n:'Looks'},{id:'plate',n:
 var FAMILIES=[
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
-  of:['Endorsement','Rating Prompt','Sequence','Reversed Field','Twin Marks','Marquee',
-      'Oversize','Split Field','Corner','Inset Panel','Baseline']},
+  of:['Endorsement','Rating Prompt','Endorsement Mirror','Endorsement Rated',
+      'Half Band','Spine Field','Panel Rule','Pair Stack',
+      'Twin Marks','Marquee','Split Field','Baseline']},
  {id:'clean', n:'Clean \u00b7 no name',
   note:'nothing that names the business \u2014 stock rather than a job',
   of:['Quiet Pair','Wash','Rules','Tint Panel']},

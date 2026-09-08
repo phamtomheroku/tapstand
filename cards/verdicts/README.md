@@ -31,6 +31,16 @@ So a round reaches this folder one of two ways:
 5. Regenerate the deck, republish the artifact to the SAME url, and say what
    changed and why.
 
+## Rounds so far
+
+| Round | Deck | Kept | What it settled |
+|---|---|---|---|
+| 1 | 135 (15 compositions x 9 themes) | 65 | Flooding the card is out; five compositions rejected in every theme |
+
+Each round writes to its own store collection — `swipes-r1`, `swipes-r2` — rather
+than a shared one. Survivors keep their ids between rounds, so a shared collection
+would have marked half of the next deck as already judged before it was opened.
+
 ## File shape
 
 ```json
