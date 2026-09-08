@@ -30,6 +30,16 @@ against every theme at the current trim, narrowed by family, theme, colour or a 
 word. Tiles fill as they scroll into view, so the grid costs about nine renders to open
 however many hundred pairings the filters leave.
 
+**Keep / drop, and the loop back.** Every tile in Browse all has a ✓ and a ✕ on it,
+and the Verdict row filters to Undecided so you can work through a few hundred designs
+without losing your place. Judgements live on the device the way the starred tiles do.
+**Download verdicts** writes `verdicts.json`; drop it in `cards/` and commit it, and the
+next round of designs gets built from what you actually kept rather than from a guess.
+
+Keys in that file are `Composition|Theme|Palette` — names, not indices, because indices
+move whenever a composition or theme is added and a verdict file that points at the wrong
+design is worse than no file at all.
+
 **Three families of composition.** *Badge-led* makes the review badge the subject and still
 carries the business. *Clean* carries nothing that names it — the brand is a 7–12% tint, a
 hairline or a tinted panel — so the same print works for anybody and can be made before you

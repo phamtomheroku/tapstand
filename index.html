@@ -415,6 +415,27 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .brnote{font-size:11.5px;color:var(--ink-3,#888)}
 .brcount{font-family:var(--mono,monospace);font-size:10.5px;letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink-3,#888);padding:11px 14px 0}
+.brfoot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brtools{display:flex;gap:6px}
+.brtool{font:inherit;font-size:11.5px;padding:4px 9px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);color:inherit}
+.brtool:hover{border-color:var(--accent,#1F6B7A)}
+/* Keep / drop, pinned to the tile so judging a grid never costs a round trip into
+   a detail pane and back. Visible always, not on hover: on a touch screen there is
+   no hover, and this is the one control the whole sheet exists for. */
+.lvote{position:absolute;left:8px;top:8px;display:flex;gap:4px;z-index:2}
+.lv{width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line,#e6e6e9);background:rgba(255,255,255,.92);color:var(--ink-3,#777)}
+.lv:hover{transform:scale(1.08)}
+.lv.yes.on{background:#1E7A44;border-color:#1E7A44;color:#fff}
+.lv.no.on{background:#B23A2E;border-color:#B23A2E;color:#fff}
+.ltile:has(.lv.yes.on){outline:2px solid #1E7A44;outline-offset:-2px}
+.ltile:has(.lv.no.on){opacity:.5}
+.ltile:has(.lv.no.on):hover{opacity:1}
+.ldact{display:flex;align-items:center;gap:10px}
+.ldact .lvote{position:static}
+.ldact .lv{width:34px;height:34px;font-size:16px}
 .lookgrid[hidden]{display:none}
 .lookgrid-in{padding:0}
 .ltile{position:relative;background:var(--panel);border:1px solid var(--rule-2);
@@ -6768,6 +6789,21 @@ function lookFresh(){
   var k=lookSeed();
   if(k!==LOOKSEED){ LOOKART={}; PLATENAMED={}; LOOKSEED=k; }
 }
+/* Approve and deny sit ON the tile rather than behind a click into the detail
+   pane, because judging three hundred designs is a scanning job: you know inside a
+   second, and anything that costs a round trip per card turns a ten-minute pass
+   into an afternoon. They are real buttons so a keyboard can reach them. */
+function lookVerdictBtns(id){
+  var q=id.split('.'), v=verdictOf(+q[0],+q[1],+q[2]);
+  function one(cls,val,glyph,label,on){
+    return '<span class="lv '+cls+(on?' on':'')+'" role="button" tabindex="0" '+
+      'data-v="'+val+'" data-vid="'+esc(id)+'" title="'+label+'" aria-label="'+label+'" '+
+      'aria-pressed="'+(!!on)+'">'+glyph+'</span>';
+  }
+  return '<span class="lvote">'+
+    one('yes','1','\u2713','Keep this one', v>0)+
+    one('no','-1','\u2715','Drop this one', v<0)+'</span>';
+}
 function lookArtFor(fid,id){
   var k=fid+'/'+id;
   if(LOOKART[k]!=null) return LOOKART[k];
@@ -6819,7 +6855,63 @@ function famOf(pi){
     if(FAMILIES[i].of && FAMILIES[i].of.indexOf(n)>=0) return FAMILIES[i].id;
   return 'classic';
 }
-var BR={q:'', fam:'badge', th:null, pal:null};
+var BR={q:'', fam:'badge', th:null, pal:null, v:null};
+
+/* ---- verdicts --------------------------------------------------------------
+   A design is keyed by the NAMES of the three things that make it, not by their
+   indices: "Endorsement|Google|Flat". Indices move whenever a composition, theme
+   or palette is added — a verdict file written today and read next month would
+   otherwise point at whatever happens to sit at position 8 by then, which is worse
+   than having no file at all because it looks correct.
+
+   Kept on this device the same way the starred tiles and the sourcing scratchpad
+   are: best-effort localStorage, never a crash if the browser refuses. It is a few
+   hundred short strings, nowhere near the weight that keeps studio state out.
+   Download is still the durable answer, and the file it writes is meant to be
+   dropped straight into the repo so the next round of designs can be built from
+   what you actually kept. */
+var VKEY='tapstand.verdicts.v1';
+S.verdicts={};
+try{ var _vd=localStorage.getItem(VKEY); if(_vd) S.verdicts=JSON.parse(_vd)||{}; }
+catch(e){ S.verdicts={} }
+function vKey(pl,th,pal){
+  return (PLATES[pl]||[''])[0]+'|'+(THEMES[th]||{}).k+'|'+(PALETTES[pal]||{}).k;
+}
+function verdictOf(pl,th,pal){ return S.verdicts[vKey(pl,th,pal)]||0 }
+function setVerdict(pl,th,pal,v){
+  var k=vKey(pl,th,pal);
+  if(!v) delete S.verdicts[k]; else S.verdicts[k]=v;
+  try{ localStorage.setItem(VKEY,JSON.stringify(S.verdicts)); }catch(e){}
+}
+// counts over everything the CURRENT filters would show, minus the verdict filter,
+// so the tally does not change as you step through Approved / Denied / Undecided
+function verdictTally(){
+  var keep=BR.v; BR.v=null;
+  var t={yes:0,no:0,none:0,all:0};
+  try{
+    browseItems().forEach(function(it){
+      var v=verdictOf(it.pl,it.th,it.pal);
+      t.all++; t[v>0?'yes':v<0?'no':'none']++;
+    });
+  } finally { BR.v=keep }
+  return t;
+}
+/* What the file says. Names, a timestamp, and the trim they were judged at —
+   a verdict on a credit card is not automatically a verdict on a 4x3 stand, and
+   whoever reads this later needs to know which one was on screen. */
+function verdictExport(){
+  var yes=[], no=[];
+  Object.keys(S.verdicts).sort().forEach(function(k){
+    (S.verdicts[k]>0?yes:no).push(k);
+  });
+  return {
+    kind:'tapstand.verdicts', version:1,
+    judgedAt:new Date().toISOString().slice(0,10),
+    trim:(FORMATS[S.fmt]||{}).k||'',
+    note:'keys are Composition|Theme|Palette',
+    approved:yes, denied:no
+  };
+}
 
 /* Every pairing the filters allow. Composition is the outer loop so one design's
    variants sit together rather than being scattered a screen apart. */
@@ -6832,6 +6924,12 @@ function browseItems(){
     if(BR.fam && famOf(pi)!==BR.fam) return;
     if(q && P[0].toLowerCase().indexOf(q)<0) return;
     ths.forEach(function(ti){
+      if(BR.v){
+        var v=verdictOf(pi,ti,pal);
+        if(BR.v==='yes'  && v<=0) return;
+        if(BR.v==='no'   && v>=0) return;
+        if(BR.v==='none' && v!==0) return;
+      }
       out.push({id:pi+'.'+ti+'.'+pal, pl:pi, th:ti, pal:pal});
     });
   });
@@ -6857,14 +6955,23 @@ function browseChips(){
   var pa=[{v:'',n:'Current'}].concat(PALETTES.map(function(P,i){return {v:i,n:P.k}}));
   var note='';
   for(var i=0;i<FAMILIES.length;i++) if(FAMILIES[i].id===BR.fam) note=FAMILIES[i].note;
+  var t=verdictTally();
+  var vs=[{v:'',n:'All '+t.all},{v:'none',n:'Undecided '+t.none},
+          {v:'yes',n:'\u2713 Kept '+t.yes},{v:'no',n:'\u2715 Dropped '+t.no}];
   return '<div class="brbar">'+
     '<input class="brq" id="brQ" type="search" placeholder="Search compositions\u2026" '+
       'value="'+esc(BR.q)+'" autocomplete="off">'+
     row('Family',fam,BR.fam==null?'':BR.fam,'fam')+
     row('Theme', th, BR.th==null?'':BR.th, 'th')+
     row('Colour',pa, BR.pal==null?'':BR.pal,'pal')+
-    (note?'<div class="brnote">'+esc(note)+'</div>':'')+
-    '</div>';
+    row('Verdict',vs, BR.v==null?'':BR.v,'v')+
+    '<div class="brfoot">'+
+      (note?'<span class="brnote">'+esc(note)+'</span>':'<span></span>')+
+      '<span class="brtools">'+
+        '<button class="brtool" type="button" data-vexport="1">Download verdicts</button>'+
+        (t.yes+t.no ? '<button class="brtool" type="button" data-vclear="1">Clear all</button>' : '')+
+      '</span>'+
+    '</div></div>';
 }
 var LOOK_FIDS={plate:1,theme:1,pal:1,dir:1};
 
@@ -6876,7 +6983,8 @@ function lookTile(fid,id,name,sub,on){
     '<span class="lmeta"><span class="lname">'+esc(name)+'</span>'+
     (sub?'<span class="lsub">'+esc(sub)+'</span>':'')+'</span>'+
     '<span class="dstar'+(isFav(fid,id)?' on':'')+'" data-fav="1" aria-hidden="true">'+
-    (isFav(fid,id)?'\u2605':'\u2606')+'</span></button>';
+    (isFav(fid,id)?'\u2605':'\u2606')+'</span>'+
+    (fid==='browse'?lookVerdictBtns(id):'')+'</button>';
 }
 /* Which directions recommend this one. The whitelists are useful as a reason to
    pick something and harmful as a filter — most compositions and the Google theme
@@ -7048,7 +7156,8 @@ function lookDetailHTML(d){
     '<div class="ldetail"><div class="lbig">'+big+'</div>'+
     '<div class="lspec"><h4>'+esc(title)+'</h4>'+
     '<p class="lprose">'+esc(prose)+'</p>'+extra+
-    '<div><button class="btn solid" type="button" data-use="1">Use this</button></div>'+
+    '<div class="ldact"><button class="btn solid" type="button" data-use="1">Use this</button>'+
+    (fid==='browse'?lookVerdictBtns(id):'')+'</div>'+
     '</div></div>';
 }
 function lookDraw(){
@@ -7155,11 +7264,34 @@ $('lookTabs').addEventListener('click',function(e){
   lookTab=b.dataset.tab; lookDetail=null; lookDraw();
 });
 $('lookBody').addEventListener('click',function(e){
+  var vb=e.target.closest('.lv');
+  if(vb){
+    e.preventDefault(); e.stopPropagation();
+    var vq=vb.dataset.vid.split('.'), want=+vb.dataset.v;
+    var had=verdictOf(+vq[0],+vq[1],+vq[2]);
+    setVerdict(+vq[0],+vq[1],+vq[2], had===want ? 0 : want);   // click again to undo
+    lookScroll.browse=$('lookBody').scrollTop; lookDraw(); return;
+  }
+  if(e.target.closest('[data-vexport]')){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(verdictExport(),null,1)],
+      {type:'application/json'}));
+    a.download='verdicts.json'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+    return;
+  }
+  if(e.target.closest('[data-vclear]')){
+    if(!confirm('Forget every keep and drop? This cannot be undone.')) return;
+    S.verdicts={};
+    try{ localStorage.setItem(VKEY,'{}'); }catch(err){}
+    lookDraw(); return;
+  }
   var chip=e.target.closest('.brchip');
   if(chip){
     if(chip.dataset.fam!=null) BR.fam = chip.dataset.fam || null;
     else if(chip.dataset.th!=null) BR.th = chip.dataset.th===''?null:+chip.dataset.th;
     else if(chip.dataset.pal!=null) BR.pal = chip.dataset.pal===''?null:+chip.dataset.pal;
+    else if(chip.dataset.v!=null) BR.v = chip.dataset.v || null;
     lookScroll.browse=0; lookDraw(); return;
   }
   if(e.target.closest('.lback')){ lookDetail=null; lookDraw(); return }
@@ -7172,6 +7304,13 @@ $('lookBody').addEventListener('click',function(e){
   lookScroll[lookTab]=this.scrollTop;
   lookDetail={f:t.dataset.f, id:t.dataset.id};
   lookDraw();
+});
+// spans do not fire a click on Enter or Space the way a button does, so give the
+// two verdict controls their keyboard back rather than leaving them mouse-only
+$('lookBody').addEventListener('keydown',function(e){
+  if(e.key!=='Enter' && e.key!==' ' && e.key!=='Spacebar') return;
+  var t=e.target.closest && e.target.closest('.lv,.dstar'); if(!t) return;
+  e.preventDefault(); t.click();
 });
 $('lookBody').addEventListener('input',function(e){
   if(!e.target.closest('#brQ')) return;
