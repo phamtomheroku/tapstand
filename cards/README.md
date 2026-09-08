@@ -1,12 +1,33 @@
 # cards/
 
-Twenty-one finished cards. Ten are credit cards (85.6 × 54 mm), one on each of
-the landscape compositions. Eleven more are built on the six compositions that
-make the review badge the subject rather than the signature, split between
-credit-card size and the 102 × 152 mm counter card, where an upright trim gives
-the portrait lockup the height it wants.
+Twenty-nine finished cards. The badge-led compositions are the default now, so
+most of these are built on them; the ten original credit cards on the name-led
+landscape compositions are kept as a reference for what changed.
 
-Every card wears the contactless hand mark and the Google review badge.
+## The two trims that matter
+
+`stand-*` are 102 × 76 mm, for the 4×3 L-shaped acrylic sign holders. `card-*`
+are 85.6 × 54 mm, for the credit-card tags. Those two are what the editor now
+opens on and what the compositions are tuned around.
+
+| File | Composition | Trim | Business |
+|---|---|---|---|
+| stand-halcyon-spa | Endorsement | 102 × 76 | day spa |
+| stand-orbit-barbers | Reversed Field | 102 × 76 | barbershop |
+| stand-copper-kettle | Rating Prompt | 102 × 76 | tearoom |
+| stand-north-bay-bikes | Sequence | 102 × 76 | bike shop |
+| card-solace-studio | Endorsement | 85.6 × 54 | yoga studio |
+| card-fern-and-thistle | Marquee | 85.6 × 54 | garden centre |
+| card-harbor-fish-co | Twin Marks | 85.6 × 54 | fishmonger |
+| card-maple-lane | Reversed Field | 85.6 × 54 | florist |
+
+About the L-shaped holders: the insert slides down into the base channel, so the
+bottom few millimetres of a 4×3 print sit behind acrylic. The editor's Safe area
+overlay is a uniform ~4.6 mm margin rather than a lip allowance, so it does not
+model that specifically — but measured, the four `stand-*` cards leave 9.8, 10.3,
+12.0 and 16.7 mm of clear space below their lowest element, which is well outside
+any lip on a holder this size. If you meet a deeper one, the `face` rectangle that
+keeps the wrap template's design off its flaps will do the same job here.
 
 Load one with **Export → Save, load & contact sheet → Load**. It joins the Saved
 cards shelf, so you can load several and tick the ones you want ganged onto a

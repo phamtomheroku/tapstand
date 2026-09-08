@@ -2988,40 +2988,72 @@ function hMarquee(f,g){
   {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
-var ARCHETYPES=[["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
+/* The badge-led six come first: they are the ones the card is actually for, so
+   they are what the composition row offers before anything else. Nothing here is
+   referenced by position any more — DIRECTIONS names its compositions — so this
+   order is presentation and can be changed without repointing anything. */
+var ARCHETYPES=[
+ ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
+ ["Sequence",hSequence,"any"],["Reversed Field",hReversedField,"any"],
+ ["Twin Marks",hTwinMarks,"any"],["Marquee",hMarquee,"any"],
+["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
  ["Grid",aGrid],["Banded",aBanded],["Diagonal",aDiagonal],["Depth",aDepth],
  ["Action Third",wActionThird,"wide"],["Low Band",wLowBand,"wide"],["Bleed Ring",wBleedRing,"wide"],["Standing Panel",wStandingPanel,"wide"],["Spine Stub",wSpineStub,"wide"],["Admission Ticket",wAdmissionTicket,"wide"],["Footer Bar",wFooterBar,"wide"],["Centre Band",wCentreBand,"wide"],["Ticket Stub",wTicketStub,"wide"],["Crossbar",wCrossbar,"wide"],
- ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail],
- ["Endorsement",hEndorsement,"any"],["Reversed Field",hReversedField,"any"],["Twin Marks",hTwinMarks,"any"],
- ["Rating Prompt",hRatingPrompt,"any"],["Sequence",hSequence,"any"],["Marquee",hMarquee,"any"]];
+ ["Bracket",aBracket],["Passepartout",aPassepartout],["Dogleg",aDogleg],["Notch",aNotch],["Masthead",aMasthead],["Button",aButton],["Letterbox",aLetterbox],["Belt",aBelt],["Cachet",aCachet],["Aperture",aAperture],["Pivot",aPivot],["Thumb Rail",aThumbRail]];
 
 /* ---- direction ------------------------------------------------------------
    Chosen first, and it governs the rest: which compositions, themes and palettes
    are on offer, and which drawn graphics get used. Everything stays overridable
    underneath — the direction sets the starting point, it doesn't lock the door. */
+/* Compositions are named here, not numbered. They used to be indices into PLATES,
+   which meant every curated list and every default silently repointed the moment a
+   composition was added anywhere but the end — a bug that has come close twice.
+   Names cost one lookup and cannot drift. */
 var DIRECTIONS=[
  {k:"All",        th:null, pal:null, pl:null, g:{pat:"terrazzo",hero:"concentric",motif:"coffee"}},
- {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:[8,13,12,10],
-                  g:{pat:"memphis",hero:"starburst",motif:"dumbbell"}, def:[0,3,8]},
- {k:"Premium",    th:[1,3,7], pal:[0,1,5], pl:[11,12,9],
-                  g:{pat:"topo",hero:"concentric",motif:"flower"},    def:[1,5,11]},
- {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:[9,15,13],
-                  g:{pat:"confetti",hero:"blob",motif:"coffee"},      def:[5,1,9]},
- {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:[12,11,13,19,27],
-                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,12]},
- /* The four below lean on the newer compositions. A direction is a starting
-    point, not a cage — every axis under it stays yours to override. */
- {k:"Quiet",      th:[7,1,3], pal:[0,1],   pl:[16,17,25,8],
-                  g:{pat:"grid",hero:"concentric",motif:"leaf"},      def:[7,0,16]},
- {k:"Newsprint",  th:[1,6,2], pal:[0,2],   pl:[20,22,26,15],
-                  g:{pat:"topo",hero:"rays",motif:"croissant"},       def:[1,0,20]},
- {k:"Counter",    th:[0,4,5], pal:[3,4,1], pl:[22,23,19,8],
-                  g:{pat:"halftone",hero:"blob",motif:"coffee"},      def:[0,3,22]},
- {k:"Badge",      th:[3,6,1], pal:[1,5,0], pl:[24,25,21,10],
-                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[3,1,24]}
+ /* The badge-led family leads, because it is what the card is for. A customer at a
+    counter already knows whose shop they are in; the name is not what they are
+    hunting. They are looking for what they are about to do, and the review badge
+    says it in one object — the platform, the verb and a glyph they have seen ten
+    thousand times. Every direction below now opens on one of these. */
+ {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Sequence","Reversed Field","Twin Marks","Marquee"],
+                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
+ {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Reversed Field","Marquee","Sequence","Endorsed","Plaque"],
+                  g:{pat:"memphis",hero:"starburst",motif:"dumbbell"},def:[0,3,"Reversed Field"]},
+ {k:"Premium",    th:[1,3,7], pal:[0,1,5], pl:["Endorsement","Twin Marks","Rating Prompt","Brand field","Plaque"],
+                  g:{pat:"topo",hero:"concentric",motif:"flower"},    def:[1,5,"Endorsement"]},
+ {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:["Marquee","Rating Prompt","Reversed Field","Instruction","Split"],
+                  g:{pat:"confetti",hero:"blob",motif:"coffee"},      def:[5,1,"Marquee"]},
+ {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:["Sequence","Twin Marks","Endorsement","Plaque","Brand field","Admission Ticket"],
+                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,"Sequence"]},
+ /* A direction is a starting point, not a cage — every axis under it stays yours
+    to override, and the older name-led compositions are all still one pick away. */
+ {k:"Quiet",      th:[7,1,3], pal:[0,1],   pl:["Endorsement","Twin Marks","Radial","Edge","Quiet"],
+                  g:{pat:"grid",hero:"concentric",motif:"leaf"},      def:[7,0,"Endorsement"]},
+ {k:"Newsprint",  th:[1,6,2], pal:[0,2],   pl:["Rating Prompt","Marquee","Diagonal","Spine Stub","Split"],
+                  g:{pat:"topo",hero:"rays",motif:"croissant"},       def:[1,0,"Rating Prompt"]},
+ {k:"Counter",    th:[0,4,5], pal:[3,4,1], pl:["Sequence","Marquee","Rating Prompt","Action Third","Low Band"],
+                  g:{pat:"halftone",hero:"blob",motif:"coffee"},      def:[0,3,"Sequence"]},
+ {k:"Badge",      th:[3,6,1], pal:[1,5,0], pl:["Twin Marks","Reversed Field","Endorsement","Bleed Ring","Standing Panel"],
+                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[3,1,"Twin Marks"]}
 ];
+/* One place that turns a composition's name into its index, so everything above
+   reads as design intent rather than as offsets. An unknown name is dropped rather
+   than silently resolving to composition 0. */
+function plateIx(v){
+  if(typeof v==='number') return v;
+  for(var i=0;i<PLATES.length;i++) if(PLATES[i][0]===v) return i;
+  return -1;
+}
+function dirPlates(d){
+  if(!d || !d.pl) return null;
+  var out=[],i,ix;
+  for(i=0;i<d.pl.length;i++){ ix=plateIx(d.pl[i]); if(ix>=0) out.push(ix) }
+  return out;
+}
+function dirDefPlate(d){ return d && d.def ? Math.max(0, plateIx(d.def[2])) : 0 }
 function DIR(){ return DIRECTIONS[S.dir||0] }
 
 // bottom → top, exactly like stripDesign.stack
@@ -4398,10 +4430,21 @@ function drawAxes(){
   // a composition drawn for the card should not be offered on a 4x6, and vice
   // versa — the direction's own whitelist narrows it further from there
   var fits=PLATES.map(function(_,i){return i}).filter(plateFitsTrim);
-  var allowPl = d.pl ? d.pl.filter(function(i){ return fits.indexOf(i)>=0 }) : fits;
+  var dpl = dirPlates(d);
+  var allowPl = dpl ? dpl.filter(function(i){ return fits.indexOf(i)>=0 }) : fits;
   drawRow($('plates'),PLATES,function(x){return x[0]},S.plate,allowPl,'p');
   drawRow($('themes'),THEMES,function(x){return x.k},S.theme,d.th,'t');
   drawRow($('pals'),PALETTES,function(x){return x.k},S.pal,d.pal,'a');
+  /* The direction and trim rows are built once, at parse time, so their pressed
+     state was only ever correct if nothing had moved since. Keep both in step with
+     S here instead — the same omission is why the trim row used to keep offering
+     upright compositions after switching to a landscape card. */
+  [['dirs','d',S.dir|0],['formats','f',S.fmt|0]].forEach(function(r){
+    var el=$(r[0]); if(!el) return;
+    [].forEach.call(el.querySelectorAll('button[data-'+r[1]+']'),function(b){
+      b.setAttribute('aria-pressed', String(+b.dataset[r[1]]===r[2]));
+    });
+  });
   // the button in the sidebar says what the card is wearing without opening anything
   if($('lookBtnN')){
     $('lookBtnN').textContent=(PLATES[S.plate]||[''])[0]||'Custom';
@@ -4411,11 +4454,11 @@ function drawAxes(){
 }
 var dirsEl=$('dirs');
 dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
-  return '<button class="chip" type="button" data-d="'+i+'" aria-pressed="'+(i===0)+'">'+t.k+'</button>'}).join('');
+  return '<button class="chip" type="button" data-d="'+i+'" aria-pressed="'+(i===(S.dir|0))+'">'+t.k+'</button>'}).join('');
 dirsEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-d]'); if(!b)return;
   S.dir=+b.dataset.d; var d=DIR();
-  if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
+  if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=dirDefPlate(d);
              S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
   Array.prototype.forEach.call(dirsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
@@ -4929,6 +4972,28 @@ var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draf
   .concat(ARCHETYPES.map(function(a){
     return [a[0], function(f){ return a[1](f, DIRECTIONS[S.dir||0].g); }, a[2]];
   }));
+
+/* What the editor opens on, now that PLATES exists to be looked up in.
+
+   The 4x3 L-shaped acrylic stand is the holder actually in hand, so that is the
+   trim you get before touching anything, and Endorsement is the composition this
+   whole family is built around. Everything is resolved by NAME: the previous
+   arrangement stored these as bare indices, which is how a composition added in
+   the wrong place could silently change what the app booted into. */
+(function(){
+  function ixOf(arr,key,val){ for(var i=0;i<arr.length;i++) if(arr[i][key]===val) return i; return -1 }
+  var f = ixOf(FORMATS,'k','4×3');       if(f>=0) S.fmt=f;
+  var d = ixOf(DIRECTIONS,'k','Badge-led');
+  if(d>=0){
+    S.dir=d;
+    var D=DIRECTIONS[d];
+    S.theme=D.def[0]; S.pal=D.def[1];
+    var pi=dirDefPlate(D);
+    if(plateFitsTrimAt(pi,S.fmt)) S.plate=pi;
+  }
+  S.stack=PLATES[S.plate][1](S.fmt);
+})();
+
 var platesEl=$('plates');
 platesEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-p]'); if(!b)return;
@@ -5018,7 +5083,7 @@ tagsEl.addEventListener('click',function(e){
 
 var fmtEl=$('formats');
 fmtEl.innerHTML=FORMATS.map(function(f,i){
-  return '<button class="chip" type="button" data-f="'+i+'" aria-pressed="'+(i===0)+'">'+f.k+'</button>'}).join('');
+  return '<button class="chip" type="button" data-f="'+i+'" aria-pressed="'+(i===(S.fmt|0))+'">'+f.k+'</button>'}).join('');
 fmtEl.addEventListener('click',function(e){
   var b=e.target.closest('button[data-f]'); if(!b)return;
   S.fmt=+b.dataset.f; keepPlateInTrim(); S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
@@ -6095,7 +6160,7 @@ function dockUse(fid,id){
   else if(fid==='pal')   S.pal=+id.slice(1);
   else if(fid==='dir'){
     S.dir=+id.slice(1); var d=DIR();
-    if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=d.def[2];
+    if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=dirDefPlate(d);
                S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
   }
   /* A platform mark and a logo are not layers — they fill a slot. If the card has
@@ -6422,7 +6487,7 @@ function lookBuild(){
        four times — Playful, Quiet and Newsprint were each showing two cards twice.
        Topping the list up keeps the curation where it matters (the front of the
        shelf) and still fills the row with four different cards. */
-    var pl=(d.pl||[]).filter(plateFitsTrim);
+    var pl=(dirPlates(d)||[]).filter(plateFitsTrim);
     all.forEach(function(i){ if(pl.indexOf(i)<0) pl.push(i) });
     if(!pl.length) return;
     var usedC={}, usedTP={}, n=0;
@@ -6436,7 +6501,8 @@ function lookBuild(){
     }
     // the seed is what the direction actually authored — four of them name a
     // composition their trim does not offer, so it is checked before it is used
-    add(plateFitsTrimAt(d.def[2],S.fmt)?d.def[2]:pl[0], d.def[0], d.def[1]);
+    var dp=dirDefPlate(d);
+    add(plateFitsTrimAt(dp,S.fmt)?dp:pl[0], d.def[0], d.def[1]);
     /* Enumerate the theme x palette cross product rather than stepping both at
        once: stepping them together repeats after max(len) pairs, so a direction
        offering three themes and three palettes ran out after three looks instead
