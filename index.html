@@ -2862,6 +2862,8 @@ function gEndorsed(f){                   // built around the lockup, not under i
 // card runs out of height long before an upright one does and the two need
 // different numbers to look like the same decision.
 function heroPh(f){ return isWide(f) ? 38 : 58 }
+// the card's height in cqw, which is what a badge's size actually runs out against
+function cardHt(f){ return 100*((FORMATS[f]&&FORMATS[f].ar)||1.5) }
 
 function hEndorsement(f,g){
  /* The lockup holds one column and every word answers it from the other, so the
@@ -2992,10 +2994,131 @@ function hMarquee(f,g){
    they are what the composition row offers before anything else. Nothing here is
    referenced by position any more — DIRECTIONS names its compositions — so this
    order is presentation and can be changed without repointing anything. */
+/* Five more, and these exist because the first six had a shape in common: the badge
+   held a column on the left and the words answered from the right. That is one good
+   arrangement, not a family. Laid out on a sheet together they read as one card in
+   different colours, which is the opposite of what a shelf of designs is for.
+
+   So these move the badge itself rather than rearranging the type around it —
+   cropped off an edge, reversed out of half the card, answering a headline from a
+   corner, framed inside a panel, or sitting on a rule. Position and scale are what
+   the eye sorts first; changing the copy underneath never was. */
+
+function hOversize(f,g){
+ /* The badge cropped by the trim. Nothing on a counter is read whole from six feet
+    away, and a mark this familiar survives losing a third of itself — so it stops
+    being an object placed on the card and becomes the surface the card is printed
+    on. bleed:1 because auto-fit's job is to pull things back inside, and here that
+    is exactly wrong. */
+ var w=isWide(f), ch=cardHt(f);
+ if(w) return[
+  {t:"box",k:"plat",x:.28,y:.42,    s:1,ph:Math.min(66,ch*.95),bleed:1},
+  {t:"box",k:"logo",x:.66,y:0.25,   s:1,al:"left",shape:"circle",d:15},
+  {t:"box",k:"name",x:.66,y:0.25,   s:.78,w:.28,al:"left"},
+  {t:"box",k:"head",x:.66,y:0.5,    s:.6,w:.28,al:"left"},
+  {t:"box",k:"tap", x:.66,y:0.75,   s:.72,w:.28,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"plat",x:.5,y:0.34,   s:1,ph:Math.min(112,ch*.62),bleed:1},
+  {t:"box",k:"logo",x:.5,y:0.6875, s:1,shape:"circle",d:20},
+  {t:"box",k:"name",x:.5,y:0.6875, s:.8,w:.8},
+  {t:"box",k:"head",x:.5,y:0.8125, s:.56,w:.72},
+  {t:"box",k:"tap", x:.5,y:0.9375, s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hSplitField(f,g){
+ /* Half the card flooded, half left as paper, and the badge reversed out of the
+    flooded half. The hard vertical edge does the work a rule or a box would
+    otherwise have to, and the two halves give the type somewhere quiet to sit. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.25,y:.5,w:.54,hf:1.2},
+  {t:"box",k:"pattern",x:.25,y:.5,w:.54,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.25,y:.5,    s:1,onBand:1,ph:33},
+  {t:"box",k:"logo", x:.60,y:0.25,  s:1,al:"left",shape:"circle",d:15},
+  {t:"box",k:"name", x:.60,y:0.25,  s:.8,w:.33,al:"left"},
+  {t:"box",k:"head", x:.60,y:0.5,   s:.6,w:.33,al:"left"},
+  {t:"box",k:"tap",  x:.60,y:0.75,  s:.74,w:.33,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:0.3125,w:1.06,hf:.64},
+  {t:"box",k:"pattern",x:.5,y:0.3125,w:1.06,hf:.64,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.3125,s:1,onBand:1,ph:54},
+  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
+  {t:"box",k:"head", x:.5,y:0.8125,s:.56,w:.72},
+  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hCorner(f,g){
+ /* The one where the words lead and the badge answers. A shop with something worth
+    saying — a real line, not a slogan — gets to say it at headline size, and the
+    badge sits in the far corner doing what a signature does. Still badge-led in the
+    sense that matters: the badge is the only thing you have to find. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"logo", x:.07,y:0.1875,s:1,al:"left",shape:"circle",d:12},
+  {t:"box",k:"name", x:.07,y:0.1875,s:.7,w:.46,al:"left"},
+  {t:"box",k:"head", x:.07,y:0.4375,s:1.1,w:.5,al:"left"},
+  {t:"box",k:"tap",  x:.07,y:0.8125,s:.76,w:.36,al:"left",cap:"TAP TO REVIEW",lay:"inline"},
+  {t:"box",k:"plat", x:.82,y:0.6875,s:1,ph:26}];
+ return[
+  {t:"box",k:"logo", x:.07,y:0.125, s:1,al:"left",shape:"circle",d:17},
+  {t:"box",k:"name", x:.07,y:0.125, s:.78,w:.7,al:"left"},
+  {t:"box",k:"head", x:.07,y:0.375, s:1.15,w:.82,al:"left"},
+  {t:"box",k:"tap",  x:.07,y:0.9375,s:.9,w:.5,al:"left",cap:"TAP TO REVIEW",lay:"inline"},
+  {t:"box",k:"plat", x:.76,y:0.6875,s:1,ph:40}];
+}
+
+function hInsetPanel(f,g){
+ /* A paper panel floated on a flooded card, with the badge inside it. This is the
+    only arrangement where the card is flooded and the badge still keeps its own
+    colours, because it is not standing on the brand — it is standing on paper that
+    happens to be surrounded by brand. Reads as a framed sign rather than a print. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"fill",   x:.5,y:0.4375,w:.74,hf:.5,c:"ground"},
+  {t:"box",k:"plat",   x:.5,y:0.4375,s:1,ph:25},
+  {t:"box",k:"logo",   x:.07,y:0.8125,s:1,al:"left",onBand:1,shape:"circle",d:12},
+  {t:"box",k:"name",   x:.07,y:0.8125,s:.68,w:.42,al:"left",onBand:1},
+  {t:"box",k:"tap",    x:.93,y:0.8125,s:.68,w:.36,al:"right",onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"fill",   x:.5,y:0.4375,w:.84,hf:.5,c:"ground"},
+  {t:"box",k:"plat",   x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"logo",   x:.5,y:0.8125,s:1,onBand:1,shape:"circle",d:20},
+  {t:"box",k:"name",   x:.5,y:0.8125,s:.8,w:.8,onBand:1},
+  {t:"box",k:"tap",    x:.5,y:0.9375,s:.9,onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
+function hBaseline(f,g){
+ /* Everything hangs off one rule near the top: the name above it, the badge below
+    it, an empty star row under that. A strictly centred, strictly vertical read —
+    the most formal of the set, and the one that suits a name worth setting large.
+    Its stars are outline for the same reason every other star row here is. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"logo", x:.5,y:0.1875,s:1,shape:"circle",d:11},
+  {t:"box",k:"name", x:.5,y:0.1875,s:.76,w:.8},
+  {t:"box",k:"rule", x:.5,y:0.3125,w:.84},
+  {t:"box",k:"plat", x:.5,y:0.5625,s:1,ph:26},
+  {t:"box",k:"tap",  x:.5,y:0.875, s:.68,w:.5,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"logo", x:.5,y:0.125, s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.125, s:.84,w:.8},
+  {t:"box",k:"rule", x:.5,y:0.1875,w:.84},
+  {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"stars",x:.5,y:0.6875,s:1,star:"outline"},
+  {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
  ["Sequence",hSequence,"any"],["Reversed Field",hReversedField,"any"],
  ["Twin Marks",hTwinMarks,"any"],["Marquee",hMarquee,"any"],
+ ["Oversize",hOversize,"any"],["Split Field",hSplitField,"any"],["Corner",hCorner,"any"],
+ ["Inset Panel",hInsetPanel,"any"],["Baseline",hBaseline,"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
@@ -3564,8 +3687,11 @@ function bodyHTML(L,ctx){
       var mfc = L.c==='accent' ? gc.accent : L.c==='ground' ? gc.ground : gc.brand;
       return libArt(me,mfc,libBox(30*s*(me.ar||1),30*s), L.asis||undefined);
     case 'fill':
+      var fillC = L.c==='accent' ? ctx.pal.accent
+                : L.c==='ground' ? ctx.pal.ground
+                : ctx.brand;
       return '<div style="width:100%;height:'+(L.hf!=null?L.hf*ctx.cardH:240*s)+
-        'cqw;background:'+(L.c==='accent'?ctx.pal.accent:ctx.brand)+';opacity:'+(L.op==null?1:L.op)+'"></div>';
+        'cqw;background:'+fillC+';opacity:'+(L.op==null?1:L.op)+'"></div>';
     case 'split':
       return '<div style="width:100%;height:'+(80*s)+'cqw;background:'+ctx.brand+
         ';clip-path:polygon(0 0,100% 0,100% 74%,0 100%)"></div>';
@@ -3842,6 +3968,7 @@ function paint(quiet){
     var d=document.createElement('div');
     d.className='lay'+(L.hidden?' hid':'')+(L.locked?' locked':'')+(isSel(L.id)?' sel':'');
     d.dataset.id=L.id; d.dataset.k=L.k||L.t;
+    if(L.bleed) d.dataset.bleed='1'; else delete d.dataset.bleed;
     d.style.cssText=layerCSS(L,fmap(L),ctx,th,brand,i);
     d.innerHTML=bodyHTML(L,ctx)+'<div class="hnd" data-h="w"></div><div class="hnd" data-h="1"></div>';
     card.appendChild(d);

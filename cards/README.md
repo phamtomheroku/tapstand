@@ -1,6 +1,6 @@
 # cards/
 
-Twenty-nine finished cards. The badge-led compositions are the default now, so
+Thirty-seven finished cards. The badge-led compositions are the default now, so
 most of these are built on them; the ten original credit cards on the name-led
 landscape compositions are kept as a reference for what changed.
 
@@ -20,6 +20,26 @@ opens on and what the compositions are tuned around.
 | card-fern-and-thistle | Marquee | 85.6 × 54 | garden centre |
 | card-harbor-fish-co | Twin Marks | 85.6 × 54 | fishmonger |
 | card-maple-lane | Reversed Field | 85.6 × 54 | florist |
+| stand-vela-atelier | Oversize | 102 × 76 | atelier |
+| stand-brick-lane-thai | Split Field | 102 × 76 | restaurant |
+| stand-otto-barbers | Corner | 102 × 76 | barbershop |
+| stand-pike-coffee | Inset Panel | 102 × 76 | coffee roaster |
+| card-riva-nails | Oversize | 85.6 × 54 | nail salon |
+| card-alder-dental | Split Field | 85.6 × 54 | dental |
+| card-linden-bakery | Inset Panel | 85.6 × 54 | bakery |
+| card-mercer-optical | Baseline | 85.6 × 54 | optician |
+
+The first six badge-led compositions had a shape in common — badge holding a column
+on the left, words answering from the right. That is one good arrangement, not a
+family; laid out together they read as one card in different colours. The five
+newest move the BADGE rather than rearranging the type: cropped by the trim
+(Oversize), reversed out of half the card (Split Field), answering a headline from
+a corner (Corner), framed inside a paper panel on a flooded ground (Inset Panel),
+or hung off a rule (Baseline). Position and scale are what the eye sorts first.
+
+Oversize crops from the TOP, not the side. Cut from the left and "on Google" loses
+its first letters, which reads as a spelling mistake rather than a graphic device.
+Cut from the top and the glyph is what leaves the card while the words stay whole.
 
 About the L-shaped holders: the insert slides down into the base channel, so the
 bottom few millimetres of a 4×3 print sit behind acrylic. The editor's Safe area
