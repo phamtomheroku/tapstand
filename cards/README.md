@@ -1,6 +1,6 @@
 # cards/
 
-Thirty-seven finished cards. The badge-led compositions are the default now, so
+Forty-five finished cards. The badge-led compositions are the default now, so
 most of these are built on them; the ten original credit cards on the name-led
 landscape compositions are kept as a reference for what changed.
 
@@ -36,6 +36,30 @@ newest move the BADGE rather than rearranging the type: cropped by the trim
 (Oversize), reversed out of half the card (Split Field), answering a headline from
 a corner (Corner), framed inside a paper panel on a flooded ground (Inset Panel),
 or hung off a rule (Baseline). Position and scale are what the eye sorts first.
+
+## The clean set — nothing that names the business
+
+`clean-*` carry no wordmark, no logo slot, not even a place for one. What is left is
+the pair that does the work: the thing you tap and the place the tap goes.
+
+| File | Composition | Trim |
+|---|---|---|
+| clean-pair-stand / -card | Quiet Pair | 102 × 76 / 85.6 × 54 |
+| clean-wash-stand / -card | Wash | 102 × 76 / 85.6 × 54 |
+| clean-rules-stand / -card | Rules | 102 × 76 / 85.6 × 54 |
+| clean-panel-stand / -card | Tint Panel | 102 × 76 / 85.6 × 54 |
+
+The brand is still there, as a TINT: a fill at 7–12% over the card's ground, or a
+hairline in brand, or a tinted panel. That is the business's colour at the weight a
+well-made shop sign uses it, not a flood. Nothing in this set sits on a band, so
+nothing flips to reversed type — at these opacities the ground is still paper and
+the ink is still ink, which is the whole point.
+
+This is not a lesser card, it is a different product. One with no identity printed
+on it can be made BEFORE you know whose it is, because the destination lives on the
+tag rather than in the ink — so a run of these is stock rather than a job. It is
+also the honest answer for a shop whose counter is already covered in its own
+branding and does not want one more thing saying its name back at it.
 
 Oversize crops from the TOP, not the side. Cut from the left and "on Google" loses
 its first letters, which reads as a spelling mistake rather than a graphic device.

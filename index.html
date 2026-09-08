@@ -3113,12 +3113,93 @@ function hBaseline(f,g){
   {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
+/* ---- the clean set: no identity on the card at all -------------------------
+   These carry nothing that names the business — no wordmark, no logo slot, not
+   even a place for one. What is left is the pair that actually does the work: the
+   thing you tap and the place the tap goes.
+
+   That is not a lesser card, it is a different product. A card with no identity on
+   it can be printed BEFORE you know whose it is, because the destination lives on
+   the tag rather than in the ink, so a run of these is stock rather than a job.
+   It is also the honest answer for a shop whose counter is already covered in its
+   own branding and does not want one more thing shouting its own name back at it.
+
+   The brand is still present, but as a TINT — the fill sits at 7-12% over the
+   card's ground, which is the business's colour at the weight a well-made shop
+   sign uses it, not a flood. Nothing sits on a band here, so nothing flips to
+   reversed type: at these opacities the ground is still paper and the ink is still
+   ink, which is the entire point of the set. */
+
+function cQuietPair(f,g){
+ /* The two marks, the same size, nothing else on the card. The most reduced thing
+    in the editor that is still a complete instruction. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2,op:.07},
+  {t:"box",k:"tap", x:.28,y:.48,s:1.12,ring:"circle",cap:"TAP TO REVIEW"},
+  {t:"box",k:"plat",x:.74,y:.46,s:1,ph:38}];
+ return[
+  {t:"box",k:"fill",x:.5,y:.5,w:1.06,hf:1.2,op:.07},
+  {t:"box",k:"tap", x:.5,y:0.25, s:1.5,ring:"circle",cap:"TAP TO REVIEW"},
+  {t:"box",k:"plat",x:.5,y:0.6875,s:1,ph:heroPh(f)}];
+}
+
+function cWash(f,g){
+ /* The card is the brand colour at a tenth of its strength, and the badge is the
+    only saturated thing on it — which is what makes the badge read from across a
+    room rather than competing with a flooded panel for the same attention. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2,op:.10},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.05},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:36},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2,op:.10},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.05},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1.25,cap:"TAP TO REVIEW"}];
+}
+
+function cRules(f,g){
+ /* Brand as a line rather than a field. Two hairlines hold the badge between them
+    and the instruction sits under the lower one — the most formal card here, and
+    the one that survives being printed on whatever stock is already in the tray. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"rule",x:.5,y:0.1875,w:.78,c:"brand"},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:Math.min(30, .5*cardHt(f) - 10)},
+  {t:"box",k:"rule",x:.5,y:0.6875,w:.78,c:"brand"},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"rule",x:.5,y:0.1875,w:.72,c:"brand"},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"rule",x:.5,y:0.6875,w:.72,c:"brand"},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1.2,cap:"TAP TO REVIEW"}];
+}
+
+function cTintPanel(f,g){
+ /* A tinted panel with the badge in it and the instruction underneath on bare
+    paper. The panel gives the badge a field of its own without the card having to
+    commit to a colour, which is what a shop with a pale interior actually wants. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",x:.5,y:0.4375,w:.86,hf:.58,op:.12},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:30},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",x:.5,y:0.4375,w:.88,hf:.5,op:.12},
+  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
+  {t:"box",k:"tap", x:.5,y:0.8125,s:1.2,cap:"TAP TO REVIEW"}];
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
  ["Sequence",hSequence,"any"],["Reversed Field",hReversedField,"any"],
  ["Twin Marks",hTwinMarks,"any"],["Marquee",hMarquee,"any"],
  ["Oversize",hOversize,"any"],["Split Field",hSplitField,"any"],["Corner",hCorner,"any"],
  ["Inset Panel",hInsetPanel,"any"],["Baseline",hBaseline,"any"],
+ ["Quiet Pair",cQuietPair,"any"],["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
@@ -3702,7 +3783,7 @@ function bodyHTML(L,ctx){
         (L.bg==='ground'?ctx.bg:ctx.brand)+'"></div>';
     case 'rule':
       return '<div style="width:100%;border-top:'+(.7*s)+'cqw '+(L.dash?'dashed':'solid')+
-        ' currentColor;opacity:'+(L.dash?.45:.9)+'"></div>';
+        ' '+(L.c==='brand'?mc:'currentColor')+';opacity:'+(L.dash?.45:.9)+'"></div>';
     case 'lockup':
       var mark = ctx.logo
         ? '<img src="'+ctx.logo+'" alt="" style="width:'+(30*s)+'cqw;height:'+(11*s)+
