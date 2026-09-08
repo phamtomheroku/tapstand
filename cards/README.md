@@ -37,6 +37,13 @@ newest move the BADGE rather than rearranging the type: cropped by the trim
 a corner (Corner), framed inside a paper panel on a flooded ground (Inset Panel),
 or hung off a rule (Baseline). Position and scale are what the eye sorts first.
 
+## Judging rounds
+
+`verdicts/` holds keep-or-drop passes over the design deck, one file per round, and
+the next deck is built from what survived the last. The deck itself is a swipe
+artifact — see `verdicts/README.md` for how a round travels from the phone into
+this folder, and what happens to it once it lands.
+
 ## The clean set — nothing that names the business
 
 `clean-*` carry no wordmark, no logo slot, not even a place for one. What is left is
