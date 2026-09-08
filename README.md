@@ -19,9 +19,21 @@ suits, and every supplier that carries it.
 buys two, a hotel buys forty; that's what decides which bodies are worth stocking.
 
 **A layered insert editor.** Every element on the card is a layer: drag it anywhere, add
-text layers, reorder, hide, lock. Two plates (stand insert and flat review card), four trim
-sizes, brand colour and logo per client, and overlays for safe area, holder lip and the
-30 mm NTAG213 disc drawn at true scale behind the tap ring.
+text layers, reorder, hide, lock. Nine trim sizes, brand colour and logo per client, and
+overlays for safe area, holder lip and the 30 mm NTAG213 disc drawn at true scale behind
+the tap ring. It opens on the 4×3 acrylic stand wearing a badge-led composition.
+
+**Browse all** — the way you actually pick one. A composition is not a design until it is
+wearing a theme and a palette, and no list of composition names tells you which pairings
+are worth having, so this shows the cross product as finished cards: every composition
+against every theme at the current trim, narrowed by family, theme, colour or a typed
+word. Tiles fill as they scroll into view, so the grid costs about nine renders to open
+however many hundred pairings the filters leave.
+
+**Three families of composition.** *Badge-led* makes the review badge the subject and still
+carries the business. *Clean* carries nothing that names it — the brand is a 7–12% tint, a
+hairline or a tinted panel — so the same print works for anybody and can be made before you
+know whose it is. *Classic* is the older name-led set.
 
 **89 sourcing links** across 20 categories — tags, bodies, adhesives, machines, print shops,
 compliance, competitors. Mark any link Shortlist / Ordered / Ruled out, keep notes against

@@ -396,6 +396,25 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lart{flex:none}
 .lookgrid{display:grid;gap:12px;padding:15px 14px;
   grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
+/* Browse-all's filter bar. It sticks because the grid under it is long enough that
+   you would otherwise scroll away from the only controls that shorten it. */
+.brbar{position:sticky;top:0;z-index:5;background:var(--panel,#fff);
+  border-bottom:1px solid var(--line,#e6e6e9);padding:11px 14px 9px;
+  display:flex;flex-direction:column;gap:7px}
+.brq{width:100%;padding:8px 10px;font:inherit;font-size:13px;
+  border:1px solid var(--line,#e6e6e9);border-radius:8px;background:var(--bg,#fafafa)}
+.brq:focus{outline:2px solid var(--accent,#1F6B7A);outline-offset:-1px}
+.brrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.brlab{font-family:var(--mono,monospace);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3,#888);min-width:52px}
+.brchip{font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);color:inherit}
+.brchip:hover{border-color:var(--accent,#1F6B7A)}
+.brchip[aria-pressed="true"]{background:var(--ink,#14181C);color:var(--panel,#fff);
+  border-color:var(--ink,#14181C)}
+.brnote{font-size:11.5px;color:var(--ink-3,#888)}
+.brcount{font-family:var(--mono,monospace);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3,#888);padding:11px 14px 0}
 .lookgrid[hidden]{display:none}
 .lookgrid-in{padding:0}
 .ltile{position:relative;background:var(--panel);border:1px solid var(--rule-2);
@@ -6755,14 +6774,98 @@ function lookArtFor(fid,id){
   var out='';
   try{
     if(fid==='look'){ var L=lookGet(id); out=L?lookMini(L):'' }
+    else if(fid==='browse'){
+      var q=id.split('.');
+      out=browseMini({pl:+q[0], th:+q[1], pal:+q[2]});
+    }
     else out=dockStyleArt(fid,{id:id, i:+id.slice(1)});
   }catch(err){ out='' }        // a broken composition must not empty the shelf
   LOOKART[k]=out; return out;
 }
 
 var lookTab='look', lookDetail=null, lookOpener=null, lookIO=null, lookScroll={};
-var LOOK_TABS=[{id:'look',n:'Looks'},{id:'plate',n:'Compositions'},
+var LOOK_TABS=[{id:'browse',n:'Browse all'},{id:'look',n:'Looks'},{id:'plate',n:'Compositions'},
   {id:'theme',n:'Themes'},{id:'pal',n:'Palettes'},{id:'fav',n:'\u2605 Starred'}];
+
+/* ---- Browse all ------------------------------------------------------------
+   The other tabs each show ONE axis: compositions, or themes, or palettes, and a
+   short curated shelf of pairings. That is fine for adjusting a card you already
+   have and useless for the question people actually arrive with, which is "show me
+   what this could look like". A composition is not a design until it is wearing a
+   theme and a palette, and no amount of scrolling a list of composition names tells
+   you which pairings are worth having.
+
+   So this tab enumerates the cross product and lets you narrow it: every
+   composition against every theme, drawn as the finished card at the current trim,
+   filtered by family, theme, palette or a typed word. Tiles fill as they scroll
+   into view on the machinery the other tabs already use, so the grid costs about
+   nine renders on open however many thousand pairings the filters leave. */
+
+/* Families named rather than sliced by position, so adding a composition anywhere
+   cannot silently move one into the wrong shelf. Anything unlisted is 'classic'. */
+var FAMILIES=[
+ {id:'badge', n:'Badge-led',
+  note:'the review badge is the subject; the card still carries the business',
+  of:['Endorsement','Rating Prompt','Sequence','Reversed Field','Twin Marks','Marquee',
+      'Oversize','Split Field','Corner','Inset Panel','Baseline']},
+ {id:'clean', n:'Clean \u00b7 no name',
+  note:'nothing that names the business \u2014 stock rather than a job',
+  of:['Quiet Pair','Wash','Rules','Tint Panel']},
+ {id:'classic', n:'Classic', note:'the name-led compositions', of:null}
+];
+function famOf(pi){
+  var n=(PLATES[pi]||[''])[0];
+  for(var i=0;i<FAMILIES.length;i++)
+    if(FAMILIES[i].of && FAMILIES[i].of.indexOf(n)>=0) return FAMILIES[i].id;
+  return 'classic';
+}
+var BR={q:'', fam:'badge', th:null, pal:null};
+
+/* Every pairing the filters allow. Composition is the outer loop so one design's
+   variants sit together rather than being scattered a screen apart. */
+function browseItems(){
+  var out=[], q=BR.q.toLowerCase().trim();
+  var ths = BR.th==null ? THEMES.map(function(_,i){return i}) : [BR.th];
+  var pal = BR.pal==null ? (S.pal|0) : BR.pal;
+  PLATES.forEach(function(P,pi){
+    if(!plateFitsTrim(pi)) return;
+    if(BR.fam && famOf(pi)!==BR.fam) return;
+    if(q && P[0].toLowerCase().indexOf(q)<0) return;
+    ths.forEach(function(ti){
+      out.push({id:pi+'.'+ti+'.'+pal, pl:pi, th:ti, pal:pal});
+    });
+  });
+  return out;
+}
+function browseMini(it){
+  // built standing in the current direction, the same way a look is, so an
+  // archetype reads the pattern set it is actually going to be drawn with
+  return miniCard(PLATES[it.pl][1](S.fmt),
+    {th:THEMES[it.th], pal:PALETTES[it.pal].fn(elBrand.value,elBg.value)});
+}
+function browseOn(it){ return S.plate===it.pl && S.theme===it.th && S.pal===it.pal }
+function browseChips(){
+  function row(label,items,cur,attr){
+    return '<div class="brrow"><span class="brlab">'+esc(label)+'</span>'+
+      items.map(function(x){
+        return '<button class="brchip" type="button" data-'+attr+'="'+esc(String(x.v))+
+          '" aria-pressed="'+(String(x.v)===String(cur))+'">'+esc(x.n)+'</button>';
+      }).join('')+'</div>';
+  }
+  var fam=[{v:'',n:'Everything'}].concat(FAMILIES.map(function(F){return {v:F.id,n:F.n}}));
+  var th=[{v:'',n:'Any'}].concat(THEMES.map(function(T,i){return {v:i,n:T.k}}));
+  var pa=[{v:'',n:'Current'}].concat(PALETTES.map(function(P,i){return {v:i,n:P.k}}));
+  var note='';
+  for(var i=0;i<FAMILIES.length;i++) if(FAMILIES[i].id===BR.fam) note=FAMILIES[i].note;
+  return '<div class="brbar">'+
+    '<input class="brq" id="brQ" type="search" placeholder="Search compositions\u2026" '+
+      'value="'+esc(BR.q)+'" autocomplete="off">'+
+    row('Family',fam,BR.fam==null?'':BR.fam,'fam')+
+    row('Theme', th, BR.th==null?'':BR.th, 'th')+
+    row('Colour',pa, BR.pal==null?'':BR.pal,'pal')+
+    (note?'<div class="brnote">'+esc(note)+'</div>':'')+
+    '</div>';
+}
 var LOOK_FIDS={plate:1,theme:1,pal:1,dir:1};
 
 function lookTile(fid,id,name,sub,on){
@@ -6806,6 +6909,17 @@ function lookTabCount(id){
   return dockStyleItems(id).length;
 }
 function lookListHTML(){
+  if(lookTab==='browse'){
+    var it=browseItems();
+    return browseChips()+(it.length
+      ? '<div class="brcount">'+it.length+' design'+(it.length===1?'':'s')+'</div>'+
+        '<div class="lookgrid">'+it.map(function(x){
+          return lookTile('browse', x.id, PLATES[x.pl][0],
+            THEMES[x.th].k+' \u00b7 '+PALETTES[x.pal].k, browseOn(x));
+        }).join('')+'</div>'
+      : '<div class="dempty">NOTHING MATCHES THOSE FILTERS<br>'+
+        'CLEAR THE SEARCH OR PICK ANOTHER FAMILY</div>');
+  }
   if(lookTab==='look'){
     var by={}; looks().forEach(function(L){ (by[L.dir]=by[L.dir]||[]).push(L) });
     return DIRECTIONS.map(function(d,di){
@@ -6881,6 +6995,26 @@ function lookDetailHTML(d){
             '<i style="background:'+pal.tint+'"></i></div>'+
           '<div class="lings">'+lookIngredients(st).map(function(n){
             return '<span class="ling">'+esc(n)+'</span>' }).join('')+'</div>';
+  }else if(fid==='browse'){
+    var q=id.split('.'), pi=+q[0], ti=+q[1], ai=+q[2];
+    var bst=[]; try{ bst=PLATES[pi][1](S.fmt) }catch(err){ bst=[] }
+    var bpal=PALETTES[ai].fn(elBrand.value,elBg.value);
+    big=lookArtFor('browse',id);
+    title=PLATES[pi][0];
+    var fam=famOf(pi), famN='', famNote='';
+    for(var fi=0;fi<FAMILIES.length;fi++) if(FAMILIES[fi].id===fam){
+      famN=FAMILIES[fi].n; famNote=FAMILIES[fi].note;
+    }
+    prose=PLATES[pi][0]+' in the '+THEMES[ti].k+' theme, '+PALETTES[ai].k+
+          ' palette. '+famN+' \u2014 '+famNote+'.';
+    extra='<div class="lface" style="font-family:'+FONTS[THEMES[ti].disp]+'">'+
+            esc(THEMES[ti].k)+'</div>'+
+          '<div class="lsw"><i style="background:'+bpal.ground+'"></i>'+
+            '<i style="background:'+bpal.brand+'"></i>'+
+            '<i style="background:'+bpal.accent+'"></i>'+
+            '<i style="background:'+bpal.tint+'"></i></div>'+
+          '<div class="lings">'+lookIngredients(bst).map(function(nm){
+            return '<span class="ling">'+esc(nm)+'</span>' }).join('')+'</div>';
   }else{
     var i=+id.slice(1);
     big=lookArtFor(fid,id);
@@ -6922,7 +7056,8 @@ function lookDraw(){
   $('lookTabs').innerHTML=LOOK_TABS.map(function(t){
     return '<button class="ltab" type="button" role="tab" data-tab="'+t.id+
       '" aria-selected="'+(lookTab===t.id)+'">'+t.n+
-      '<span class="dn">'+lookTabCount(t.id)+'</span></button>' }).join('');
+      '<span class="dn">'+(t.id==='browse'?browseItems().length:lookTabCount(t.id))+
+      '</span></button>' }).join('');
   var b=$('lookBody');
   b.innerHTML = lookDetail ? lookDetailHTML(lookDetail) : lookListHTML();
   b.scrollTop = lookDetail ? 0 : (lookScroll[lookTab]||0);
@@ -6998,6 +7133,11 @@ function lookUse(fid,id){
     S.dir=L.dir; S.theme=L.th; S.pal=L.pal; S.plate=L.pl;
     S.stack=lookStack(L); selectOnly(null);
   }
+  else if(fid==='browse'){
+    var q=id.split('.');
+    S.plate=+q[0]; S.theme=+q[1]; S.pal=+q[2];
+    S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
+  }
   else if(fid==='plate'){ S.plate=+id.slice(1);
     S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null) }
   else if(fid==='theme') S.theme=+id.slice(1);
@@ -7005,7 +7145,7 @@ function lookUse(fid,id){
   else { UNDO.pop(); return }
   drawAxes(); paint(); lookDraw();
 }
-$('lookOpen').addEventListener('click',function(){ openLook('look',this) });
+$('lookOpen').addEventListener('click',function(){ openLook('browse',this) });
 $('lookClose').addEventListener('click',closeLook);
 $('lookDone').addEventListener('click',closeLook);
 $('lookModal').addEventListener('click',function(e){ if(e.target===this) closeLook() });
@@ -7015,6 +7155,13 @@ $('lookTabs').addEventListener('click',function(e){
   lookTab=b.dataset.tab; lookDetail=null; lookDraw();
 });
 $('lookBody').addEventListener('click',function(e){
+  var chip=e.target.closest('.brchip');
+  if(chip){
+    if(chip.dataset.fam!=null) BR.fam = chip.dataset.fam || null;
+    else if(chip.dataset.th!=null) BR.th = chip.dataset.th===''?null:+chip.dataset.th;
+    else if(chip.dataset.pal!=null) BR.pal = chip.dataset.pal===''?null:+chip.dataset.pal;
+    lookScroll.browse=0; lookDraw(); return;
+  }
   if(e.target.closest('.lback')){ lookDetail=null; lookDraw(); return }
   if(e.target.closest('[data-use]')){ if(lookDetail) lookUse(lookDetail.f,lookDetail.id); return }
   var t=e.target.closest('.ltile'); if(!t) return;
@@ -7025,6 +7172,13 @@ $('lookBody').addEventListener('click',function(e){
   lookScroll[lookTab]=this.scrollTop;
   lookDetail={f:t.dataset.f, id:t.dataset.id};
   lookDraw();
+});
+$('lookBody').addEventListener('input',function(e){
+  if(!e.target.closest('#brQ')) return;
+  BR.q=e.target.value;
+  var at=e.target.selectionStart;
+  lookScroll.browse=0; lookDraw();
+  var q=$('brQ'); if(q){ q.focus(); try{ q.setSelectionRange(at,at) }catch(err){} }
 });
 $('lookRandom').addEventListener('click',function(){
   var a=looks(); if(a.length) lookUse('look', a[(Math.random()*a.length)|0].id);
