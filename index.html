@@ -1950,86 +1950,98 @@ function _svg(w,h,body,par){return 'data:image/svg+xml;utf8,'+encodeURIComponent
    Round 2 said theme had stopped doing visible work — all eight landed inside a single
    card of each other. So the deck needed an axis that actually changes what you see.
 
-   The first attempt at this was nine variations on ONE idea: a line motif tiled across
-   the card. Squiggle, noodle, arches, scallop, zigzag, plus, comet — seven ways of
-   drawing the same gesture, which is not a range, it is a tic. These are sorted by
-   KIND instead, and the kinds are what differ: a gradient with no motif at all; one
-   enormous shape placed on the card rather than repeated; hard-edged geometry; a
-   density that changes across the card; a drawing grid. Exactly one line motif
-   survives, because the family should be represented, not absent.
+   Two attempts got thrown out getting here. The first was nine variations on ONE idea,
+   a line motif tiled across the card: squiggle, noodle, arches, scallop, zigzag, plus,
+   comet. Seven ways of drawing the same gesture is a tic, not a range. The second was
+   the same set sorted by kind — gradients, one big arc, hard geometry, a grid, a wedge
+   — better shaped and still wrong, because every one of them was decoration. Arcs and
+   grids say nothing about a card whose whole job is to ask for a Google review.
 
-   Paper grain was tried here and cut: noise averaged down to a tile prints as a flat
-   grey wash, and the card already has a texture axis (tx-grain) doing that job on the
-   stock itself. A ground has to be a drawing.
+   So the grounds are now about the SUBJECT. A five-star row, a wall of reviews, speech
+   bubbles, a map pin, a quote mark, the tap itself. Someone glancing at the card from
+   two feet away should read "reviews" off the background before they read a word of it.
 
-   Three ways of painting, because "one big arc" and "a grid at 14 mm" cannot be the
-   same mechanism: a repeating TILE sized in millimetres, a FULL graphic scaled to the
-   card, or raw CSS for the gradients. They print in brand at low opacity — round 1 settled
-   that flooding loses, and a ground competing with the badge has failed at its only
-   job. */
+   Three ways of painting, because "one giant pin" and "review cards at 38 mm" cannot be
+   the same mechanism: a repeating TILE sized in millimetres so a motif is the same
+   physical size on a credit card and a counter stand; a FULL graphic scaled to the card
+   and cropped by it; or raw CSS where there is no drawing at all. Everything prints in
+   brand at low opacity — round 1 settled that flooding loses, and a ground competing
+   with the badge has failed at its only job. */
+function _star(cx,cy,r){
+  var p='',i,a,rr;
+  for(i=0;i<10;i++){ a=(-90+i*36)*Math.PI/180; rr=(i%2)?r*0.42:r;
+    p+=(i?'L':'M')+(cx+Math.cos(a)*rr).toFixed(2)+' '+(cy+Math.sin(a)*rr).toFixed(2) }
+  return p+'Z';
+}
+function _stars(x,y,r,gap,f){
+  var o='',i; for(i=0;i<5;i++) o+='<path d="'+_star(x+i*gap,y,r)+'" fill="'+f+'"/>';
+  return o;
+}
+/* a rounded box with a tail on the lower left — the shape everyone reads as "someone
+   said something", which is what a review is */
+function _bubble(x,y,w,h,f){
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(h*0.32).toFixed(1)+
+    '" fill="'+f+'"/><path d="M'+(x+w*0.22)+' '+(y+h-1)+'l0 '+(h*0.42).toFixed(1)+'l'+
+    (h*0.42).toFixed(1)+' -'+(h*0.42).toFixed(1)+'Z" fill="'+f+'"/>';
+}
 var GROUNDS={
  none:null,
 
- /* no motif at all: light falling across the card */
+ /* the rating itself, repeated — a wall of five-star rows */
+ stars:{op:.15, mm:34, tile:function(c){
+   return _svg(150,34, _stars(12,15,9.4,22,c.brand))}},
+
+ /* what a Google review actually looks like: a face, five stars, two lines of text.
+    Tiled, it is the review feed the card is asking someone to add a row to. */
+ wall:{op:.14, mm:48, tile:function(c){
+   return _svg(116,66,
+     '<circle cx="11" cy="11" r="8" fill="'+c.brand+'"/>'+
+     _stars(28,10.5,5,11,c.accent)+
+     '<rect x="0" y="30" width="94" height="5" rx="2.5" fill="'+c.brand+'"/>'+
+     '<rect x="0" y="41" width="62" height="5" rx="2.5" fill="'+c.brand+'"/>')}},
+
+ /* people talking, one of them rating */
+ bubbles:{op:.15, mm:46, tile:function(c){
+   return _svg(120,104,
+     _bubble(4,6,54,26,c.brand)+_stars(15,19,4,9,'#fff')+
+     _bubble(70,44,44,20,c.accent)+
+     _bubble(20,66,50,22,c.brand))}},
+
+ /* one enormous rating, cropped by the card the way a photograph is */
+ fivestar:{op:.16, fit:'cover', full:function(c){
+   return _svg(200,150, _stars(26,76,29,37,c.brand))}},
+ bigstar:{op:.13, fit:'cover', full:function(c){
+   return _svg(200,150,'<path d="'+_star(146,62,86)+'" fill="'+c.brand+'"/>')}},
+
+ /* where the review lands */
+ pin:{op:.13, fit:'cover', full:function(c){
+   return _svg(200,150,'<path fill-rule="evenodd" fill="'+c.brand+'" d="M64 8'+
+     'c-25 0-45 20-45 45 0 33 45 89 45 89s45-56 45-89c0-25-20-45-45-45z'+
+     'M64 36a17 17 0 1 0 0 34 17 17 0 1 0 0-34z"/>')}},
+
+ /* what they are being asked for, in their own words */
+ quote:{op:.15, fit:'cover', full:function(c){
+   var q=function(x,f){ return '<path fill="'+f+'" d="M'+x+' 20l38 0-15 84h-23z"/>' };
+   return _svg(200,150, q(26,c.brand)+q(80,c.accent))}},
+
+ /* the gesture: the signal leaving the phone at the corner it is held against */
+ tap:{op:.17, fit:'cover', full:function(c){
+   var r='',i; for(i=1;i<=5;i++)
+     r+='<path d="M'+(200-i*33)+' 150A'+(i*33)+' '+(i*33)+' 0 0 1 200 '+(150-i*33)+
+        '" fill="none" stroke="'+(i%2?c.brand:c.accent)+
+        '" stroke-width="10" stroke-linecap="round"/>';
+   return _svg(200,150,r)}},
+
+ /* the thing in their hand, showing the thing you want on it */
+ phone:{op:.14, fit:'cover', full:function(c){
+   return _svg(200,150,
+     '<rect x="108" y="12" width="74" height="130" rx="13" fill="none" stroke="'+c.brand+
+     '" stroke-width="8"/><rect x="133" y="24" width="24" height="5" rx="2.5" fill="'+
+     c.brand+'"/>'+_stars(124,80,8,12.5,c.accent))}},
+
+ /* the one option with no drawing at all, for a composition that wants the card bare */
  sweep:{op:.16, css:function(c){
-   return 'linear-gradient(118deg,'+c.brand+' 0%,'+c.brand+' 22%,transparent 62%)'}},
- halo:{op:.20, css:function(c){
-   return 'radial-gradient(120% 90% at 88% 8%,'+c.accent+' 0%,transparent 58%),'+
-          'radial-gradient(90% 80% at 6% 96%,'+c.brand+' 0%,transparent 55%)'}},
-
- /* one shape, placed — not a repeat. The card is the frame it is cropped by. */
- arc:{op:.15, fit:'cover', full:function(c){
-   return _svg(200,200,'<circle cx="196" cy="188" r="150" fill="none" stroke="'+c.brand+
-     '" stroke-width="34"/><circle cx="196" cy="188" r="96" fill="none" stroke="'+
-     c.accent+'" stroke-width="22"/>')}},
- rings:{op:.14, fit:'cover', full:function(c){
-   var r='',i; for(i=1;i<=7;i++)
-     r+='<circle cx="18" cy="182" r="'+(i*27)+'" fill="none" stroke="'+
-        (i%2?c.brand:c.accent)+'" stroke-width="6"/>';
-   return _svg(200,200,r)}},
-
- /* hard-edged geometry: rules and blocks, nothing organic */
- terrace:{op:.17, fit:'stretch', full:function(c){
-   /* every step sits ON the bottom edge, so it reads as one stepped mass rising out
-      of the corner. Floating rows of different lengths read as a loading skeleton. */
-   var r='',i,H=[64,52,41,31,22,14];
-   for(i=0;i<H.length;i++)
-     r+='<rect x="'+(i*17)+'" y="'+(100-H[i])+'" width="17.4" height="'+H[i]+'" fill="'+
-        (i?c.brand:c.accent)+'"/>';
-   return _svg(100,100,r,'none')}},
- column:{op:.15, fit:'stretch', full:function(c){
-   return _svg(100,100,
-     '<rect x="0" y="0" width="26" height="100" fill="'+c.brand+'"/>'+
-     '<rect x="26" y="0" width="7" height="100" fill="'+c.accent+'"/>'+
-     '<rect x="90" y="0" width="10" height="100" fill="'+c.accent+'"/>','none')}},
-
- /* a density that changes across the card rather than a uniform field */
- halftone:{op:.22, fit:'cover', full:function(c){
-   var r='',x,y; for(y=0;y<11;y++)for(x=0;x<15;x++){
-     var t=(x/14)*0.75+(y/10)*0.25;
-     r+='<circle cx="'+(x*7+3.5)+'" cy="'+(y*9.6+4.8)+'" r="'+(0.5+t*3.4).toFixed(2)+
-        '" fill="'+c.brand+'"/>'}
-   return _svg(105,106,r)}},
-
- wedge:{op:.15, fit:'stretch', full:function(c){
-   /* the only hard DIAGONAL in the set. sweep divides the card on the same axis but
-      as light; this one is a cut. */
-   return _svg(100,100,
-     '<path d="M0 100L100 26V100Z" fill="'+c.brand+'"/>'+
-     '<path d="M0 76L100 2v13L0 89Z" fill="'+c.accent+'"/>','none')}},
-
- /* a drawn grid rather than a printed field */
- graph:{op:.16, mm:14, tile:function(c){
-   var r='',i; for(i=1;i<5;i++)
-     r+='<path d="M'+(i*20)+' 0V100M0 '+(i*20)+'H100" stroke="'+c.brand+'" stroke-width="1"/>';
-   return _svg(100,100,r+'<path d="M0 0V100M0 0H100" stroke="'+c.accent+'" stroke-width="3"/>')}},
-
- /* one line motif, so the family is represented rather than absent */
- squiggle:{op:.14, mm:30, tile:function(c){
-   var r='',i; for(i=0;i<2;i++)
-     r+='<path d="M4 '+(26+i*46)+' c14 -18 28 18 42 0 s28 -18 42 0" fill="none" stroke="'+
-        c.brand+'" stroke-width="5" stroke-linecap="round"/>';
-   return _svg(130,96,r)}}
+   return 'linear-gradient(118deg,'+c.brand+' 0%,'+c.brand+' 22%,transparent 62%)'}}
 };
 
 var PATTERNS={
