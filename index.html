@@ -3033,22 +3033,21 @@ function heroPh(f){ return isWide(f) ? 38 : 58 }
 function cardHt(f){ return 100*((FORMATS[f]&&FORMATS[f].ar)||1.5) }
 
 function hEndorsement(f,g){
- /* The lockup holds one column and every word answers it from the other, so the
-    card reads across rather than down: what you are doing, then who is asking. */
- var w=isWide(f), t=gT('eyebrow',f,.46);
+ /* The lockup holds one column and the words answer it from the other, so the card
+    reads across rather than down: what you are doing, then who is asking. The badge is
+    the biggest thing on it by a distance, which is the point of the whole family. */
+ var w=isWide(f);
  if(w) return[
-  {t:"box",k:"plat",x:.27,y:.5,     s:1,ph:heroPh(f)},
-  {t:"box",k:"logo",x:.56,y:0.25,   s:1,al:"left",shape:"circle",d:17},
-  {t:"box",k:"name",x:.56,y:0.25,   s:.82,w:.38,al:"left"},
-  {t:"box",k:"rule",x:.56,y:0.4375, w:.16,al:"left",op:.5},
-  {t:"box",k:"head",x:.56,y:0.625,  s:.7,w:.38,al:"left"},
-  {t:"box",k:"tap", x:.56,y:0.8125, s:.82,w:.36,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"plat",x:.29,y:.5,   s:1,ph:48},
+  {t:"box",k:"logo",x:.62,y:0.30, s:1,al:"left",shape:"circle",d:17},
+  {t:"box",k:"name",x:.62,y:0.30, s:.82,w:.34,al:"left"},
+  {t:"box",k:"rule",x:.62,y:0.48, w:.16,al:"left",op:.5},
+  {t:"box",k:"tap", x:.62,y:0.70, s:.86,w:.34,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
-  {t:"box",k:"logo",x:.5,y:0.1875,s:1,shape:"circle",d:24},
-  {t:"box",k:"name",x:.5,y:0.1875,s:.8,w:.8},
-  {t:"box",k:"plat",x:.5,y:0.5,   s:1,ph:heroPh(f)},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"logo",x:.5,y:0.14, s:1,shape:"circle",d:24},
+  {t:"box",k:"name",x:.5,y:0.14, s:.8,w:.8},
+  {t:"box",k:"plat",x:.5,y:0.50, s:1,ph:70},
+  {t:"box",k:"tap", x:.5,y:0.855,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 
@@ -3114,44 +3113,45 @@ function hSplitField(f,g){
     otherwise have to, and the two halves give the type somewhere quiet to sit. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"fill",   x:.25,y:.5,w:.54,hf:1.2},
-  {t:"box",k:"pattern",x:.25,y:.5,w:.54,hf:1.2,g:g.pat,op:.10},
-  {t:"box",k:"plat", x:.25,y:.5,    s:1,onBand:1,ph:33},
-  {t:"box",k:"logo", x:.60,y:0.25,  s:1,al:"left",shape:"circle",d:15},
-  {t:"box",k:"name", x:.60,y:0.25,  s:.8,w:.33,al:"left"},
-  {t:"box",k:"head", x:.60,y:0.5,   s:.6,w:.33,al:"left"},
-  {t:"box",k:"tap",  x:.60,y:0.75,  s:.74,w:.33,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"fill",   x:.27,y:.5,w:.58,hf:1.2},
+  {t:"box",k:"pattern",x:.27,y:.5,w:.58,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.27,y:.5,   s:1,onBand:1,ph:44},
+  {t:"box",k:"logo", x:.64,y:0.30, s:1,al:"left",shape:"circle",d:15},
+  {t:"box",k:"name", x:.64,y:0.30, s:.8,w:.30,al:"left"},
+  {t:"box",k:"tap",  x:.64,y:0.70, s:.74,w:.30,al:"left",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"fill",   x:.5,y:0.3125,w:1.06,hf:.64},
-  {t:"box",k:"pattern",x:.5,y:0.3125,w:1.06,hf:.64,g:g.pat,op:.10},
-  {t:"box",k:"plat", x:.5,y:0.3125,s:1,onBand:1,ph:54},
-  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
-  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
-  {t:"box",k:"head", x:.5,y:0.8125,s:.56,w:.72},
-  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"fill",   x:.5,y:0.34,w:1.06,hf:.70},
+  {t:"box",k:"pattern",x:.5,y:0.34,w:1.06,hf:.70,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.34, s:1,onBand:1,ph:66},
+  {t:"box",k:"logo", x:.5,y:0.79, s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.79, s:.8,w:.8},
+  {t:"box",k:"tap",  x:.5,y:0.92, s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 
 
 function hBaseline(f,g){
- /* Everything hangs off one rule near the top: the name above it, the badge below
-    it, an empty star row under that. A strictly centred, strictly vertical read —
-    the most formal of the set, and the one that suits a name worth setting large.
-    Its stars are outline for the same reason every other star row here is. */
+ /* Everything hangs off one rule near the top: the name above it, the badge below,
+    the tap under that. A strictly centred, strictly vertical read — the most formal
+    of the set, and the one that suits a name worth setting large. The star row it
+    used to carry is gone; a rating is a fourth thing to look at, and this belongs to
+    the family whose rule is that there is no fourth thing. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"logo", x:.5,y:0.1875,s:1,shape:"circle",d:11},
-  {t:"box",k:"name", x:.5,y:0.1875,s:.76,w:.8},
-  {t:"box",k:"rule", x:.5,y:0.3125,w:.84},
-  {t:"box",k:"plat", x:.5,y:0.5625,s:1,ph:26},
-  {t:"box",k:"tap",  x:.5,y:0.875, s:.68,w:.5,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"logo", x:.5,y:0.16, s:1,shape:"circle",d:11},
+  {t:"box",k:"name", x:.5,y:0.16, s:.76,w:.8},
+  {t:"box",k:"rule", x:.5,y:0.27, w:.84},
+  /* capped against the card's own height, not just given a number: 38 cqw is 29% of
+     a 4x3 stand and 60% of a credit card, which walked the badge straight up into the
+     rule on the short trims. */
+  {t:"box",k:"plat", x:.5,y:0.56, s:1,ph:Math.min(38,.48*cardHt(f))},
+  {t:"box",k:"tap",  x:.5,y:0.875,s:.68,w:.5,cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"logo", x:.5,y:0.125, s:1,shape:"circle",d:20},
-  {t:"box",k:"name", x:.5,y:0.125, s:.84,w:.8},
-  {t:"box",k:"rule", x:.5,y:0.1875,w:.84},
-  {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
-  {t:"box",k:"stars",x:.5,y:0.6875,s:1,star:"outline"},
-  {t:"box",k:"tap",  x:.5,y:0.875, s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"logo", x:.5,y:0.115,s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.115,s:.84,w:.8},
+  {t:"box",k:"rule", x:.5,y:0.175,w:.84},
+  {t:"box",k:"plat", x:.5,y:0.50, s:1,ph:68},
+  {t:"box",k:"tap",  x:.5,y:0.875,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 /* ---- the clean set: no identity on the card at all -------------------------
@@ -3212,13 +3212,13 @@ function cTintPanel(f,g){
     commit to a colour, which is what a shop with a pale interior actually wants. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"fill",x:.5,y:0.4375,w:.86,hf:.58,op:.12},
-  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:30},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"fill",x:.5,y:0.42,w:.88,hf:.66,op:.12},
+  {t:"box",k:"plat",x:.5,y:0.42,s:1,ph:42},
+  {t:"box",k:"tap", x:.5,y:0.845,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"fill",x:.5,y:0.4375,w:.88,hf:.5,op:.12},
-  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:1.2,cap:"TAP TO REVIEW"}];
+  {t:"box",k:"fill",x:.5,y:0.42,w:.90,hf:.62,op:.12},
+  {t:"box",k:"plat",x:.5,y:0.42,s:1,ph:70},
+  {t:"box",k:"tap", x:.5,y:0.845,s:1.2,cap:"TAP TO REVIEW"}];
 }
 
 /* ---- round 2: built from what survived round 1 --------------------------------
@@ -3271,20 +3271,19 @@ function hHalfBand(f,g){
     the other axis before any more is built on it. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"fill",   x:.5,y:0.28,w:1.06,hf:.52},
-  {t:"box",k:"pattern",x:.5,y:0.28,w:1.06,hf:.52,g:g.pat,op:.10},
-  {t:"box",k:"plat", x:.5,y:0.28,  s:1,onBand:1,ph:Math.min(26,.34*cardHt(f))},
-  {t:"box",k:"logo", x:.07,y:0.75,  s:1,al:"left",shape:"circle",d:12},
-  {t:"box",k:"name", x:.07,y:0.75,  s:.7,w:.42,al:"left"},
-  {t:"box",k:"tap",  x:.93,y:0.75,  s:.7,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"fill",   x:.5,y:0.31,w:1.06,hf:.60},
+  {t:"box",k:"pattern",x:.5,y:0.31,w:1.06,hf:.60,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.31,  s:1,onBand:1,ph:Math.min(36,.46*cardHt(f))},
+  {t:"box",k:"logo", x:.07,y:0.80, s:1,al:"left",shape:"circle",d:12},
+  {t:"box",k:"name", x:.07,y:0.80, s:.7,w:.42,al:"left"},
+  {t:"box",k:"tap",  x:.93,y:0.80, s:.7,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"fill",   x:.5,y:0.28,w:1.06,hf:.58},
-  {t:"box",k:"pattern",x:.5,y:0.28,w:1.06,hf:.58,g:g.pat,op:.10},
-  {t:"box",k:"plat", x:.5,y:0.28,  s:1,onBand:1,ph:heroPh(f)},
-  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
-  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
-  {t:"box",k:"head", x:.5,y:0.8125,s:.56,w:.72},
-  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"fill",   x:.5,y:0.31,w:1.06,hf:.64},
+  {t:"box",k:"pattern",x:.5,y:0.31,w:1.06,hf:.64,g:g.pat,op:.10},
+  {t:"box",k:"plat", x:.5,y:0.31,  s:1,onBand:1,ph:68},
+  {t:"box",k:"logo", x:.5,y:0.78,  s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.78,  s:.8,w:.8},
+  {t:"box",k:"tap",  x:.5,y:0.92,  s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 function hSpineField(f,g){
@@ -3294,17 +3293,16 @@ function hSpineField(f,g){
  var w=isWide(f);
  if(w) return[
   {t:"box",k:"fill", x:.09,y:.5,w:.24,hf:1.2},
-  {t:"box",k:"plat", x:.47,y:.5,    s:1,ph:Math.min(34,.46*cardHt(f))},
-  {t:"box",k:"logo", x:.93,y:0.25,  s:1,al:"right",shape:"circle",d:13},
-  {t:"box",k:"name", x:.93,y:0.25,  s:.72,w:.25,al:"right"},
-  {t:"box",k:"head", x:.93,y:0.5,   s:.54,w:.25,al:"right"},
-  {t:"box",k:"tap",  x:.93,y:0.75,  s:.68,w:.25,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"plat", x:.44,y:.5,   s:1,ph:Math.min(40,.56*cardHt(f))},
+  {t:"box",k:"logo", x:.93,y:0.30, s:1,al:"right",shape:"circle",d:13},
+  {t:"box",k:"name", x:.93,y:0.30, s:.72,w:.24,al:"right"},
+  {t:"box",k:"tap",  x:.93,y:0.70, s:.68,w:.24,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
  return[
   {t:"box",k:"fill", x:.5,y:0.09,w:1.06,hf:.2},
-  {t:"box",k:"plat", x:.5,y:0.4375,s:1,ph:heroPh(f)},
-  {t:"box",k:"logo", x:.5,y:0.75,  s:1,shape:"circle",d:20},
-  {t:"box",k:"name", x:.5,y:0.75,  s:.8,w:.8},
-  {t:"box",k:"tap",  x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"plat", x:.5,y:0.46, s:1,ph:66},
+  {t:"box",k:"logo", x:.5,y:0.78, s:1,shape:"circle",d:20},
+  {t:"box",k:"name", x:.5,y:0.78, s:.8,w:.8},
+  {t:"box",k:"tap",  x:.5,y:0.92, s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
 function hPanelRule(f,g){
@@ -5363,7 +5361,7 @@ var PLATES=[["Stand insert",defaults],["Review card",reviewCard],["Co-brand draf
 (function(){
   function ixOf(arr,key,val){ for(var i=0;i<arr.length;i++) if(arr[i][key]===val) return i; return -1 }
   var f = ixOf(FORMATS,'k','4×3');       if(f>=0) S.fmt=f;
-  var d = ixOf(DIRECTIONS,'k','Badge-led');
+  var d = ixOf(DIRECTIONS,'k','Simple');
   if(d>=0){
     S.dir=d;
     var D=DIRECTIONS[d];
