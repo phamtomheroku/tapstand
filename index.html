@@ -1925,80 +1925,112 @@ var PALETTES=[
    in Browse all read it separately and a tile that disagrees with the card it claims
    to preview is worse than no tile. */
 function gndCSS(pal){
-  var f=GROUNDS[S.ground||'none'];
-  if(!f) return 'display:none';
+  var g=GROUNDS[S.ground||'none'];
+  if(!g) return 'display:none';
   var c={brand:pal.brand, accent:pal.accent};
-  return "background-image:url('"+f(c)+"');background-size:calc(var(--mm,1.17cqw)*"+
-    groundMM(S.ground)+") auto;opacity:"+(S.groundOp==null?.13:S.groundOp);
+  var op = S.groundOp!=null ? S.groundOp : (g.op!=null ? g.op : .14);
+  /* Three kinds, three declarations. A tile repeats at a physical size; a full
+     graphic is one drawing scaled to the card, either cropped to cover it or
+     stretched to it depending on whether the shapes survive being stretched; a css
+     ground is a gradient and has no image at all. */
+  if(g.css) return 'background-image:'+g.css(c)+';opacity:'+op;
+  if(g.full) return "background-image:url('"+g.full(c)+"');background-repeat:no-repeat;"+
+    "background-position:center;background-size:"+
+    (g.fit==='stretch'?'100% 100%':'cover')+";opacity:"+op;
+  return "background-image:url('"+g.tile(c)+"');background-size:calc(var(--mm,1.17cqw)*"+
+    (g.mm||24)+") auto;opacity:"+op;
 }
-function _svg(w,h,body){return 'data:image/svg+xml;utf8,'+encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+body+'</svg>')}
+/* par: pass 'none' for a drawing meant to be stretched to the card. An SVG used as a
+   background image keeps its viewBox aspect even under background-size:100% 100%, so
+   without this a square drawing letterboxes and leaves bare strips down the sides. */
+function _svg(w,h,body,par){return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"'+
+  (par?' preserveAspectRatio="'+par+'"':'')+'>'+body+'</svg>')}
 /* ---- grounds: the card's own background graphic --------------------------------
-   Round 2 said theme had stopped doing visible work — all eight themes landed inside
-   a single card of each other, where round 1 could still tell them apart. A theme
-   changes a typeface, a frame and a star; at card size, next to a badge that fills a
-   third of the print, none of that survives being looked at from a counter. So the
-   deck needed something that actually changes what you see, and this is it.
+   Round 2 said theme had stopped doing visible work — all eight landed inside a single
+   card of each other. So the deck needed an axis that actually changes what you see.
 
-   These are drawn as one tile and repeated, sized in MILLIMETRES like the textures
-   are, so a squiggle is the same squiggle on a credit card and on a 4x3 stand rather
-   than four times coarser on one of them. They print in the brand colour at low
-   opacity: round 1 settled that flooding a card loses (19% against 51% on paper), and
-   a ground graphic is a surface, not a flood — if it competes with the badge it has
-   failed at the one job it has. */
+   The first attempt at this was nine variations on ONE idea: a line motif tiled across
+   the card. Squiggle, noodle, arches, scallop, zigzag, plus, comet — seven ways of
+   drawing the same gesture, which is not a range, it is a tic. These are sorted by
+   KIND instead, and the kinds are what differ: a gradient with no motif at all; one
+   enormous shape placed on the card rather than repeated; hard-edged geometry; a
+   density that changes across the card; a drawing grid. Exactly one line motif
+   survives, because the family should be represented, not absent.
+
+   Paper grain was tried here and cut: noise averaged down to a tile prints as a flat
+   grey wash, and the card already has a texture axis (tx-grain) doing that job on the
+   stock itself. A ground has to be a drawing.
+
+   Three ways of painting, because "one big arc" and "a grid at 14 mm" cannot be the
+   same mechanism: a repeating TILE sized in millimetres, a FULL graphic scaled to the
+   card, or raw CSS for the gradients. They print in brand at low opacity — round 1 settled
+   that flooding loses, and a ground competing with the badge has failed at its only
+   job. */
 var GROUNDS={
  none:null,
- squiggle:function(c){var r='',i;for(i=0;i<3;i++)
-   r+='<path d="M4 '+(26+i*46)+' c14 -18 28 18 42 0 s28 -18 42 0" '+
-      'fill="none" stroke="'+c.brand+'" stroke-width="5" stroke-linecap="round"/>';
-   return _svg(130,96,r)},
- noodle:function(c){return _svg(120,120,
-   '<path d="M10 60 C10 20 46 12 62 34 S104 62 96 88 S46 116 30 96 S12 76 34 70 '+
-   'S82 62 88 40" fill="none" stroke="'+c.brand+'" stroke-width="3.2" '+
-   'stroke-linecap="round" stroke-linejoin="round"/>')},
- arches:function(c){var r='',x,y;for(y=0;y<2;y++)for(x=0;x<3;x++)
-   r+='<path d="M'+(x*40+8)+' '+(y*50+46)+' a16 16 0 0 1 32 0" fill="none" stroke="'+
-      (((x+y)%2)?c.accent:c.brand)+'" stroke-width="4.4" stroke-linecap="round"/>';
-   return _svg(128,100,r)},
- blobs:function(c){return _svg(110,110,
-   '<path d="M28 16c14 -8 30 2 30 16s-10 18 -22 24 -22 16 -32 8 -8 -26 0 -34 10 -8 24 -14z" fill="'+c.brand+'"/>'+
-   '<path d="M78 54c10 -4 22 6 20 18s-14 20 -24 16 -14 -14 -10 -22 6 -10 14 -12z" fill="'+c.accent+'"/>'+
-   '<path d="M62 92c8 -2 14 6 10 12s-16 6 -18 -2 2 -8 8 -10z" fill="'+c.brand+'"/>')},
- scallop:function(c){var r='',i,y;for(y=0;y<3;y++){for(i=0;i<5;i++)
-   r+='<path d="M'+(i*30)+' '+(y*34+26)+' a15 15 0 0 0 30 0" fill="none" stroke="'+
-      c.brand+'" stroke-width="3.6"/>'}
-   return _svg(120,104,r)},
- zigzag:function(c){var r='',i;for(i=0;i<4;i++)
-   r+='<path d="M0 '+(20+i*34)+' l22 -13 22 13 22 -13 22 13" fill="none" stroke="'+
-      c.brand+'" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>';
-   return _svg(88,112,r)},
- plus:function(c){var r='',x,y;for(y=0;y<3;y++)for(x=0;x<3;x++){
-   var cx=x*30+15+(y%2?15:0), cy=y*30+15;
-   r+='<path d="M'+cx+' '+(cy-8)+'v16M'+(cx-8)+' '+cy+'h16" stroke="'+c.brand+
-      '" stroke-width="3.4" stroke-linecap="round"/>'}
-   return _svg(90,90,r)},
- mesh:function(c){return _svg(120,120,
-   '<circle cx="34" cy="38" r="30" fill="'+c.brand+'" opacity=".55"/>'+
-   '<circle cx="84" cy="30" r="24" fill="'+c.accent+'" opacity=".45"/>'+
-   '<circle cx="68" cy="86" r="34" fill="'+c.brand+'" opacity=".35"/>'+
-   '<circle cx="20" cy="96" r="20" fill="'+c.accent+'" opacity=".4"/>')},
- comet:function(c){var r='',i,P=[[12,20],[58,8],[92,34],[30,56],[74,70],[16,92],[60,104]];
-   for(i=0;i<P.length;i++)
-     r+='<path d="M'+P[i][0]+' '+P[i][1]+' q14 6 26 2" fill="none" stroke="'+
-        (i%2?c.accent:c.brand)+'" stroke-width="2.4" stroke-linecap="round"/>'+
-        '<circle cx="'+(P[i][0]+28)+'" cy="'+(P[i][1]+1)+'" r="2.6" fill="'+
-        (i%2?c.accent:c.brand)+'"/>';
-   return _svg(126,118,r)}
+
+ /* no motif at all: light falling across the card */
+ sweep:{op:.16, css:function(c){
+   return 'linear-gradient(118deg,'+c.brand+' 0%,'+c.brand+' 22%,transparent 62%)'}},
+ halo:{op:.20, css:function(c){
+   return 'radial-gradient(120% 90% at 88% 8%,'+c.accent+' 0%,transparent 58%),'+
+          'radial-gradient(90% 80% at 6% 96%,'+c.brand+' 0%,transparent 55%)'}},
+
+ /* one shape, placed — not a repeat. The card is the frame it is cropped by. */
+ arc:{op:.15, fit:'cover', full:function(c){
+   return _svg(200,200,'<circle cx="196" cy="188" r="150" fill="none" stroke="'+c.brand+
+     '" stroke-width="34"/><circle cx="196" cy="188" r="96" fill="none" stroke="'+
+     c.accent+'" stroke-width="22"/>')}},
+ rings:{op:.14, fit:'cover', full:function(c){
+   var r='',i; for(i=1;i<=7;i++)
+     r+='<circle cx="18" cy="182" r="'+(i*27)+'" fill="none" stroke="'+
+        (i%2?c.brand:c.accent)+'" stroke-width="6"/>';
+   return _svg(200,200,r)}},
+
+ /* hard-edged geometry: rules and blocks, nothing organic */
+ terrace:{op:.17, fit:'stretch', full:function(c){
+   /* every step sits ON the bottom edge, so it reads as one stepped mass rising out
+      of the corner. Floating rows of different lengths read as a loading skeleton. */
+   var r='',i,H=[64,52,41,31,22,14];
+   for(i=0;i<H.length;i++)
+     r+='<rect x="'+(i*17)+'" y="'+(100-H[i])+'" width="17.4" height="'+H[i]+'" fill="'+
+        (i?c.brand:c.accent)+'"/>';
+   return _svg(100,100,r,'none')}},
+ column:{op:.15, fit:'stretch', full:function(c){
+   return _svg(100,100,
+     '<rect x="0" y="0" width="26" height="100" fill="'+c.brand+'"/>'+
+     '<rect x="26" y="0" width="7" height="100" fill="'+c.accent+'"/>'+
+     '<rect x="90" y="0" width="10" height="100" fill="'+c.accent+'"/>','none')}},
+
+ /* a density that changes across the card rather than a uniform field */
+ halftone:{op:.22, fit:'cover', full:function(c){
+   var r='',x,y; for(y=0;y<11;y++)for(x=0;x<15;x++){
+     var t=(x/14)*0.75+(y/10)*0.25;
+     r+='<circle cx="'+(x*7+3.5)+'" cy="'+(y*9.6+4.8)+'" r="'+(0.5+t*3.4).toFixed(2)+
+        '" fill="'+c.brand+'"/>'}
+   return _svg(105,106,r)}},
+
+ wedge:{op:.15, fit:'stretch', full:function(c){
+   /* the only hard DIAGONAL in the set. sweep divides the card on the same axis but
+      as light; this one is a cut. */
+   return _svg(100,100,
+     '<path d="M0 100L100 26V100Z" fill="'+c.brand+'"/>'+
+     '<path d="M0 76L100 2v13L0 89Z" fill="'+c.accent+'"/>','none')}},
+
+ /* a drawn grid rather than a printed field */
+ graph:{op:.16, mm:14, tile:function(c){
+   var r='',i; for(i=1;i<5;i++)
+     r+='<path d="M'+(i*20)+' 0V100M0 '+(i*20)+'H100" stroke="'+c.brand+'" stroke-width="1"/>';
+   return _svg(100,100,r+'<path d="M0 0V100M0 0H100" stroke="'+c.accent+'" stroke-width="3"/>')}},
+
+ /* one line motif, so the family is represented rather than absent */
+ squiggle:{op:.14, mm:30, tile:function(c){
+   var r='',i; for(i=0;i<2;i++)
+     r+='<path d="M4 '+(26+i*46)+' c14 -18 28 18 42 0 s28 -18 42 0" fill="none" stroke="'+
+        c.brand+'" stroke-width="5" stroke-linecap="round"/>';
+   return _svg(130,96,r)}}
 };
-/* How big one tile prints, in millimetres, PER GROUND. A single global size made
-   every one of these read as wallpaper: at 10 mm a squiggle is not a squiggle, it is a
-   fine repeating texture, which is the opposite of the point. A ground graphic has to
-   be big enough that you see the shape rather than the repeat — a noodle wants a third
-   of the card, a plus can be small and still be a plus. Millimetres, not cqw, so the
-   same ground is the same size on a credit card and a 4x3 stand. */
-var GROUND_MM={squiggle:30, noodle:38, arches:28, blobs:34, scallop:34,
-               zigzag:28, plus:28, mesh:44, comet:44};
-function groundMM(k){ return GROUND_MM[k]||24 }
 
 var PATTERNS={
  none:null,
@@ -3314,26 +3346,26 @@ var DIRECTIONS=[
     hunting. They are looking for what they are about to do, and the review badge
     says it in one object — the platform, the verb and a glyph they have seen ten
     thousand times. Every direction below now opens on one of these. */
- {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Sequence","Reversed Field","Twin Marks","Marquee"],
+ {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Endorsement Rated","Half Band","Marquee","Tint Panel"],
                   g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
- {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Reversed Field","Marquee","Sequence","Endorsed","Plaque"],
-                  g:{pat:"memphis",hero:"starburst",motif:"dumbbell"},def:[0,3,"Reversed Field"]},
- {k:"Premium",    th:[1,3,7], pal:[0,1,5], pl:["Endorsement","Twin Marks","Rating Prompt","Brand field","Plaque"],
+ {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Marquee","Half Band","Split Field","Endorsed","Plaque"],
+                  g:{pat:"memphis",hero:"starburst",motif:"dumbbell"},def:[0,3,"Marquee"]},
+ {k:"Premium",    th:[1,3,7], pal:[0,1,5], pl:["Endorsement","Tint Panel","Rating Prompt","Brand field","Plaque"],
                   g:{pat:"topo",hero:"concentric",motif:"flower"},    def:[1,5,"Endorsement"]},
- {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:["Marquee","Rating Prompt","Reversed Field","Instruction","Split"],
+ {k:"Playful",    th:[5,3],   pal:[1,5,3], pl:["Marquee","Rating Prompt","Split Field","Instruction","Wash"],
                   g:{pat:"confetti",hero:"blob",motif:"coffee"},      def:[5,1,"Marquee"]},
- {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:["Sequence","Twin Marks","Endorsement","Plaque","Brand field","Admission Ticket"],
-                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,"Sequence"]},
+ {k:"Utilitarian",th:[4,2,6], pal:[0,2],   pl:["Panel Rule","Rules","Endorsement","Plaque","Brand field","Admission Ticket"],
+                  g:{pat:"grid",hero:"rays",motif:"wrench"},          def:[4,0,"Panel Rule"]},
  /* A direction is a starting point, not a cage — every axis under it stays yours
     to override, and the older name-led compositions are all still one pick away. */
- {k:"Quiet",      th:[7,1,3], pal:[0,1],   pl:["Endorsement","Twin Marks","Radial","Edge","Quiet"],
+ {k:"Quiet",      th:[7,1,3], pal:[0,1],   pl:["Endorsement","Tint Panel","Baseline","Rules","Quiet"],
                   g:{pat:"grid",hero:"concentric",motif:"leaf"},      def:[7,0,"Endorsement"]},
- {k:"Newsprint",  th:[1,6,2], pal:[0,2],   pl:["Rating Prompt","Marquee","Diagonal","Spine Stub","Split"],
+ {k:"Newsprint",  th:[1,6,2], pal:[0,2],   pl:["Rating Prompt","Marquee","Rules","Spine Field","Spine Stub"],
                   g:{pat:"topo",hero:"rays",motif:"croissant"},       def:[1,0,"Rating Prompt"]},
- {k:"Counter",    th:[0,4,5], pal:[3,4,1], pl:["Sequence","Marquee","Rating Prompt","Action Third","Low Band"],
-                  g:{pat:"halftone",hero:"blob",motif:"coffee"},      def:[0,3,"Sequence"]},
- {k:"Badge",      th:[3,6,1], pal:[1,5,0], pl:["Twin Marks","Reversed Field","Endorsement","Bleed Ring","Standing Panel"],
-                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[3,1,"Twin Marks"]}
+ {k:"Counter",    th:[0,4,5], pal:[3,4,1], pl:["Half Band","Marquee","Rating Prompt","Action Third","Low Band"],
+                  g:{pat:"halftone",hero:"blob",motif:"coffee"},      def:[0,3,"Half Band"]},
+ {k:"Badge",      th:[3,6,1], pal:[1,5,0], pl:["Endorsement Rated","Endorsement","Baseline","Bleed Ring","Standing Panel"],
+                  g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[3,1,"Endorsement Rated"]}
 ];
 /* One place that turns a composition's name into its index, so everything above
    reads as design intent rather than as offsets. An unknown name is dropped rather
@@ -3345,8 +3377,12 @@ function plateIx(v){
 }
 function dirPlates(d){
   if(!d || !d.pl) return null;
-  var out=[],i,ix;
-  for(i=0;i<d.pl.length;i++){ ix=plateIx(d.pl[i]); if(ix>=0) out.push(ix) }
+  var out=[],i,ix,lost=[];
+  for(i=0;i<d.pl.length;i++){ ix=plateIx(d.pl[i]); if(ix>=0) out.push(ix); else lost.push(d.pl[i]) }
+  /* Retiring a composition used to shrink whichever directions named it, quietly:
+     Badge-led was down to three of its twelve before anyone noticed. Say so. */
+  if(lost.length && !dirPlates._said){ dirPlates._said=1;
+    console.warn('direction "'+d.k+'" names retired compositions: '+lost.join(', ')) }
   return out;
 }
 function dirDefPlate(d){ return d && d.def ? Math.max(0, plateIx(d.def[2])) : 0 }
