@@ -547,6 +547,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   background:var(--b-brand);transform:translateY(-50%)}
 .fr-notched  .frame2::before{left:-3.5cqw}
 .fr-notched  .frame2::after{right:-3.5cqw}
+/* The ground sits below the textures and below every layer: it is the surface the
+   card is printed on, not an element on it. */
+.gnd{position:absolute;inset:0;pointer-events:none;z-index:50;
+  background-repeat:repeat;background-position:center}
 .tex{position:absolute;inset:0;pointer-events:none;z-index:60}
 .tx-none .tex{display:none}
 .tx-dots .tex{background-image:radial-gradient(var(--b-brand) 22%,transparent 23%);
@@ -955,6 +959,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                     <div class="chips" id="dirs"></div></div>
                   <div class="grp"><span class="lbl">Composition</span><div class="chips" id="plates"></div></div>
                   <div class="grp"><span class="lbl">Theme — type, frame, marks</span><div class="chips" id="themes"></div></div>
+                  <div class="grp"><span class="lbl">Background — the surface it prints on</span><div class="chips" id="grounds"></div></div>
                   <div class="grp"><span class="lbl">Palette</span><div class="chips" id="pals"></div></div>
                 </div>
               </details>
@@ -1098,6 +1103,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                 <div class="disc" id="discEl"></div>
                 <div class="disclab" id="discLab"></div>
               </div>
+              <div class="gnd" id="gndEl"></div>
               <div class="tex"></div>
               <div class="frame"></div>
               <div class="frame2"></div>
@@ -1915,8 +1921,85 @@ var PALETTES=[
    the imagery is drawn. For print that is the better answer anyway: vector,
    recolours per client, and sharp at any size. Every entry returns an SVG data
    URI tinted from the palette. */
+/* The ground's whole declaration in one place, because the card and the miniatures
+   in Browse all read it separately and a tile that disagrees with the card it claims
+   to preview is worse than no tile. */
+function gndCSS(pal){
+  var f=GROUNDS[S.ground||'none'];
+  if(!f) return 'display:none';
+  var c={brand:pal.brand, accent:pal.accent};
+  return "background-image:url('"+f(c)+"');background-size:calc(var(--mm,1.17cqw)*"+
+    groundMM(S.ground)+") auto;opacity:"+(S.groundOp==null?.13:S.groundOp);
+}
 function _svg(w,h,body){return 'data:image/svg+xml;utf8,'+encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+body+'</svg>')}
+/* ---- grounds: the card's own background graphic --------------------------------
+   Round 2 said theme had stopped doing visible work — all eight themes landed inside
+   a single card of each other, where round 1 could still tell them apart. A theme
+   changes a typeface, a frame and a star; at card size, next to a badge that fills a
+   third of the print, none of that survives being looked at from a counter. So the
+   deck needed something that actually changes what you see, and this is it.
+
+   These are drawn as one tile and repeated, sized in MILLIMETRES like the textures
+   are, so a squiggle is the same squiggle on a credit card and on a 4x3 stand rather
+   than four times coarser on one of them. They print in the brand colour at low
+   opacity: round 1 settled that flooding a card loses (19% against 51% on paper), and
+   a ground graphic is a surface, not a flood — if it competes with the badge it has
+   failed at the one job it has. */
+var GROUNDS={
+ none:null,
+ squiggle:function(c){var r='',i;for(i=0;i<3;i++)
+   r+='<path d="M4 '+(26+i*46)+' c14 -18 28 18 42 0 s28 -18 42 0" '+
+      'fill="none" stroke="'+c.brand+'" stroke-width="5" stroke-linecap="round"/>';
+   return _svg(130,96,r)},
+ noodle:function(c){return _svg(120,120,
+   '<path d="M10 60 C10 20 46 12 62 34 S104 62 96 88 S46 116 30 96 S12 76 34 70 '+
+   'S82 62 88 40" fill="none" stroke="'+c.brand+'" stroke-width="3.2" '+
+   'stroke-linecap="round" stroke-linejoin="round"/>')},
+ arches:function(c){var r='',x,y;for(y=0;y<2;y++)for(x=0;x<3;x++)
+   r+='<path d="M'+(x*40+8)+' '+(y*50+46)+' a16 16 0 0 1 32 0" fill="none" stroke="'+
+      (((x+y)%2)?c.accent:c.brand)+'" stroke-width="4.4" stroke-linecap="round"/>';
+   return _svg(128,100,r)},
+ blobs:function(c){return _svg(110,110,
+   '<path d="M28 16c14 -8 30 2 30 16s-10 18 -22 24 -22 16 -32 8 -8 -26 0 -34 10 -8 24 -14z" fill="'+c.brand+'"/>'+
+   '<path d="M78 54c10 -4 22 6 20 18s-14 20 -24 16 -14 -14 -10 -22 6 -10 14 -12z" fill="'+c.accent+'"/>'+
+   '<path d="M62 92c8 -2 14 6 10 12s-16 6 -18 -2 2 -8 8 -10z" fill="'+c.brand+'"/>')},
+ scallop:function(c){var r='',i,y;for(y=0;y<3;y++){for(i=0;i<5;i++)
+   r+='<path d="M'+(i*30)+' '+(y*34+26)+' a15 15 0 0 0 30 0" fill="none" stroke="'+
+      c.brand+'" stroke-width="3.6"/>'}
+   return _svg(120,104,r)},
+ zigzag:function(c){var r='',i;for(i=0;i<4;i++)
+   r+='<path d="M0 '+(20+i*34)+' l22 -13 22 13 22 -13 22 13" fill="none" stroke="'+
+      c.brand+'" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>';
+   return _svg(88,112,r)},
+ plus:function(c){var r='',x,y;for(y=0;y<3;y++)for(x=0;x<3;x++){
+   var cx=x*30+15+(y%2?15:0), cy=y*30+15;
+   r+='<path d="M'+cx+' '+(cy-8)+'v16M'+(cx-8)+' '+cy+'h16" stroke="'+c.brand+
+      '" stroke-width="3.4" stroke-linecap="round"/>'}
+   return _svg(90,90,r)},
+ mesh:function(c){return _svg(120,120,
+   '<circle cx="34" cy="38" r="30" fill="'+c.brand+'" opacity=".55"/>'+
+   '<circle cx="84" cy="30" r="24" fill="'+c.accent+'" opacity=".45"/>'+
+   '<circle cx="68" cy="86" r="34" fill="'+c.brand+'" opacity=".35"/>'+
+   '<circle cx="20" cy="96" r="20" fill="'+c.accent+'" opacity=".4"/>')},
+ comet:function(c){var r='',i,P=[[12,20],[58,8],[92,34],[30,56],[74,70],[16,92],[60,104]];
+   for(i=0;i<P.length;i++)
+     r+='<path d="M'+P[i][0]+' '+P[i][1]+' q14 6 26 2" fill="none" stroke="'+
+        (i%2?c.accent:c.brand)+'" stroke-width="2.4" stroke-linecap="round"/>'+
+        '<circle cx="'+(P[i][0]+28)+'" cy="'+(P[i][1]+1)+'" r="2.6" fill="'+
+        (i%2?c.accent:c.brand)+'"/>';
+   return _svg(126,118,r)}
+};
+/* How big one tile prints, in millimetres, PER GROUND. A single global size made
+   every one of these read as wallpaper: at 10 mm a squiggle is not a squiggle, it is a
+   fine repeating texture, which is the opposite of the point. A ground graphic has to
+   be big enough that you see the shape rather than the repeat — a noodle wants a third
+   of the card, a plus can be small and still be a plus. Millimetres, not cqw, so the
+   same ground is the same size on a credit card and a 4x3 stand. */
+var GROUND_MM={squiggle:30, noodle:38, arches:28, blobs:34, scallop:34,
+               zigzag:28, plus:28, mesh:44, comet:44};
+function groundMM(k){ return GROUND_MM[k]||24 }
+
 var PATTERNS={
  none:null,
  terrazzo:function(c){var r='',i,S=[[8,11,5],[38,7,3.4],[62,20,6],[22,34,4],[52,44,3],[14,58,5.5],[44,66,4.4],[68,52,3.2],[30,50,2.6],[58,72,2.8]];
@@ -2925,23 +3008,6 @@ function hEndorsement(f,g){
 }
 
 
-function hTwinMarks(f,g){
- /* Two marks the same size and nothing else competing: the thing you do on the
-    left, the place it goes on the right, a hairline between them standing in for
-    the arrow. The name is a caption to that sentence, not the headline. */
- return isWide(f) ? [
-  {t:"box",k:"tap", x:.27,y:.4375,s:1.42,ring:"circle",lay:"mark"},
-  {t:"box",k:"rule",x:.5, y:.4375,w:.2,rot:1,op:.4},
-  {t:"box",k:"plat",x:.73,y:.4375,s:1,ph:41},
-  {t:"box",k:"name",x:.5, y:0.875, s:.74,w:.8}
- ] : [
-  {t:"box",k:"tap", x:.5,y:0.1875,s:1.45,ring:"circle",lay:"mark"},
-  {t:"box",k:"rule",x:.5,y:0.375, w:.16,op:.4},
-  {t:"box",k:"plat",x:.5,y:0.5625,s:1,ph:56},
-  {t:"box",k:"logo",x:.5,y:0.8125,s:1,shape:"circle",d:19},
-  {t:"box",k:"name",x:.5,y:0.8125,s:.78,w:.8},
-  {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
-}
 
 /* Three more with the badge as the subject, these built around a star row.
 
@@ -3131,25 +3197,6 @@ function cTintPanel(f,g){
    and Rating Prompt were kept in all nine themes; Split Field, Tint Panel and Twin
    Marks in eight. These six vary those five rather than opening new ground. */
 
-function hEndorsementMirror(f,g){
- /* Endorsement read right-to-left. It was the only composition besides Rating Prompt
-    kept in every theme, so the cheapest honest question to ask next is whether the
-    side it sits on matters at all, or only the arrangement. */
- var w=isWide(f), t=gT('eyebrow',f,.46);
- if(w) return[
-  {t:"box",k:"plat",x:.73,y:.5,     s:1,ph:heroPh(f)},
-  {t:"box",k:"logo",x:.44,y:0.25,   s:1,al:"right",shape:"circle",d:17},
-  {t:"box",k:"name",x:.44,y:0.25,   s:.82,w:.38,al:"right"},
-  {t:"box",k:"rule",x:.44,y:0.4375, w:.16,al:"right",op:.5},
-  {t:"box",k:"head",x:.44,y:0.625,  s:.7,w:.38,al:"right"},
-  {t:"box",k:"tap", x:.44,y:0.8125, s:.82,w:.36,al:"right",cap:"TAP TO REVIEW",lay:"inline"}];
- return[
-  {t:"text",x:.5,y:0.125, s:t.s,fw:t.fw,ls:t.ls,text:"BEFORE YOU GO"},
-  {t:"box",k:"logo",x:.5,y:0.1875,s:1,shape:"circle",d:24},
-  {t:"box",k:"name",x:.5,y:0.1875,s:.8,w:.8},
-  {t:"box",k:"plat",x:.5,y:0.5,   s:1,ph:heroPh(f)},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
-}
 
 function hEndorsementRated(f,g){
  /* The two compositions that went 9/9 differ by one element: Rating Prompt has an
@@ -3237,32 +3284,12 @@ function hPanelRule(f,g){
   {t:"box",k:"tap", x:.5,y:0.9375,s:.9,cap:"TAP TO REVIEW",lay:"inline"}];
 }
 
-function hPairStack(f,g){
- /* Twin Marks turned upright, with the name between the two marks instead of under
-    them. The pair scored 8/9 while the same pair with no name at all scored 0/9, so
-    the name is doing more work here than a caption usually does — this puts it where
-    it cannot be missed. */
- var w=isWide(f);
- if(w) return[
-  {t:"box",k:"tap", x:.22,y:.4375,s:1.3,ring:"circle",lay:"mark"},
-  {t:"box",k:"logo",x:.5, y:0.4375,s:1,shape:"circle",d:15},
-  {t:"box",k:"name",x:.5, y:0.4375,s:.72,w:.24},
-  {t:"box",k:"plat",x:.78,y:.4375,s:1,ph:38},
-  {t:"box",k:"head",x:.5, y:0.875, s:.56,w:.7}];
- return[
-  {t:"box",k:"tap", x:.5,y:0.1875,s:1.45,ring:"circle",lay:"mark"},
-  {t:"box",k:"logo",x:.5,y:0.4375,s:1,shape:"circle",d:20},
-  {t:"box",k:"name",x:.5,y:0.4375,s:.8,w:.8},
-  {t:"box",k:"plat",x:.5,y:0.6875,s:1,ph:52},
-  {t:"box",k:"head",x:.5,y:0.9375,s:.52,w:.74}];
-}
 
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
- ["Endorsement Mirror",hEndorsementMirror,"any"],["Endorsement Rated",hEndorsementRated,"any"],
+ ["Endorsement Rated",hEndorsementRated,"any"],
  ["Half Band",hHalfBand,"any"],["Spine Field",hSpineField,"any"],
- ["Panel Rule",hPanelRule,"any"],["Pair Stack",hPairStack,"any"],
- ["Twin Marks",hTwinMarks,"any"],["Marquee",hMarquee,"any"],
+ ["Panel Rule",hPanelRule,"any"],["Marquee",hMarquee,"any"],
  ["Split Field",hSplitField,"any"],["Baseline",hBaseline,"any"],
  ["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
@@ -3370,7 +3397,7 @@ function defaults(fmt){
 }
 
 var curPreset=0;
-var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
+var S={fmt:0,plate:0,theme:0,dir:0,pal:0,tag:0,ground:'none',groundOp:.13,logo:null,sel:null,stack:defaults(0),uid:0,grid:false,
        userFonts:[],dispFont:'',bodyFont:'',platImg:null,platLib:null,platImgMode:'asis',tapImg:null,tapImgMode:'tint',multi:[]};
 
 /* ---- custom fonts --------------------------------------------------------
@@ -4072,6 +4099,7 @@ function paint(quiet){
      a 4.3 mm dot on the 5x7, and the grain tiled at 29 mm on a credit card, which
      is blotches rather than grain. */
   card.style.setProperty('--mm', (100/(fmt.mm||100))+'cqw');
+  if($('gndEl')) $('gndEl').style.cssText=gndCSS(pal);
   /* user-uploaded families override the theme's picks; system fallback is always appended */
   card.style.setProperty('--f-disp', S.dispFont ? fontStack(S.dispFont) : FONTS[th.disp]);
   card.style.setProperty('--f-body', S.bodyFont ? fontStack(S.bodyFont) : FONTS[th.body]);
@@ -4718,6 +4746,7 @@ function drawAxes(){
       b.setAttribute('aria-pressed', String(+b.dataset[r[1]]===r[2]));
     });
   });
+  if(typeof drawGrounds==='function') drawGrounds();
   // the button in the sidebar says what the card is wearing without opening anything
   if($('lookBtnN')){
     $('lookBtnN').textContent=(PLATES[S.plate]||[''])[0]||'Custom';
@@ -4725,6 +4754,26 @@ function drawAxes(){
       ' \u00b7 '+PALETTES[S.pal|0].k;
   }
 }
+/* The background row. Named keys rather than indices, for the reason every other
+   list here uses names now: a bank grows and positions move. */
+var groundsEl=$('grounds');
+var GROUND_KEYS=Object.keys(GROUNDS);
+function drawGrounds(){
+  if(!groundsEl) return;
+  groundsEl.innerHTML=GROUND_KEYS.map(function(k){
+    return '<button class="chip" type="button" data-gnd="'+esc(k)+'" aria-pressed="'+
+      (k===(S.ground||'none'))+'">'+esc(k==='none'?'None':k.charAt(0).toUpperCase()+k.slice(1))+
+      '</button>';
+  }).join('');
+}
+groundsEl && groundsEl.addEventListener('click',function(e){
+  var b=e.target.closest('button[data-gnd]'); if(!b) return;
+  pushUndo();
+  S.ground=b.dataset.gnd;
+  drawGrounds(); paint();
+});
+drawGrounds();
+
 var dirsEl=$('dirs');
 dirsEl.innerHTML=DIRECTIONS.map(function(t,i){
   return '<button class="chip" type="button" data-d="'+i+'" aria-pressed="'+(i===(S.dir|0))+'">'+t.k+'</button>'}).join('');
@@ -6322,6 +6371,7 @@ function miniCard(stack,over){
        A miniature was emitting the classes and none of the children, so the
        selectors matched nothing and frame and texture — two of the nine things a
        theme changes — were invisible in every preview in the app. */
+    '<div class="gnd" style="'+gndCSS(pal)+'"></div>'+
     '<div class="tex"></div><div class="frame"></div><div class="frame2"></div></div>';
 }
 function dockStyleArt(fid,it){
@@ -6867,9 +6917,8 @@ var LOOK_TABS=[{id:'browse',n:'Browse all'},{id:'look',n:'Looks'},{id:'plate',n:
 var FAMILIES=[
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
-  of:['Endorsement','Rating Prompt','Endorsement Mirror','Endorsement Rated',
-      'Half Band','Spine Field','Panel Rule','Pair Stack',
-      'Twin Marks','Marquee','Split Field','Baseline']},
+  of:['Endorsement','Rating Prompt','Endorsement Rated','Half Band',
+      'Spine Field','Panel Rule','Marquee','Split Field','Baseline']},
  {id:'clean', n:'Clean \u00b7 no name',
   note:'nothing that names the business \u2014 stock rather than a job',
   of:['Quiet Pair','Wash','Rules','Tint Panel']},

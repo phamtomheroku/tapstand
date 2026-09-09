@@ -1,0 +1,805 @@
+{
+ "kind": "tapstand.swipes",
+ "version": 1,
+ "round": 2,
+ "judgedAt": "2026-09-09",
+ "trim": "102 x 76 mm",
+ "deck": 120,
+ "judged": 94,
+ "partial": true,
+ "brand": "#1F6B7A",
+ "business": "Harbour & Vine",
+ "kept": 68,
+ "dropped": 26,
+ "compositions": [
+  {
+   "name": "Panel Rule",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Endorsement Rated",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Split Field",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Baseline",
+   "kept": 6,
+   "n": 6,
+   "pct": 1.0
+  },
+  {
+   "name": "Half Band",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Rating Prompt",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Endorsement",
+   "kept": 8,
+   "n": 8,
+   "pct": 1.0
+  },
+  {
+   "name": "Marquee",
+   "kept": 6,
+   "n": 8,
+   "pct": 0.75
+  },
+  {
+   "name": "Spine Field",
+   "kept": 6,
+   "n": 8,
+   "pct": 0.75
+  },
+  {
+   "name": "Endorsement Mirror",
+   "kept": 2,
+   "n": 8,
+   "pct": 0.25
+  },
+  {
+   "name": "Pair Stack",
+   "kept": 0,
+   "n": 8,
+   "pct": 0.0
+  },
+  {
+   "name": "Twin Marks",
+   "kept": 0,
+   "n": 8,
+   "pct": 0.0
+  }
+ ],
+ "themes": [
+  {
+   "name": "Clean",
+   "kept": 9,
+   "n": 12,
+   "pct": 0.75
+  },
+  {
+   "name": "Salon",
+   "kept": 9,
+   "n": 12,
+   "pct": 0.75
+  },
+  {
+   "name": "Soft",
+   "kept": 9,
+   "n": 12,
+   "pct": 0.75
+  },
+  {
+   "name": "Press",
+   "kept": 9,
+   "n": 12,
+   "pct": 0.75
+  },
+  {
+   "name": "Minimal",
+   "kept": 8,
+   "n": 11,
+   "pct": 0.727
+  },
+  {
+   "name": "Google",
+   "kept": 8,
+   "n": 11,
+   "pct": 0.727
+  },
+  {
+   "name": "Industrial",
+   "kept": 8,
+   "n": 12,
+   "pct": 0.667
+  },
+  {
+   "name": "Editorial",
+   "kept": 8,
+   "n": 12,
+   "pct": 0.667
+  }
+ ],
+ "readings": [
+  "A partial pass: 94 of 120 judged, so the 26 unseen are absent rather than rejected.",
+  "THEME HAS STOPPED DISCRIMINATING. All eight land between 67% and 75% - a spread of one card. Round 1 could still tell themes apart (40-90% over live compositions); now it cannot. That is the data agreeing with the note that came with this pass: a lot of these are pretty much identical. Varying a deck by theme no longer varies what you see.",
+  "Seven compositions were kept every time they appeared: Panel Rule, Endorsement Rated, Split Field, Baseline, Half Band, Rating Prompt, Endorsement.",
+  "Endorsement Mirror scored 2/8 against Endorsement at 8/8. The side the badge sits on is not arbitrary - it belongs on the left, and the mirror question is answered.",
+  "Twin Marks reversed: 8/9 in round 1, 0/8 here, and Pair Stack (built from it) also 0/8. The mark-pairing idea is out. Two marks at equal weight reads as indecision next to a card where the badge simply leads."
+ ],
+ "cards": [
+  {
+   "id": "baseline-clean",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "baseline-editorial",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "baseline-industrial",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "baseline-press",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "baseline-salon",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "baseline-soft",
+   "verdict": 1,
+   "composition": "Baseline",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-clean",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-editorial",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-google",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-industrial",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-minimal",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-clean",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-editorial",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-google",
+   "verdict": 1,
+   "composition": "Endorsement Mirror",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-industrial",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-minimal",
+   "verdict": 1,
+   "composition": "Endorsement Mirror",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-press",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-salon",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-mirror-soft",
+   "verdict": -1,
+   "composition": "Endorsement Mirror",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-press",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-clean",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-editorial",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-google",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-industrial",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-minimal",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-press",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-salon",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-rated-soft",
+   "verdict": 1,
+   "composition": "Endorsement Rated",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-salon",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "endorsement-soft",
+   "verdict": 1,
+   "composition": "Endorsement",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-clean",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-editorial",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-google",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-industrial",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-minimal",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-press",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-salon",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "half-band-soft",
+   "verdict": 1,
+   "composition": "Half Band",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-clean",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-editorial",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-google",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-industrial",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-minimal",
+   "verdict": -1,
+   "composition": "Marquee",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-press",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-salon",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "marquee-soft",
+   "verdict": 1,
+   "composition": "Marquee",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-clean",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-editorial",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-google",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-industrial",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-minimal",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-press",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-salon",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "pair-stack-soft",
+   "verdict": -1,
+   "composition": "Pair Stack",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-clean",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-editorial",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-google",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-industrial",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-minimal",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-press",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-salon",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "panel-rule-soft",
+   "verdict": 1,
+   "composition": "Panel Rule",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-clean",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-editorial",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-google",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-industrial",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-minimal",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-press",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-salon",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "rating-prompt-soft",
+   "verdict": 1,
+   "composition": "Rating Prompt",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-clean",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-editorial",
+   "verdict": -1,
+   "composition": "Spine Field",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-google",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-industrial",
+   "verdict": -1,
+   "composition": "Spine Field",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-minimal",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-press",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-salon",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "spine-field-soft",
+   "verdict": 1,
+   "composition": "Spine Field",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-clean",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-editorial",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-google",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-industrial",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-minimal",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-press",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-salon",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "split-field-soft",
+   "verdict": 1,
+   "composition": "Split Field",
+   "theme": "Soft",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-clean",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Clean",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-editorial",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Editorial",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-google",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Google",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-industrial",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Industrial",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-minimal",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Minimal",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-press",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Press",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-salon",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Salon",
+   "family": "badge"
+  },
+  {
+   "id": "twin-marks-soft",
+   "verdict": -1,
+   "composition": "Twin Marks",
+   "theme": "Soft",
+   "family": "badge"
+  }
+ ]
+}

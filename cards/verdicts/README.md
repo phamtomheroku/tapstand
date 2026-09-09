@@ -36,6 +36,14 @@ So a round reaches this folder one of two ways:
 | Round | Deck | Kept | What it settled |
 |---|---|---|---|
 | 1 | 135 (15 compositions x 9 themes) | 65 | Flooding the card is out; five compositions rejected in every theme |
+| 2 | 120 (15 x 8), 94 judged | 68 | Theme stopped discriminating; the badge belongs on the left; mark-pairing is out |
+| 3 | 90 (9 compositions x 10 backgrounds) | - | Judging the background graphic instead of the theme |
+
+A round varies ONE axis and holds the rest still. Round 3 varies the background and
+fixes the theme, because round 2 put all eight themes inside a single card of each
+other: a deck built on an axis that no longer separates anything shows the same design
+ten times, which is what "a lot are pretty much identical" means in practice. When an
+axis stops discriminating, stop varying it and find one that does.
 
 Each round writes to its own store collection — `swipes-r1`, `swipes-r2` — rather
 than a shared one. Survivors keep their ids between rounds, so a shared collection
