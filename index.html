@@ -3358,6 +3358,15 @@ var DIRECTIONS=[
     hunting. They are looking for what they are about to do, and the review badge
     says it in one object — the platform, the verb and a glyph they have seen ten
     thousand times. Every direction below now opens on one of these. */
+ /* The plainest thing the card can be: divided once, and carrying nothing but the
+    badge, the name, the prompt and the tap. No rating, no rule doing decoration, no
+    background graphic — `gnd` pins that, because a Simple composition with a wall of
+    stars behind it is no longer the thing this direction is for. The three names in
+    `g` are deliberately ones no library holds: a pattern, hero or motif that does not
+    resolve draws nothing, which is the whole point here. */
+ {k:"Simple",     th:[8,0,7], pal:[0,2],   pl:["Split Field","Half Band","Spine Field","Endorsement","Baseline","Tint Panel"],
+                  gnd:"none",
+                  g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Split Field"]},
  {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Endorsement Rated","Half Band","Marquee","Tint Panel"],
                   g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
  {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Marquee","Half Band","Split Field","Endorsed","Plaque"],
@@ -4830,6 +4839,7 @@ dirsEl.addEventListener('click',function(e){
   S.dir=+b.dataset.d; var d=DIR();
   if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=dirDefPlate(d);
              S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
+  if(d.gnd!=null) S.ground=d.gnd;
   Array.prototype.forEach.call(dirsEl.children,function(c){
     c.setAttribute('aria-pressed',c===b?'true':'false')});
   drawAxes(); paint();
@@ -6533,6 +6543,7 @@ function dockUse(fid,id){
     S.dir=+id.slice(1); var d=DIR();
     if(d.def){ S.theme=d.def[0]; S.pal=d.def[1]; S.plate=dirDefPlate(d);
                S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null); }
+    if(d.gnd!=null) S.ground=d.gnd;
   }
   /* A platform mark and a logo are not layers — they fill a slot. If the card has
      no slot for one, setting it would be silent and look broken, so make the slot.
@@ -6961,8 +6972,17 @@ var LOOK_TABS=[{id:'browse',n:'Browse all'},{id:'look',n:'Looks'},{id:'plate',n:
    nine renders on open however many thousand pairings the filters leave. */
 
 /* Families named rather than sliced by position, so adding a composition anywhere
-   cannot silently move one into the wrong shelf. Anything unlisted is 'classic'. */
+   cannot silently move one into the wrong shelf. Anything unlisted is 'classic'.
+
+   'simple' is the odd one out and deliberately so: it is a CHARACTERISTIC, not a
+   shelf, so it overlaps the others rather than taking compositions off them. Split
+   Field is badge-led and simple at the same time, and a card that had to stop being
+   one to be the other would be a filing error, not a design. Everything else here is
+   exclusive and a composition lands on exactly one. */
 var FAMILIES=[
+ {id:'simple', n:'Simple',
+  note:'divided once and carrying nothing else \u2014 badge, name, prompt, tap',
+  of:['Split Field','Half Band','Spine Field','Endorsement','Baseline','Tint Panel']},
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
   of:['Endorsement','Rating Prompt','Endorsement Rated','Half Band',
@@ -6972,11 +6992,18 @@ var FAMILIES=[
   of:['Quiet Pair','Wash','Rules','Tint Panel']},
  {id:'classic', n:'Classic', note:'the name-led compositions', of:null}
 ];
-function famOf(pi){
-  var n=(PLATES[pi]||[''])[0];
-  for(var i=0;i<FAMILIES.length;i++)
-    if(FAMILIES[i].of && FAMILIES[i].of.indexOf(n)>=0) return FAMILIES[i].id;
-  return 'classic';
+/* Every family a composition belongs to, because 'simple' overlaps the shelves.
+   Returns ['classic'] for anything unlisted so there is always somewhere to file it. */
+function famsOf(pi){
+  var n=(PLATES[pi]||[''])[0], out=[], i;
+  for(i=0;i<FAMILIES.length;i++)
+    if(FAMILIES[i].of && FAMILIES[i].of.indexOf(n)>=0) out.push(FAMILIES[i].id);
+  return out.length ? out : ['classic'];
+}
+function famNames(pi){
+  var ids=famsOf(pi), out=[], i, j;
+  for(i=0;i<FAMILIES.length;i++) if(ids.indexOf(FAMILIES[i].id)>=0) out.push(FAMILIES[i]);
+  return out;
 }
 var BR={q:'', fam:'badge', th:null, pal:null, v:null};
 
@@ -7044,7 +7071,7 @@ function browseItems(){
   var pal = BR.pal==null ? (S.pal|0) : BR.pal;
   PLATES.forEach(function(P,pi){
     if(!plateFitsTrim(pi)) return;
-    if(BR.fam && famOf(pi)!==BR.fam) return;
+    if(BR.fam && famsOf(pi).indexOf(BR.fam)<0) return;
     if(q && P[0].toLowerCase().indexOf(q)<0) return;
     ths.forEach(function(ti){
       if(BR.v){
@@ -7232,12 +7259,10 @@ function lookDetailHTML(d){
     var bpal=PALETTES[ai].fn(elBrand.value,elBg.value);
     big=lookArtFor('browse',id);
     title=PLATES[pi][0];
-    var fam=famOf(pi), famN='', famNote='';
-    for(var fi=0;fi<FAMILIES.length;fi++) if(FAMILIES[fi].id===fam){
-      famN=FAMILIES[fi].n; famNote=FAMILIES[fi].note;
-    }
+    var fams=famNames(pi);
     prose=PLATES[pi][0]+' in the '+THEMES[ti].k+' theme, '+PALETTES[ai].k+
-          ' palette. '+famN+' \u2014 '+famNote+'.';
+          ' palette. '+fams.map(function(F){return F.n}).join(' \u00b7 ')+
+          ' \u2014 '+fams.map(function(F){return F.note}).join('; ')+'.';
     extra='<div class="lface" style="font-family:'+FONTS[THEMES[ti].disp]+'">'+
             esc(THEMES[ti].k)+'</div>'+
           '<div class="lsw"><i style="background:'+bpal.ground+'"></i>'+
