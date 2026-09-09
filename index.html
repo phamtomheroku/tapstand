@@ -396,6 +396,15 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lart{flex:none}
 .lookgrid{display:grid;gap:12px;padding:15px 14px;
   grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
+/* A 196 px minimum puts ONE card per row on a phone, which is a slideshow rather
+   than a shelf you can scan. Two up, and the tile furniture shrinks to suit. */
+@media (max-width:520px){
+  .lookgrid{gap:9px;padding:12px 10px;grid-template-columns:repeat(2,1fr)}
+  .lv{width:22px;height:22px;font-size:11px}
+  .lvote{left:5px;top:5px;gap:3px}
+  .lpack{right:5px;bottom:5px;font-size:9px;padding:3px 6px}
+  .lname{font-size:12.5px}
+}
 /* Browse-all's filter bar. It sticks because the grid under it is long enough that
    you would otherwise scroll away from the only controls that shorten it. */
 .brbar{position:sticky;top:0;z-index:5;background:var(--panel,#fff);
@@ -404,22 +413,75 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .brq{width:100%;padding:8px 10px;font:inherit;font-size:13px;
   border:1px solid var(--line,#e6e6e9);border-radius:8px;background:var(--bg,#fafafa)}
 .brq:focus{outline:2px solid var(--accent,#1F6B7A);outline-offset:-1px}
+/* The bar used to be six rows of chips — forty-odd controls, all visible, all the
+   same weight, with the machinery of the thing shown before the thing itself. The
+   shape now is: one row you always see, one line of state, and everything else
+   behind a button that says how much of it is switched on. */
+.brtop{display:flex;align-items:center;gap:8px}
+.brq{flex:1;min-width:0}
+.brbtn{font:inherit;font-size:12.5px;padding:7px 12px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);color:inherit;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.brbtn:hover{border-color:var(--accent,#1F6B7A)}
+.brbtn[aria-expanded="true"]{background:var(--ink,#14181C);color:var(--panel,#fff);
+  border-color:var(--ink,#14181C)}
+.brbtn .cue{font-size:9px;opacity:.65}
+.brbtn b{font-weight:600;font-size:11px;padding:0 5px;border-radius:999px;
+  background:var(--accent,#1F6B7A);color:#fff;line-height:16px;min-width:16px;text-align:center}
+.brbtn[aria-expanded="true"] b{background:var(--panel,#fff);color:var(--ink,#14181C)}
+
+/* state, said once, in plain words rather than by lighting up one chip in five rows */
+.brstate{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:22px}
+.brnum{font-family:var(--mono,monospace);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3,#888);margin-right:2px}
+.brtok{font:inherit;font-size:11.5px;padding:3px 6px 3px 9px;border-radius:999px;
+  cursor:pointer;border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);
+  color:inherit;display:inline-flex;align-items:center;gap:5px}
+.brtok:hover{border-color:var(--drop,#B23A2E);color:var(--drop,#B23A2E)}
+.brtok i{font-style:normal;font-size:12px;opacity:.5}
+.brtok:hover i{opacity:1}
+.brnote{font-size:11.5px;color:var(--ink-3,#888)}
+
+/* the panel: the old rows, but only when asked for */
+.brpanel{border:1px solid var(--line,#e6e6e9);border-radius:10px;padding:10px 12px;
+  background:var(--bg,#fafafa);display:flex;flex-direction:column;gap:9px}
+.brgrp{display:flex;flex-direction:column;gap:6px}
+.brlab{font-family:var(--mono,monospace);font-size:9.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3,#888)}
 .brrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.brlab{font-family:var(--mono,monospace);font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink-3,#888);min-width:52px}
 .brchip{font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer;
-  border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);color:inherit}
+  border:1px solid var(--line,#e6e6e9);background:var(--panel,#fff);color:inherit}
 .brchip:hover{border-color:var(--accent,#1F6B7A)}
 .brchip[aria-pressed="true"]{background:var(--ink,#14181C);color:var(--panel,#fff);
   border-color:var(--ink,#14181C)}
-.brnote{font-size:11.5px;color:var(--ink-3,#888)}
-.brcount{font-family:var(--mono,monospace);font-size:10.5px;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink-3,#888);padding:11px 14px 0}
-.brfoot{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.brtools{display:flex;gap:6px}
-.brtool{font:inherit;font-size:11.5px;padding:4px 9px;border-radius:6px;cursor:pointer;
-  border:1px solid var(--line,#e6e6e9);background:var(--bg,#fafafa);color:inherit}
+.brpfoot{display:flex;gap:6px;flex-wrap:wrap;padding-top:2px;
+  border-top:1px solid var(--line,#e6e6e9);margin-top:1px}
+.brtool{font:inherit;font-size:11.5px;padding:5px 10px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line,#e6e6e9);background:var(--panel,#fff);color:inherit}
 .brtool:hover{border-color:var(--accent,#1F6B7A)}
+.brtool.warn:hover{border-color:var(--drop,#B23A2E);color:var(--drop,#B23A2E)}
+
+/* one pack per line, the way a list of albums reads */
+.brpack{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer;
+  border:1px solid transparent;background:var(--panel,#fff);color:inherit}
+.brpack:hover{border-color:var(--accent,#1F6B7A)}
+.brpack[aria-pressed="true"]{background:var(--ink,#14181C);color:var(--panel,#fff)}
+.brpack .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brpack .c{font-family:var(--mono,monospace);font-size:10.5px;opacity:.6}
+
+/* inside a pack there are exactly two places to be, so it is a switch, not chips */
+.brseg{display:inline-flex;padding:2px;gap:2px;border-radius:9px;
+  background:var(--bg,#f0f0f2);border:1px solid var(--line,#e6e6e9)}
+.brseg button{font:inherit;font-size:12.5px;padding:5px 14px;border-radius:7px;
+  border:0;background:transparent;color:var(--ink-3,#777);cursor:pointer;white-space:nowrap}
+.brseg button[aria-pressed="true"]{background:var(--panel,#fff);color:inherit;
+  box-shadow:0 1px 2px rgba(0,0,0,.12);font-weight:600}
+.brback{font:inherit;font-size:12.5px;padding:6px 8px 6px 4px;border:0;cursor:pointer;
+  background:transparent;color:var(--accent,#1F6B7A);display:inline-flex;align-items:center;gap:3px}
+.brtitle{font-size:14.5px;font-weight:600;letter-spacing:-.01em;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 /* Keep / drop, pinned to the tile so judging a grid never costs a round trip into
    a detail pane and back. Visible always, not on hover: on a touch screen there is
    no hover, and this is the one control the whole sheet exists for. */
@@ -7022,7 +7084,10 @@ function famNames(pi){
   for(i=0;i<FAMILIES.length;i++) if(ids.indexOf(FAMILIES[i].id)>=0) out.push(FAMILIES[i]);
   return out;
 }
-var BR={q:'', fam:'badge', th:null, pal:null, v:null, pack:null, packView:'in'};
+/* fam starts null. It used to open on 'badge', a filter nobody had asked for and
+   nothing on screen admitted to — which is exactly the kind of hidden state the bar
+   was rebuilt to stop. */
+var BR={q:'', fam:null, th:null, pal:null, v:null, pack:null, packView:'in', panel:null};
 
 /* ---- verdicts --------------------------------------------------------------
    A design is keyed by the NAMES of the three things that make it, not by their
@@ -7193,63 +7258,127 @@ function browseMini(it){
     {th:THEMES[it.th], pal:PALETTES[it.pal].fn(elBrand.value,elBg.value)});
 }
 function browseOn(it){ return S.plate===it.pl && S.theme===it.th && S.pal===it.pal }
+/* ---- the browse bar ---------------------------------------------------------
+   This was six stacked rows of chips: Pack, Showing, Family, Theme, Colour, Verdict,
+   forty-odd controls with equal weight and nothing to say which mattered. It showed
+   you the machinery before it showed you the thing.
+
+   What it is now, in three parts:
+     1. ONE row you always see — search, a Packs button, a Filter button that carries
+        a count when filters are on.
+     2. ONE line of state, in words: how many designs, and a removable token per
+        active filter. Nothing lights up in a row of five to tell you what is on.
+     3. A panel, only when asked for. The old chips live here, grouped and labelled,
+        with the actions that belong to each panel at its foot.
+
+   And when a pack is open the whole bar changes shape rather than growing: a back
+   button, the pack's name, and one two-position switch. Inside a pack, family and
+   theme filters are answering a question nobody asked about a hand-made list. */
+function brRow(label,items,cur,attr){
+  return '<div class="brgrp"><span class="brlab">'+esc(label)+'</span><div class="brrow">'+
+    items.map(function(x){
+      return '<button class="brchip" type="button" data-'+attr+'="'+esc(String(x.v))+
+        '" aria-pressed="'+(String(x.v)===String(cur))+'">'+esc(x.n)+'</button>';
+    }).join('')+'</div></div>';
+}
+function brTok(label,attr){
+  return '<button class="brtok" type="button" data-clear="'+attr+'" '+
+    'title="Remove this filter">'+esc(label)+'<i>✕</i></button>';
+}
+/* Everything currently narrowing the grid, as words. This is also the count on the
+   Filter button, so the two can never disagree. */
+function brTokens(){
+  var out=[], i;
+  if(BR.fam) for(i=0;i<FAMILIES.length;i++) if(FAMILIES[i].id===BR.fam)
+    out.push({t:FAMILIES[i].n, k:'fam'});
+  if(BR.th!=null && THEMES[BR.th])   out.push({t:THEMES[BR.th].k, k:'th'});
+  if(BR.pal!=null && PALETTES[BR.pal]) out.push({t:PALETTES[BR.pal].k, k:'pal'});
+  if(BR.v) out.push({t:{yes:'Kept', no:'Dropped', none:'Undecided'}[BR.v]||BR.v, k:'v'});
+  return out;
+}
 function browseChips(){
-  function row(label,items,cur,attr){
-    return '<div class="brrow"><span class="brlab">'+esc(label)+'</span>'+
-      items.map(function(x){
-        return '<button class="brchip" type="button" data-'+attr+'="'+esc(String(x.v))+
-          '" aria-pressed="'+(String(x.v)===String(cur))+'">'+esc(x.n)+'</button>';
-      }).join('')+'</div>';
+  var n=browseItems().length;
+  var count='<span class="brnum">'+n+' design'+(n===1?'':'s')+'</span>';
+  var opk = BR.pack ? packGet(BR.pack) : null;
+  var search='<input class="brq" id="brQ" type="search" placeholder="Search compositions…" '+
+    'value="'+esc(BR.q)+'" autocomplete="off">';
+  var packsBtn='<button class="brbtn" type="button" data-panel="packs" aria-expanded="'+
+    (BR.panel==='packs')+'">Packs<span class="cue">▾</span></button>';
+
+  /* ---- inside a pack: a back button, a name, and one switch ---- */
+  if(opk){
+    return '<div class="brbar">'+
+      '<div class="brtop">'+
+        '<button class="brback" type="button" data-clear="pack">‹ All designs</button>'+
+        '<span class="brtitle">'+esc(opk.n)+'</span>'+ packsBtn +
+      '</div>'+
+      '<div class="brstate">'+
+        '<span class="brseg">'+
+          '<button type="button" data-pv="in" aria-pressed="'+(BR.packView==='in')+'">'+
+            'In the pack '+opk.of.length+'</button>'+
+          '<button type="button" data-pv="all" aria-pressed="'+(BR.packView!=='in')+'">'+
+            'Add designs</button>'+
+        '</span>'+ count +
+        (opk.seeded && BR.packView==='in'
+          ? '<span class="brnote">started for you — delete anything</span>' : '')+
+      '</div>'+
+      (BR.panel==='packs' ? brPacksPanel() : '')+
+    '</div>';
   }
+
+  /* ---- everything else: search, two buttons, and the state in words ---- */
+  var toks=brTokens();
+  return '<div class="brbar">'+
+    '<div class="brtop">'+ search + packsBtn +
+      '<button class="brbtn" type="button" data-panel="filter" aria-expanded="'+
+        (BR.panel==='filter')+'">Filter'+
+        (toks.length?'<b>'+toks.length+'</b>':'<span class="cue">▾</span>')+'</button>'+
+    '</div>'+
+    '<div class="brstate">'+ count +
+      toks.map(function(t){ return brTok(t.t,t.k) }).join('')+
+      (toks.length>1?'<button class="brtok" type="button" data-clear="all">'+
+        'Clear all<i>✕</i></button>':'')+
+    '</div>'+
+    (BR.panel==='filter' ? brFilterPanel() : '')+
+    (BR.panel==='packs'  ? brPacksPanel()  : '')+
+  '</div>';
+}
+function brFilterPanel(){
   var fam=[{v:'',n:'Everything'}].concat(FAMILIES.map(function(F){return {v:F.id,n:F.n}}));
   var th=[{v:'',n:'Any'}].concat(THEMES.map(function(T,i){return {v:i,n:T.k}}));
   var pa=[{v:'',n:'Current'}].concat(PALETTES.map(function(P,i){return {v:i,n:P.k}}));
+  var t=verdictTally();
+  var vs=[{v:'',n:'All'},{v:'none',n:'Undecided '+t.none},
+          {v:'yes',n:'✓ Kept '+t.yes},{v:'no',n:'✕ Dropped '+t.no}];
   var note='';
   for(var i=0;i<FAMILIES.length;i++) if(FAMILIES[i].id===BR.fam) note=FAMILIES[i].note;
-  var t=verdictTally();
-  var vs=[{v:'',n:'All '+t.all},{v:'none',n:'Undecided '+t.none},
-          {v:'yes',n:'\u2713 Kept '+t.yes},{v:'no',n:'\u2715 Dropped '+t.no}];
+  return '<div class="brpanel">'+
+    brRow('Family',fam,BR.fam==null?'':BR.fam,'fam')+
+    (note?'<span class="brnote">'+esc(note)+'</span>':'')+
+    brRow('Theme', th, BR.th==null?'':BR.th, 'th')+
+    brRow('Colour',pa, BR.pal==null?'':BR.pal,'pal')+
+    brRow('Verdict',vs, BR.v==null?'':BR.v,'v')+
+    '<div class="brpfoot">'+
+      '<button class="brtool" type="button" data-clear="all">Reset filters</button>'+
+      '<button class="brtool" type="button" data-panel="">Done</button>'+
+    '</div></div>';
+}
+function brPacksPanel(){
   var opk = BR.pack ? packGet(BR.pack) : null;
-  var pks=[{v:'',n:'No pack'}].concat(S.packs.map(function(P){
-    return {v:P.id, n:P.n+' '+P.of.length} }));
-  /* With a pack open the family / theme / colour chips are answering a question that
-     is no longer being asked, so the bar swaps them for the two that are: whether you
-     are looking at what is in the pack or at everything you could add to it. */
-  var mid = opk
-    ? '<div class="brrow"><span class="brlab">Showing</span>'+
-        '<button class="brchip" type="button" data-pv="in" aria-pressed="'+
-          (BR.packView==='in')+'">In the pack '+opk.of.length+'</button>'+
-        '<button class="brchip" type="button" data-pv="all" aria-pressed="'+
-          (BR.packView!=='in')+'">Everything \u2014 add to it</button>'+
-      '</div>'+
-      (BR.packView==='in' ? '' :
-        row('Family',fam,BR.fam==null?'':BR.fam,'fam')+
-        row('Theme', th, BR.th==null?'':BR.th, 'th')+
-        row('Colour',pa, BR.pal==null?'':BR.pal,'pal'))
-    : row('Family',fam,BR.fam==null?'':BR.fam,'fam')+
-      row('Theme', th, BR.th==null?'':BR.th, 'th')+
-      row('Colour',pa, BR.pal==null?'':BR.pal,'pal');
-  var foot = opk
-    ? (opk.seeded
-        ? 'started for you \u2014 it is your list, delete anything in it'
-        : 'yours \u2014 '+opk.of.length+' design'+(opk.of.length===1?'':'s')+
-          ', in the order you added them')
-    : note;
-  return '<div class="brbar">'+
-    '<input class="brq" id="brQ" type="search" placeholder="Search compositions\u2026" '+
-      'value="'+esc(BR.q)+'" autocomplete="off">'+
-    row('Pack',pks,BR.pack==null?'':BR.pack,'pack')+
-    mid+
-    row('Verdict',vs, BR.v==null?'':BR.v,'v')+
-    '<div class="brfoot">'+
-      (foot?'<span class="brnote">'+esc(foot)+'</span>':'<span></span>')+
-      '<span class="brtools">'+
-        '<button class="brtool" type="button" data-pnew="1">+ New pack</button>'+
-        (opk?'<button class="brtool" type="button" data-pren="1">Rename</button>'+
-             '<button class="brtool" type="button" data-pdel="1">Delete pack</button>':'')+
-        '<button class="brtool" type="button" data-vexport="1">Download picks</button>'+
-        (t.yes+t.no ? '<button class="brtool" type="button" data-vclear="1">Clear verdicts</button>' : '')+
-      '</span>'+
+  return '<div class="brpanel">'+
+    (S.packs.length
+      ? S.packs.map(function(P){
+          return '<button class="brpack" type="button" data-pack="'+esc(P.id)+'" '+
+            'aria-pressed="'+(BR.pack===P.id)+'"><span class="n">'+esc(P.n)+'</span>'+
+            '<span class="c">'+P.of.length+'</span></button>';
+        }).join('')
+      : '<span class="brnote">No packs yet — a pack is a list you make by hand, '+
+        'and it keeps the order you add things in.</span>')+
+    '<div class="brpfoot">'+
+      '<button class="brtool" type="button" data-pnew="1">+ New pack</button>'+
+      (opk?'<button class="brtool" type="button" data-pren="1">Rename</button>'+
+           '<button class="brtool warn" type="button" data-pdel="1">Delete pack</button>':'')+
+      '<button class="brtool" type="button" data-vexport="1">Download picks</button>'+
     '</div></div>';
 }
 var LOOK_FIDS={plate:1,theme:1,pal:1,dir:1};
@@ -7299,8 +7428,7 @@ function lookListHTML(){
   if(lookTab==='browse'){
     var it=browseItems();
     return browseChips()+(it.length
-      ? '<div class="brcount">'+it.length+' design'+(it.length===1?'':'s')+'</div>'+
-        '<div class="lookgrid'+(BR.pack&&BR.packView!=='in'?' packadd':'')+'">'+it.map(function(x){
+      ? '<div class="lookgrid'+(BR.pack&&BR.packView!=='in'?' packadd':'')+'">'+it.map(function(x){
           return lookTile('browse', x.id, PLATES[x.pl][0],
             THEMES[x.th].k+' \u00b7 '+PALETTES[x.pal].k, browseOn(x));
         }).join('')+'</div>'
@@ -7567,7 +7695,7 @@ $('lookBody').addEventListener('click',function(e){
     var nn=prompt('Name this pack','Untitled pack');
     if(nn==null || !nn.trim()) return;
     var np=packNew(nn.trim());
-    BR.pack=np.id; BR.packView='all';
+    BR.pack=np.id; BR.packView='all'; BR.panel=null;
     lookScroll.browse=0; lookDraw(); return;
   }
   if(e.target.closest('[data-pren]')){
@@ -7583,11 +7711,31 @@ $('lookBody').addEventListener('click',function(e){
     packsSave(); BR.pack=null; BR.packView='in';
     lookScroll.browse=0; lookDraw(); return;
   }
+  var pn=e.target.closest('[data-panel]');
+  if(pn){ var w=pn.dataset.panel; BR.panel = (w && BR.panel!==w) ? w : null;
+          lookDraw(); return }
+  var cl=e.target.closest('[data-clear]');
+  if(cl){
+    var k=cl.dataset.clear;
+    if(k==='all'){ BR.fam=null; BR.th=null; BR.pal=null; BR.v=null }
+    else if(k==='pack'){ BR.pack=null; BR.packView='in'; BR.panel=null }
+    else if(k==='fam') BR.fam=null;
+    else if(k==='th')  BR.th=null;
+    else if(k==='pal') BR.pal=null;
+    else if(k==='v')   BR.v=null;
+    lookScroll.browse=0; lookDraw(); return;
+  }
+  var prow=e.target.closest('.brpack');
+  if(prow){
+    BR.pack = BR.pack===prow.dataset.pack ? null : prow.dataset.pack;
+    BR.packView='in'; BR.panel=null;
+    lookScroll.browse=0; lookDraw(); return;
+  }
+  var seg=e.target.closest('.brseg button');
+  if(seg){ BR.packView=seg.dataset.pv; lookScroll.browse=0; lookDraw(); return }
   var chip=e.target.closest('.brchip');
   if(chip){
-    if(chip.dataset.pack!=null){ BR.pack = chip.dataset.pack || null; BR.packView='in'; }
-    else if(chip.dataset.pv!=null) BR.packView = chip.dataset.pv;
-    else if(chip.dataset.fam!=null) BR.fam = chip.dataset.fam || null;
+    if(chip.dataset.fam!=null) BR.fam = chip.dataset.fam || null;
     else if(chip.dataset.th!=null) BR.th = chip.dataset.th===''?null:+chip.dataset.th;
     else if(chip.dataset.pal!=null) BR.pal = chip.dataset.pal===''?null:+chip.dataset.pal;
     else if(chip.dataset.v!=null) BR.v = chip.dataset.v || null;
