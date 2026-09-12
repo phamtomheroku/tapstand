@@ -4294,10 +4294,15 @@ function bodyHTML(L,ctx){
       // target, Mark size decides how much of it the artwork fills. Every mark is
       // cropped differently, so this is per-layer rather than baked per icon.
       var mk = L.mk==null?1:L.mk;
+      /* Mark size had no opposite number: you could grow the artwork but the words
+         were pinned to Scale, so the only way to match them was to move both and
+         hope. cz does for the caption what mk does for the mark, and every caption
+         in every tap treatment goes through it. */
+      var cz = L.cz==null?1:L.cz;
       if(L.style==='bar')
         return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
-          'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s)+'cqw;letter-spacing:.14em">'+
+          'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s*cz)+'cqw;letter-spacing:.14em">'+
           tapArt(9*s,6*s,contrast(mc))+esc(L.cap||'TAP')+'</div>';
       /* A round target. The mark sits over the words rather than beside them, because
          a circle wastes its width on a single line of type and the whole point of this
@@ -4311,7 +4316,7 @@ function bodyHTML(L,ctx){
           (L.crop?'flex-start':'center')+';gap:'+(1.5*cs)+'cqw;text-align:center;padding:'+
           (L.crop?(2.6*cs)+'cqw '+(3*cs)+'cqw':(3*cs)+'cqw')+';box-sizing:border-box">'+
           tapArt(13*cs,9*cs, ringed?mc:contrast(mc))+
-          '<b style="font-family:var(--f-disp);font-weight:750;font-size:'+(3.3*cs)+
+          '<b style="font-family:var(--f-disp);font-weight:750;font-size:'+(3.3*cs*cz)+
           'cqw;letter-spacing:.09em;line-height:1.2">'+esc(L.cap||'TAP')+'</b></div>';
       }
       /* An inset button: the bar's weight with a margin round it, so it reads as a
@@ -4320,17 +4325,17 @@ function bodyHTML(L,ctx){
         return '<div style="background:'+mc+';color:'+contrast(mc)+';border-radius:999px;'+
           'display:flex;align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;'+
           'padding:'+(4*s)+'cqw '+(5.5*s)+'cqw;font-family:var(--f-disp);font-weight:750;'+
-          'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em;white-space:nowrap">'+
+          'font-size:'+(4.4*s*cz)+'cqw;letter-spacing:.1em;white-space:nowrap">'+
           tapArt(10*s,7*s,contrast(mc))+esc(L.cap||'TAP')+'</div>';
       if(L.style==='bare')
         return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+(1.6*s)+'cqw">'+
           tapArt(22*s,16*s)+'<b style="font-family:var(--f-disp);'+
-          'font-size:'+(3.4*s)+'cqw;letter-spacing:.18em;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
+          'font-size:'+(3.4*s*cz)+'cqw;letter-spacing:.18em;color:'+mc+'">'+esc(L.cap||'TAP')+'</b></div>';
       if(L.style==='underline')
         return '<div style="display:flex;align-items:center;gap:'+(2.4*s)+'cqw;border-bottom:'+
           (.9*s)+'cqw solid '+mc+';padding-bottom:'+(1.6*s)+'cqw;color:'+mc+'">'+
           tapArt(11*s,8*s)+'<b style="font-family:var(--f-disp);'+
-          'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em">'+esc(L.cap||'TAP')+'</b></div>';
+          'font-size:'+(4.4*s*cz)+'cqw;letter-spacing:.1em">'+esc(L.cap||'TAP')+'</b></div>';
       // Whatever the mark is, it is tinted: a library vector by having its stroke
       // set, an uploaded file by being used as a MASK. 'As-is' keeps its own
       // colours. An empty icon means the first entry in the library, which is the
@@ -4358,7 +4363,7 @@ function bodyHTML(L,ctx){
         var lay=L.lay||'stack';
         // cap:"" is a deliberate "no words" — only an absent cap falls back to TAP
         var capTxt = (L.cap==null ? 'TAP' : L.cap);
-        var capHTML = capTxt ? '<b style="font-size:'+(3.1*s)+'cqw;color:'+mc+'">'+esc(capTxt)+'</b>' : '';
+        var capHTML = capTxt ? '<b style="font-size:'+(3.1*s*cz)+'cqw;color:'+mc+'">'+esc(capTxt)+'</b>' : '';
         if(lay==='cap')  return '<div class="tapring" style="border:none;width:auto;height:auto">'+
           capHTML+'</div>';
         if(lay==='mark') return tapArt(15*s*tapAR(L), 15*s);
@@ -4421,7 +4426,7 @@ function bodyHTML(L,ctx){
         '<div style="'+inner+'">'+tapArt(iw, ih)+'</div></div>';
       if(!ringCap) return ringHTML;
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+
-        (1.8*s)+'cqw">'+ringHTML+'<b style="font-family:var(--f-disp);font-size:'+(3.1*s)+
+        (1.8*s)+'cqw">'+ringHTML+'<b style="font-family:var(--f-disp);font-size:'+(3.1*s*cz)+
         'cqw;letter-spacing:.16em;font-weight:750;line-height:1.18;max-width:'+(25*s)+
         'cqw;color:'+mc+'">'+esc(ringCap)+'</b></div>';
     case 'qr':
@@ -4781,6 +4786,7 @@ function drawInspector(){
   }
   if(L.k==='tap'){
     var mkv=Math.round((L.mk==null?1:L.mk)*100);
+    var czv=Math.round((L.cz==null?1:L.cz)*100);
     h+='<span class="lbl">Ring</span>'+
        '<div class="chips" id="iRing">'+
        [['','None'],['circle','Circle'],['square','Square'],['hex','Hex'],
@@ -4794,7 +4800,14 @@ function drawInspector(){
          return '<button class="chip" type="button" data-l="'+o[0]+'" aria-pressed="'+
            ((L.lay||'stack')===o[0])+'">'+o[1]+'</button>' }).join('')+'</div>')+
        '<span class="lbl">Mark size &middot; '+mkv+'%</span>'+
-       '<input type="range" id="iMk" min="30" max="200" value="'+mkv+'">'+
+       '<input type="range" id="iMk" min="20" max="320" value="'+mkv+'">'+
+       '<span class="lbl">Caption size &middot; '+czv+'%</span>'+
+       '<input type="range" id="iCz" min="40" max="260" value="'+czv+'">'+
+       /* Matching two sliders by eye is a job for the machine: this measures what
+          is actually on the card and moves the mark onto the caption's cap height,
+          which is the height the words read at — not their font size, which counts
+          the space above and below them as well. */
+       '<button class="btn" type="button" id="iMatch">Match mark to caption</button>'+
        '<span class="lbl">Caption</span>'+
        '<input type="text" id="iCap" value="'+esc(L.cap||'TAP')+'">';
   }
@@ -4887,6 +4900,37 @@ function drawInspector(){
   if(L.k==='tap'){
     $('iCap').addEventListener('input',function(){L.cap=this.value;paint(true)});
     $('iMk').addEventListener('input',function(){L.mk=+this.value/100;paint(true)});
+    $('iCz').addEventListener('input',function(){L.cz=+this.value/100;paint(true)});
+    function inkH(art){
+      var r=art.getBoundingClientRect();
+      if(art.tagName && art.tagName.toLowerCase()==='svg'){
+        try{
+          var bb=art.getBBox(), vb=art.viewBox && art.viewBox.baseVal;
+          if(bb && bb.height && vb && vb.height && vb.width)
+            return bb.height*Math.min(r.width/vb.width, r.height/vb.height);
+        }catch(err){}
+      }
+      return r.height;
+    }
+    $('iMatch').addEventListener('click',function(){
+      var el=card.querySelector('.lay[data-id="'+L.id+'"]'); if(!el) return;
+      var art=el.querySelector('svg,img,div[style*="mask"]');
+      var cap=el.querySelector('b') || el;
+      if(!art) return;
+      /* The BOX the mark is drawn in is not the mark. The shipped marks are line art
+         with clear space inside their viewBox, so matching boxes leaves the glyph
+         visibly smaller than the words — which is the complaint this control exists
+         to answer. For a vector, getBBox gives what is actually drawn; for a masked
+         raster the box is all there is to go on. */
+      var ah=inkH(art);
+      /* cap height, not font size: a line box is roughly 1.4x the letters in it, and
+         matching to the line box leaves the mark visibly larger than the words. */
+      var ch=parseFloat(getComputedStyle(cap).fontSize)*0.72;
+      if(!ah || !ch) return;
+      pushUndo();
+      L.mk=Math.max(.2, Math.min(3.2, (L.mk==null?1:L.mk)*(ch/ah)));
+      paint(); drawPanel();
+    });
     $('iRing').addEventListener('click',function(e){
       var b=e.target.closest('button[data-r]'); if(!b)return;
       if(typeof pushUndo==='function') pushUndo();
