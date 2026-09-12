@@ -3249,8 +3249,8 @@ function cWash(f,g){
  if(w) return[
   {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2,op:.10},
   {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.05},
-  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:36},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"plat",x:.5,y:0.44,s:1,ph:Math.min(48,.58*cardHt(f))},
+  {t:"box",k:"tap", x:.5,y:0.845,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
  return[
   {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2,op:.10},
   {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.05},
@@ -3264,10 +3264,10 @@ function cRules(f,g){
     the one that survives being printed on whatever stock is already in the tray. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"rule",x:.5,y:0.1875,w:.78,c:"brand"},
-  {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:Math.min(30, .5*cardHt(f) - 10)},
-  {t:"box",k:"rule",x:.5,y:0.6875,w:.78,c:"brand"},
-  {t:"box",k:"tap", x:.5,y:0.8125,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
+  {t:"box",k:"rule",x:.5,y:0.155,w:.78,c:"brand"},
+  {t:"box",k:"plat",x:.5,y:0.45, s:1,ph:Math.min(42,.56*cardHt(f)-6)},
+  {t:"box",k:"rule",x:.5,y:0.745,w:.78,c:"brand"},
+  {t:"box",k:"tap", x:.5,y:0.875,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
  return[
   {t:"box",k:"rule",x:.5,y:0.1875,w:.72,c:"brand"},
   {t:"box",k:"plat",x:.5,y:0.4375,s:1,ph:heroPh(f)},
@@ -3281,11 +3281,11 @@ function cTintPanel(f,g){
     commit to a colour, which is what a shop with a pale interior actually wants. */
  var w=isWide(f);
  if(w) return[
-  {t:"box",k:"fill",x:.5,y:0.42,w:.88,hf:.66,op:.12},
+  {t:"box",k:"fill",x:.5,y:0.42,w:.88,hf:.66,op:.16},
   {t:"box",k:"plat",x:.5,y:0.42,s:1,ph:42},
   {t:"box",k:"tap", x:.5,y:0.845,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
  return[
-  {t:"box",k:"fill",x:.5,y:0.42,w:.90,hf:.62,op:.12},
+  {t:"box",k:"fill",x:.5,y:0.42,w:.90,hf:.62,op:.16},
   {t:"box",k:"plat",x:.5,y:0.42,s:1,ph:70},
   {t:"box",k:"tap", x:.5,y:0.845,s:1.2,cap:"TAP TO REVIEW"}];
 }
@@ -3396,6 +3396,75 @@ function hPanelRule(f,g){
 }
 
 
+/* ---- wordless: the brand is a colour, not a name ------------------------------
+   The Simple family's geometry with the business taken off it. No logo slot, no name,
+   no prompt — the Google badge, TAP TO REVIEW, and a colour. That makes the card
+   STOCK rather than a job: one print run works for every shop that likes the colour,
+   and a shop with no usable logo file is not stuck. The brand does the identifying
+   the way a coffee cup does it, by being the right green.
+
+   These are the same four divisions the Simple six use, so what is being tested here
+   is only the absence of the name, not a different idea about layout. */
+function cColourField(f,g){
+ /* No division at all: the whole card is the colour and the badge is reversed out of
+    it. Round 1 said a flooded card loses, but every flooded card in that pass had a
+    name and a prompt fighting the badge for the same field. This has neither. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.44, s:1,onBand:1,ph:Math.min(52,.62*cardHt(f))},
+  {t:"box",k:"tap", x:.5,y:0.845,s:1,onBand:1,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:.5,w:1.06,hf:1.2},
+  {t:"box",k:"pattern",x:.5,y:.5,w:1.06,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.44, s:1,onBand:1,ph:72},
+  {t:"box",k:"tap", x:.5,y:0.855,s:1.2,onBand:1,cap:"TAP TO REVIEW"}];
+}
+function cSplitPlain(f,g){
+ /* Split Field with the right-hand column emptied: colour and badge on one side, the
+    instruction alone on the other, and the hard edge between them doing the work. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.27,y:.5,w:.58,hf:1.2},
+  {t:"box",k:"pattern",x:.27,y:.5,w:.58,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.27,y:.5, s:1,onBand:1,ph:46},
+  {t:"box",k:"tap", x:.78,y:.5, s:.92,w:.26,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:0.34,w:1.06,hf:.70},
+  {t:"box",k:"pattern",x:.5,y:0.34,w:1.06,hf:.70,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.34, s:1,onBand:1,ph:66},
+  {t:"box",k:"tap", x:.5,y:0.855,s:1.1,cap:"TAP TO REVIEW"}];
+}
+function cBandPlain(f,g){
+ /* Half Band with nothing under the band but the instruction. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",   x:.5,y:0.33,w:1.06,hf:.64},
+  {t:"box",k:"pattern",x:.5,y:0.33,w:1.06,hf:.64,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.33, s:1,onBand:1,ph:Math.min(40,.50*cardHt(f))},
+  {t:"box",k:"tap", x:.5,y:0.835,s:1,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:0.31,w:1.06,hf:.64},
+  {t:"box",k:"pattern",x:.5,y:0.31,w:1.06,hf:.64,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.31, s:1,onBand:1,ph:68},
+  {t:"box",k:"tap", x:.5,y:0.845,s:1.15,cap:"TAP TO REVIEW"}];
+}
+function cSpinePlain(f,g){
+ /* The colour as an edge rather than a field: a spine down one side, the badge
+    standing on the paper beside it. The least ink of the four, and the one that
+    reads as a brand without ever covering the card in it. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"fill",x:.09,y:.5,w:.24,hf:1.2},
+  {t:"box",k:"plat",x:.56,y:0.42,s:1,ph:Math.min(44,.56*cardHt(f))},
+  {t:"box",k:"tap", x:.56,y:0.835,s:.95,cap:"TAP TO REVIEW",lay:"inline"}];
+ return[
+  {t:"box",k:"fill",x:.5,y:0.075,w:1.06,hf:.17},
+  {t:"box",k:"plat",x:.5,y:0.46, s:1,ph:66},
+  {t:"box",k:"tap", x:.5,y:0.855,s:1.15,cap:"TAP TO REVIEW"}];
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
  ["Endorsement Rated",hEndorsementRated,"any"],
@@ -3403,6 +3472,8 @@ var ARCHETYPES=[
  ["Panel Rule",hPanelRule,"any"],["Marquee",hMarquee,"any"],
  ["Split Field",hSplitField,"any"],["Baseline",hBaseline,"any"],
  ["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
+ ["Colour Field",cColourField,"any"],["Split Plain",cSplitPlain,"any"],
+ ["Band Plain",cBandPlain,"any"],["Spine Plain",cSpinePlain,"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
@@ -3434,6 +3505,11 @@ var DIRECTIONS=[
  {k:"Simple",     th:[8,0,7], pal:[0,2],   pl:["Split Field","Half Band","Spine Field","Endorsement","Baseline","Tint Panel"],
                   gnd:"none",
                   g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Split Field"]},
+ /* Same geometry as Simple with the business taken off it. Pinned to the plain
+    ground for the same reason Simple is: the point is the badge and the colour. */
+ {k:"Colour only",th:[8,0,7], pal:[0,2],   pl:["Spine Plain","Split Plain","Band Plain","Colour Field","Tint Panel","Wash","Rules"],
+                  gnd:"none",
+                  g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Spine Plain"]},
  {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Endorsement Rated","Half Band","Marquee","Tint Panel"],
                   g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
  {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Marquee","Half Band","Split Field","Endorsed","Plaque"],
@@ -7061,14 +7137,16 @@ var LOOK_TABS=[{id:'browse',n:'Browse all'},{id:'look',n:'Looks'},{id:'plate',n:
 var FAMILIES=[
  {id:'simple', n:'Simple',
   note:'divided once and carrying nothing else \u2014 badge, name, prompt, tap',
-  of:['Split Field','Half Band','Spine Field','Endorsement','Baseline','Tint Panel']},
+  of:['Split Field','Half Band','Spine Field','Endorsement','Baseline','Tint Panel',
+      'Colour Field','Split Plain','Band Plain','Spine Plain','Wash','Rules']},
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
   of:['Endorsement','Rating Prompt','Endorsement Rated','Half Band',
       'Spine Field','Panel Rule','Marquee','Split Field','Baseline']},
- {id:'clean', n:'Clean \u00b7 no name',
-  note:'nothing that names the business \u2014 stock rather than a job',
-  of:['Quiet Pair','Wash','Rules','Tint Panel']},
+ {id:'clean', n:'No name',
+  note:'the brand is a colour, not a name \u2014 one print run works for any shop',
+  of:['Quiet Pair','Wash','Rules','Tint Panel',
+      'Colour Field','Split Plain','Band Plain','Spine Plain']},
  {id:'classic', n:'Classic', note:'the name-led compositions', of:null}
 ];
 /* Every family a composition belongs to, because 'simple' overlaps the shelves.
