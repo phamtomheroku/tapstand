@@ -3515,6 +3515,78 @@ function withTapBar(build){
   };
 }
 
+/* ---- huge tap: the instruction as a target -----------------------------------
+   The bar made the instruction a button. These make it the second subject of the
+   card. Written out by hand rather than transformed, because at this size the tap
+   stops being an ornament on somebody else's layout and starts deciding one — five
+   transformed siblings would all have come out as "colour on the left, circle on
+   the right", which is the batch-of-identical-cards mistake in a new costume.
+
+   All five are wordless: badge, target, colour. Nothing else. */
+function xTapDisc(f,g){
+ /* Two subjects side by side, the badge and a filled disc, with nothing between them
+    but paper. The plainest way to make the tap big. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat",x:.295,y:.5,s:1,ph:Math.min(42,.54*cardHt(f))},
+  {t:"box",k:"tap", x:.775,y:.5,s:1.38,style:"disc",cap:"TAP TO REVIEW"}];
+ return[
+  {t:"box",k:"plat",x:.5,y:0.275,s:1,ph:50},
+  {t:"box",k:"tap", x:.5,y:0.725,s:2,style:"disc",cap:"TAP TO REVIEW"}];
+}
+function xColourDisc(f,g){
+ /* The same pairing with the card's colour behind the badge, so the disc reverses
+    to paper and the two halves trade places. */
+ var w=isWide(f);
+ if(w) return[
+  /* the colour stops at 53%: the disc's left edge reaches 57%, and at 60% the two
+     met with a 2% sliver of the disc printing brand-on-brand — under the seam
+     check's threshold and still a visible notch. */
+  {t:"box",k:"fill",   x:.26,y:.5,w:.54,hf:1.2},
+  {t:"box",k:"pattern",x:.26,y:.5,w:.54,hf:1.2,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.255,y:.5,s:1,onBand:1,ph:Math.min(40,.52*cardHt(f))},
+  {t:"box",k:"tap", x:.785,y:.5,s:1.32,style:"disc",cap:"TAP TO REVIEW"}];
+ return[
+  {t:"box",k:"fill",   x:.5,y:0.29,w:1.06,hf:.64},
+  {t:"box",k:"pattern",x:.5,y:0.29,w:1.06,hf:.64,g:g.pat,op:.10},
+  {t:"box",k:"plat",x:.5,y:0.27,s:1,onBand:1,ph:56},
+  {t:"box",k:"tap", x:.5,y:0.75,s:1.65,style:"disc",cap:"TAP TO REVIEW"}];
+}
+function xTapRing(f,g){
+ /* Outline rather than fill: the target is drawn, not printed, so the card keeps its
+    paper and the badge stays the only solid thing on it. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat",x:.295,y:.5,s:1,ph:Math.min(42,.54*cardHt(f))},
+  {t:"box",k:"tap", x:.775,y:.5,s:1.38,style:"ring",cap:"TAP TO REVIEW"}];
+ return[
+  {t:"box",k:"plat",x:.5,y:0.275,s:1,ph:50},
+  {t:"box",k:"tap", x:.5,y:0.725,s:2,style:"ring",cap:"TAP TO REVIEW"}];
+}
+function xHalfMoon(f,g){
+ /* A disc so big the card cannot hold it: it rises out of the bottom edge and is
+    cropped by the trim, which makes the tap the largest shape on the card without
+    the card having to be big enough to contain it. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat",x:.5,y:0.30,s:1,ph:Math.min(34,.42*cardHt(f))},
+  {t:"box",k:"tap", x:.5,y:1.06,s:2.5,cs:1,style:"disc",cap:"TAP TO REVIEW",bleed:1,crop:1}];
+ return[
+  {t:"box",k:"plat",x:.5,y:0.26,s:1,ph:52},
+  {t:"box",k:"tap", x:.5,y:1.02,s:2.8,cs:1.35,style:"disc",cap:"TAP TO REVIEW",bleed:1,crop:1}];
+}
+function xPillFoot(f,g){
+ /* The bar with a margin round it. A strip cut out of the card reads as part of the
+    card; a shape sitting on it reads as something you press. */
+ var w=isWide(f);
+ if(w) return[
+  {t:"box",k:"plat",x:.5,y:0.36,s:1,ph:Math.min(40,.48*cardHt(f))},
+  {t:"box",k:"tap", x:.5,y:0.815,s:1.05,style:"pill",cap:"TAP TO REVIEW"}];
+ return[
+  {t:"box",k:"plat",x:.5,y:0.36,s:1,ph:62},
+  {t:"box",k:"tap", x:.5,y:0.83, s:1.35,style:"pill",cap:"TAP TO REVIEW"}];
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
  ["Endorsement Rated",hEndorsementRated,"any"],
@@ -3524,6 +3596,8 @@ var ARCHETYPES=[
  ["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
  ["Colour Field",cColourField,"any"],["Split Plain",cSplitPlain,"any"],
  ["Band Plain",cBandPlain,"any"],["Spine Plain",cSpinePlain,"any"],
+ ["Tap Disc",xTapDisc,"any"],["Colour Disc",xColourDisc,"any"],
+ ["Tap Ring",xTapRing,"any"],["Half Moon",xHalfMoon,"any"],["Pill Foot",xPillFoot,"any"],
  ["Colour Bar",withTapBar(cColourField),"any"],["Split Bar",withTapBar(cSplitPlain),"any"],
  ["Band Bar",withTapBar(cBandPlain),"any"],["Spine Bar",withTapBar(cSpinePlain),"any"],
  ["Wash Bar",withTapBar(cWash),"any"],["Ruled Bar",withTapBar(cRules),"any"],
@@ -3568,6 +3642,10 @@ var DIRECTIONS=[
  {k:"Big tap",    th:[8,0,7], pal:[0,2],   pl:["Spine Bar","Split Bar","Band Bar","Colour Bar","Panel Bar","Wash Bar","Ruled Bar"],
                   gnd:"none",
                   g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Spine Bar"]},
+ /* The instruction as a target rather than a caption or a button. */
+ {k:"Huge tap",   th:[8,0,7], pal:[0,2],   pl:["Tap Disc","Colour Disc","Tap Ring","Half Moon","Pill Foot"],
+                  gnd:"none",
+                  g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Tap Disc"]},
  {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Endorsement Rated","Half Band","Marquee","Tint Panel"],
                   g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
  {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Marquee","Half Band","Split Field","Endorsed","Plaque"],
@@ -4221,6 +4299,29 @@ function bodyHTML(L,ctx){
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
           'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s)+'cqw;letter-spacing:.14em">'+
           tapArt(9*s,6*s,contrast(mc))+esc(L.cap||'TAP')+'</div>';
+      /* A round target. The mark sits over the words rather than beside them, because
+         a circle wastes its width on a single line of type and the whole point of this
+         treatment is that the tap is big enough to aim at. */
+      if(L.style==='disc' || L.style==='ring'){
+        var dd=30*s, ringed=L.style==='ring', cs=L.cs!=null?L.cs:s;
+        return '<div style="width:'+dd+'cqw;height:'+dd+'cqw;border-radius:50%;'+
+          (ringed ? 'border:'+(1.5*cs)+'cqw solid '+mc+';color:'+mc
+                  : 'background:'+mc+';color:'+contrast(mc))+
+          ';display:flex;flex-direction:column;align-items:center;justify-content:'+
+          (L.crop?'flex-start':'center')+';gap:'+(1.5*cs)+'cqw;text-align:center;padding:'+
+          (L.crop?(2.6*cs)+'cqw '+(3*cs)+'cqw':(3*cs)+'cqw')+';box-sizing:border-box">'+
+          tapArt(13*cs,9*cs, ringed?mc:contrast(mc))+
+          '<b style="font-family:var(--f-disp);font-weight:750;font-size:'+(3.3*cs)+
+          'cqw;letter-spacing:.09em;line-height:1.2">'+esc(L.cap||'TAP')+'</b></div>';
+      }
+      /* An inset button: the bar's weight with a margin round it, so it reads as a
+         thing sitting ON the card rather than a strip cut out of it. */
+      if(L.style==='pill')
+        return '<div style="background:'+mc+';color:'+contrast(mc)+';border-radius:999px;'+
+          'display:flex;align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;'+
+          'padding:'+(4*s)+'cqw '+(5.5*s)+'cqw;font-family:var(--f-disp);font-weight:750;'+
+          'font-size:'+(4.4*s)+'cqw;letter-spacing:.1em;white-space:nowrap">'+
+          tapArt(10*s,7*s,contrast(mc))+esc(L.cap||'TAP')+'</div>';
       if(L.style==='bare')
         return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+(1.6*s)+'cqw">'+
           tapArt(22*s,16*s)+'<b style="font-family:var(--f-disp);'+
@@ -7197,7 +7298,8 @@ var FAMILIES=[
   note:'divided once and carrying nothing else \u2014 badge, name, prompt, tap',
   of:['Split Field','Half Band','Spine Field','Endorsement','Baseline','Tint Panel',
       'Colour Field','Split Plain','Band Plain','Spine Plain','Wash','Rules',
-      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar']},
+      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar',
+      'Tap Disc','Colour Disc','Tap Ring','Half Moon','Pill Foot']},
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
   of:['Endorsement','Rating Prompt','Endorsement Rated','Half Band',
@@ -7206,7 +7308,8 @@ var FAMILIES=[
   note:'the brand is a colour, not a name \u2014 one print run works for any shop',
   of:['Quiet Pair','Wash','Rules','Tint Panel',
       'Colour Field','Split Plain','Band Plain','Spine Plain',
-      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar']},
+      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar',
+      'Tap Disc','Colour Disc','Tap Ring','Half Moon','Pill Foot']},
  {id:'classic', n:'Classic', note:'the name-led compositions', of:null}
 ];
 /* Every family a composition belongs to, because 'simple' overlaps the shelves.
@@ -7366,6 +7469,9 @@ function packOffer(name, plates, themeName, palName, seeded){
     'Google','Flat', false);
   packOffer('SIMPLE_bigtap',
     ['Spine Bar','Split Bar','Band Bar','Colour Bar','Panel Bar','Wash Bar','Ruled Bar'],
+    'Google','Flat', false);
+  packOffer('SIMPLE_hugetap',
+    ['Tap Disc','Colour Disc','Tap Ring','Half Moon','Pill Foot'],
     'Google','Flat', false);
 })();
 
