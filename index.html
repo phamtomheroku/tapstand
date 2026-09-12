@@ -3465,6 +3465,56 @@ function cSpinePlain(f,g){
   {t:"box",k:"tap", x:.5,y:0.855,s:1.15,cap:"TAP TO REVIEW"}];
 }
 
+/* ---- big tap: the instruction as a button ------------------------------------
+   The wordless cards put TAP TO REVIEW under the badge at the size of a caption.
+   These are the same seven with it turned into a bar across the foot of the card —
+   a filled block with the mark and the words in it, the size of something you press.
+
+   Written as a TRANSFORM rather than seven near-copies, because seven hand-written
+   siblings drift: one ends up with a different badge height or a different gap and
+   then a verdict on the pack is a verdict on the drift as well as on the tap. This
+   way the two packs differ by exactly one thing.
+
+   Two adjustments the bar forces. The badge moves up and is capped, or it collides
+   with a bar that was not there when its height was chosen. And any colour block
+   running to the bottom edge is cut off above the bar — a brand-coloured bar on a
+   brand-coloured field is an invisible button, which is the one thing a button
+   cannot be. */
+function cp(o){ var n={},k; for(k in o) if(Object.prototype.hasOwnProperty.call(o,k)) n[k]=o[k]; return n }
+function withTapBar(build){
+  return function(f,g){
+    /* the bar's own height in cqw is its padding twice over plus its cap height;
+       as a fraction of THIS card that is what decides where its centre goes if the
+       bottom edge of it is to land on the trim. */
+    var st=build(f,g), out=[], i, L;
+    var bs=isWide(f)?1:1.25, barH=(10.2*bs)/cardHt(f);
+    var BARY=1-barH/2-0.008;
+    /* two different ceilings: a colour block is cut off ON the bar's top edge, so the
+       two meet and read as one object, while the badge keeps a gap above it. Clamping
+       both to the same line left a notch of paper between spine and button. */
+    var BARTOP=BARY-barH/2, TOP=BARTOP-0.045;
+    var onBand=false;
+    for(i=0;i<st.length;i++) if(st[i].k==='tap' && st[i].onBand) onBand=true;
+    for(i=0;i<st.length;i++){
+      L=st[i];
+      if(L.k==='tap') continue;                 // rebuilt at the foot, always
+      if(L.k==='plat'){
+        L=cp(L);
+        L.y  = Math.min(L.y, TOP/2 + .02);
+        L.ph = Math.min(L.ph, (TOP-.06)*cardHt(f));
+      }
+      else if(L.k==='fill' || L.k==='pattern'){
+        var top=L.y-L.hf/2, bot=L.y+L.hf/2;
+        if(bot > BARTOP){ L=cp(L); bot=BARTOP; L.hf=bot-top; L.y=(top+bot)/2 }
+      }
+      out.push(L);
+    }
+    out.push({t:"box",k:"tap",x:.5,y:BARY,w:1.06,s:bs,
+              style:"bar",cap:"TAP TO REVIEW",bleed:1,onBand:onBand?1:0});
+    return out;
+  };
+}
+
 var ARCHETYPES=[
  ["Endorsement",hEndorsement,"any"],["Rating Prompt",hRatingPrompt,"any"],
  ["Endorsement Rated",hEndorsementRated,"any"],
@@ -3474,6 +3524,10 @@ var ARCHETYPES=[
  ["Wash",cWash,"any"],["Rules",cRules,"any"],["Tint Panel",cTintPanel,"any"],
  ["Colour Field",cColourField,"any"],["Split Plain",cSplitPlain,"any"],
  ["Band Plain",cBandPlain,"any"],["Spine Plain",cSpinePlain,"any"],
+ ["Colour Bar",withTapBar(cColourField),"any"],["Split Bar",withTapBar(cSplitPlain),"any"],
+ ["Band Bar",withTapBar(cBandPlain),"any"],["Spine Bar",withTapBar(cSpinePlain),"any"],
+ ["Wash Bar",withTapBar(cWash),"any"],["Ruled Bar",withTapBar(cRules),"any"],
+ ["Panel Bar",withTapBar(cTintPanel),"any"],
 ["Quiet",gQuiet,"any"],["Instruction",gInstruction,"any"],
  ["Rated",gRated,"any"],["Brand field",gField,"any"],["Plaque",gPlaque,"any"],["Endorsed",gEndorsed,"any"],
  ["Full bleed",aFullbleed],["Split",aSplit],["Radial",aRadial],["Edge",aEdge],
@@ -3510,6 +3564,10 @@ var DIRECTIONS=[
  {k:"Colour only",th:[8,0,7], pal:[0,2],   pl:["Spine Plain","Split Plain","Band Plain","Colour Field","Tint Panel","Wash","Rules"],
                   gnd:"none",
                   g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Spine Plain"]},
+ /* The wordless set with the instruction as a button instead of a caption. */
+ {k:"Big tap",    th:[8,0,7], pal:[0,2],   pl:["Spine Bar","Split Bar","Band Bar","Colour Bar","Panel Bar","Wash Bar","Ruled Bar"],
+                  gnd:"none",
+                  g:{pat:"none",hero:"none",motif:"none"},            def:[8,0,"Spine Bar"]},
  {k:"Badge-led",  th:[8,0,4], pal:[0,2,3], pl:["Endorsement","Rating Prompt","Endorsement Rated","Half Band","Marquee","Tint Panel"],
                   g:{pat:"arcs",hero:"concentric",motif:"gem"},       def:[8,0,"Endorsement"]},
  {k:"Bold",       th:[0,4,6], pal:[2,3,4], pl:["Marquee","Half Band","Split Field","Endorsed","Plaque"],
@@ -4162,7 +4220,7 @@ function bodyHTML(L,ctx){
         return '<div style="width:100%;background:'+mc+';color:'+contrast(mc)+';display:flex;'+
           'align-items:center;justify-content:center;gap:'+(2.6*s)+'cqw;padding:'+(3*s)+'cqw 0;'+
           'font-family:var(--f-disp);font-weight:750;font-size:'+(4*s)+'cqw;letter-spacing:.14em">'+
-          tapArt(9*s,6*s)+esc(L.cap||'TAP')+'</div>';
+          tapArt(9*s,6*s,contrast(mc))+esc(L.cap||'TAP')+'</div>';
       if(L.style==='bare')
         return '<div style="display:flex;flex-direction:column;align-items:center;gap:'+(1.6*s)+'cqw">'+
           tapArt(22*s,16*s)+'<b style="font-family:var(--f-disp);'+
@@ -4176,8 +4234,8 @@ function bodyHTML(L,ctx){
       // set, an uploaded file by being used as a MASK. 'As-is' keeps its own
       // colours. An empty icon means the first entry in the library, which is the
       // mark this editor ships with.
-      function tapArt(w,h){
-        return libArt(tapEntry(L),mc,libBox(w*mk,h*mk));
+      function tapArt(w,h,col){
+        return libArt(tapEntry(L),col||mc,libBox(w*mk,h*mk));
       }
       /* No circle unless you ask for one. A ring is a strong graphic commitment
          and it was arriving uninvited from the theme; the theme's choice is still
@@ -4440,7 +4498,7 @@ function layerCSS(L,M,ctx,th,brand,i){
      and the cap held it to 92cqw — which is why a 4 cqw strip of the card's texture
      showed down both sides of every panel and band, reading as the panel being laid
      on a busy pattern rather than as the card's own surface. */
-  if(BG_KINDS[L.k]) css+='max-width:none;';
+  if(BG_KINDS[L.k] || L.bleed) css+='max-width:none;';
   if(M.w!=null) css+='width:'+(M.w*100)+'%;';
   // Anything sitting on the colour band flips to whatever reads against the brand,
   // resolved at paint time so it keeps up when the brand colour changes.
@@ -7138,7 +7196,8 @@ var FAMILIES=[
  {id:'simple', n:'Simple',
   note:'divided once and carrying nothing else \u2014 badge, name, prompt, tap',
   of:['Split Field','Half Band','Spine Field','Endorsement','Baseline','Tint Panel',
-      'Colour Field','Split Plain','Band Plain','Spine Plain','Wash','Rules']},
+      'Colour Field','Split Plain','Band Plain','Spine Plain','Wash','Rules',
+      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar']},
  {id:'badge', n:'Badge-led',
   note:'the review badge is the subject; the card still carries the business',
   of:['Endorsement','Rating Prompt','Endorsement Rated','Half Band',
@@ -7146,7 +7205,8 @@ var FAMILIES=[
  {id:'clean', n:'No name',
   note:'the brand is a colour, not a name \u2014 one print run works for any shop',
   of:['Quiet Pair','Wash','Rules','Tint Panel',
-      'Colour Field','Split Plain','Band Plain','Spine Plain']},
+      'Colour Field','Split Plain','Band Plain','Spine Plain',
+      'Colour Bar','Split Bar','Band Bar','Spine Bar','Wash Bar','Ruled Bar','Panel Bar']},
  {id:'classic', n:'Classic', note:'the name-led compositions', of:null}
 ];
 /* Every family a composition belongs to, because 'simple' overlaps the shelves.
@@ -7272,19 +7332,41 @@ function packKeyItem(k){
   for(i=0;i<PALETTES.length;i++) if(PALETTES[i].k===q[2]){ pa=i; break }
   return (pl<0||th<0||pa<0) ? null : {pl:pl, th:th, pal:pa};
 }
-(function seedPacks(){
-  if(S.packs.length) return;
-  /* The six Simple compositions in the theme and palette the family opens on. It is a
-     starting shelf, not a recommendation — the whole point of a pack is that it is
-     edited. */
+/* Packs shipped with the app. Offering one is recorded in its own ledger, so a pack
+   you delete stays deleted — without that, every reload would put it back, which is
+   the difference between a starting shelf and a thing that will not leave you alone.
+   The ledger holds names, not contents: adding members to a shipped pack later would
+   not re-offer it, and that is deliberate. Yours once it is yours. */
+var PSEED='tapstand.packs.offered.v1';
+function packsOffered(){
+  try{ return JSON.parse(localStorage.getItem(PSEED)||'[]')||[] }catch(e){ return [] }
+}
+function packOffer(name, plates, themeName, palName, seeded){
+  var seen=packsOffered();
+  if(seen.indexOf(name)>=0) return;
+  seen.push(name);
+  try{ localStorage.setItem(PSEED,JSON.stringify(seen)) }catch(e){}
   function ix(a,k){ for(var i=0;i<a.length;i++) if(a[i].k===k) return i; return -1 }
-  var th=ix(THEMES,'Google'), pa=ix(PALETTES,'Flat');
+  var th=ix(THEMES,themeName), pa=ix(PALETTES,palName);
   if(th<0||pa<0) return;
-  var pk=packNew('Simple: Google badge main');
-  pk.seeded=1;
-  ['Split Field','Endorsement','Half Band','Spine Field','Baseline','Tint Panel']
-   .forEach(function(n){ var i=plateIx(n); if(i>=0) pk.of.push(vKey(i,th,pa)) });
+  var pk=packNew(name);
+  if(seeded) pk.seeded=1;
+  plates.forEach(function(n){ var i=plateIx(n); if(i>=0) pk.of.push(vKey(i,th,pa)) });
   packsSave();
+}
+(function seedPacks(){
+  /* The six Simple compositions in the theme and palette that family opens on. */
+  packOffer('Simple: Google badge main',
+    ['Split Field','Endorsement','Half Band','Spine Field','Baseline','Tint Panel'],
+    'Google','Flat', true);
+  /* Two packs that differ by exactly one thing, so putting them side by side asks
+     one question: how big should the instruction be? */
+  packOffer('SIMPLE_smalltap',
+    ['Spine Plain','Split Plain','Band Plain','Colour Field','Tint Panel','Wash','Rules'],
+    'Google','Flat', false);
+  packOffer('SIMPLE_bigtap',
+    ['Spine Bar','Split Bar','Band Bar','Colour Bar','Panel Bar','Wash Bar','Ruled Bar'],
+    'Google','Flat', false);
 })();
 
 /* Every pairing the filters allow. Composition is the outer loop so one design's
