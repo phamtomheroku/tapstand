@@ -1109,6 +1109,7 @@ footer{padding:34px 0 56px;font-family:var(--mono);font-size:11px;color:var(--in
                   <button class="btn solid" id="cardSave" type="button">Save this card</button>
                   <button class="btn" id="shelfAll" type="button">Tick all / none</button>
                 </div>
+                <button class="btn" id="shelfPack" type="button">Make a pack of the ticked</button>
                 <span class="libnote" id="shelfNote" style="flex:none"></span>
               </div>
               <div class="grp"><span class="lbl">Preflight</span>
@@ -6753,6 +6754,12 @@ function miniCard(stack,over){
   var brand=pal.brand||PREVIEW.brand;
   var ctx={}; for(var k in base) ctx[k]=base[k];
   ctx.th=th; ctx.pal=pal; ctx.brand=brand; ctx.bg=pal.ground; ctx.fg=contrast(pal.ground);
+  /* The words come from PREVIEW's context, which is the LIVE editor — fine for an
+     archetype, wrong for a saved card, which printed whatever business name happened
+     to be in the name box rather than its own. Anything the caller knows about the
+     design it is drawing overrides it. */
+  if(over && over.name!=null) ctx.name=over.name;
+  if(over && over.copy!=null) ctx.copy=over.copy;
   ctx.hasName=stack.some(function(L){ return L.k==='name' && !L.hidden });
   var face=ctx.face||{x:0,y:0,w:1,h:1};
   var GR={pattern:1,fill:1,hero:1,motif:1,band:1,split:1,rail:1,blob:1};
@@ -6764,7 +6771,8 @@ function miniCard(stack,over){
              w:(L.w!=null?L.w*face.w:null), sMul:face.w};
     out+='<div style="'+layerCSS(L,M,ctx,th,brand,i)+'">'+bodyHTML(L,ctx)+'</div>';
   });
-  var fmt=FORMATS[S.fmt];
+  // and its trim: a saved credit card drawn at the 4x3 aspect is not that card
+  var fmt=FORMATS[(over&&over.fmt!=null)?over.fmt:S.fmt]||FORMATS[S.fmt];
   return '<div class="mini fr-'+th.frame+' tx-'+th.tex+'" style="aspect-ratio:1/'+(fmt.ar||1.5)+
     ';background:'+pal.groundCSS+';color:'+ctx.fg+';--b-brand:'+brand+';--b-bg:'+pal.ground+
     ';--b-fg:'+ctx.fg+';--b-star:'+brand+';--rad:'+th.rad+'cqw;border-radius:'+th.rad+'cqw'+
@@ -7109,6 +7117,23 @@ function shelfDraw(){
       (S.cardSkip.length?' &middot; '+S.cardSkip.length+' too big to keep on this device':'');
   updateSheetFit();
 }
+/* The shelf's tick already means "this goes on the sheet". That is a run — a set of
+   cards you decided belong together and are about to spend paper on — and up to now
+   it existed only until you untick it. This turns the run into a pack, which is the
+   app's word for a list you made on purpose and can come back to. */
+$('shelfPack').addEventListener('click',function(){
+  var on=(S.cards||[]).filter(function(c){ return c.on });
+  if(!on.length){ alert('Tick the cards you want in the pack first.'); return }
+  var base=(elName.value||'Print run').trim() || 'Print run';
+  var nm=prompt('Name this pack', base+' \u00b7 '+on.length+' cards');
+  if(nm==null || !nm.trim()) return;
+  var pk=packNew(nm.trim());
+  on.forEach(function(c){ pk.of.push('card:'+c.id) });
+  packsSave();
+  BR.pack=pk.id; BR.packView='in'; BR.panel=null;
+  lookScroll.browse=0;
+  openLook('browse', this);
+});
 $('cardSave').addEventListener('click',function(){
   var base=(elName.value||'Card').trim();
   var n=base, i=2;
@@ -7289,7 +7314,9 @@ function lookVerdictBtns(id){
 function lookPackBtn(id){
   var pk = BR.pack ? packGet(BR.pack) : null;
   if(!pk) return '';
-  var q=id.split('.'), on=packHas(pk,+q[0],+q[1],+q[2]);
+  var on = String(id).slice(0,5)==='card:'
+    ? pk.of.indexOf(String(id))>=0
+    : (function(){ var q=id.split('.'); return packHas(pk,+q[0],+q[1],+q[2]) })();
   return '<span class="lpack'+(on?' on':'')+'" role="button" tabindex="0" '+
     'data-pk="'+esc(id)+'" aria-pressed="'+on+'" '+
     'title="'+(on?'Remove from ':'Add to ')+esc(pk.n)+'" '+
@@ -7301,7 +7328,16 @@ function lookArtFor(fid,id){
   if(LOOKART[k]!=null) return LOOKART[k];
   var out='';
   try{
-    if(fid==='look'){ var L=lookGet(id); out=L?lookMini(L):'' }
+    if(fid==='card'){
+      /* Rendered from the design as saved — its own brand, its own ground, its own
+         stack. A saved card is not a recipe to re-cook against whatever the editor
+         is set to; it is the thing you already made. */
+      var c=cardById(String(id).slice(5));
+      out = c ? miniCard(c.d.stack, {th:THEMES[c.d.theme|0]||THEMES[0],
+        pal:PALETTES[c.d.pal|0].fn(c.d.brand, c.d.bg),
+        name:c.d.name, copy:c.d.copy, fmt:c.d.fmt}) : '';
+    }
+    else if(fid==='look'){ var L=lookGet(id); out=L?lookMini(L):'' }
     else if(fid==='browse'){
       var q=id.split('.');
       out=browseMini({pl:+q[0], th:+q[1], pal:+q[2]});
@@ -7471,9 +7507,24 @@ function packToggle(pk,pl,th,pa){
   if(i<0) pk.of.push(k); else pk.of.splice(i,1);
   pk.seeded=0; packsSave();
 }
-/* A member name back into the three indices, or null if any part of it is gone. */
+/* A pack holds two kinds of thing and they are not the same animal.
+
+   An ARCHETYPE PAIRING — "Split Field|Google|Flat" — is a recipe: it renders against
+   whatever brand colour the editor is standing in, and it means the same thing on
+   any trim. A SAVED CARD — "card:c12-abc" — is a finished job: its own colours, its
+   own trim, its own hand edits, and it renders the way it was saved rather than the
+   way the editor happens to be set right now.
+
+   Both are strings so the store stays a list of strings, and the prefix is what
+   tells them apart. A member that no longer resolves — retired composition, deleted
+   card — is skipped rather than guessed at. */
 function packKeyItem(k){
-  var q=String(k).split('|'), pl=-1,th=-1,pa=-1,i;
+  k=String(k);
+  if(k.slice(0,5)==='card:'){
+    var c=cardById(k.slice(5));
+    return c ? {card:c} : null;
+  }
+  var q=k.split('|'), pl=-1,th=-1,pa=-1,i;
   for(i=0;i<PLATES.length;i++)   if(PLATES[i][0]===q[0]){ pl=i; break }
   for(i=0;i<THEMES.length;i++)   if(THEMES[i].k===q[1]){ th=i; break }
   for(i=0;i<PALETTES.length;i++) if(PALETTES[i].k===q[2]){ pa=i; break }
@@ -7533,6 +7584,14 @@ function browseItems(){
   if(opk && BR.packView==='in'){
     opk.of.forEach(function(k){
       var it=packKeyItem(k); if(!it) return;
+      if(it.card){
+        /* A saved card is shown whatever trim the editor is on: it carries its own,
+           and hiding it because you happen to be looking at a credit card would be
+           hiding a thing you put there by hand. */
+        if(q && it.card.n.toLowerCase().indexOf(q)<0) return;
+        out.push({id:'card:'+it.card.id, card:it.card});
+        return;
+      }
       if(!plateFitsTrim(it.pl)) return;
       if(q && PLATES[it.pl][0].toLowerCase().indexOf(q)<0) return;
       if(BR.v){
@@ -7702,7 +7761,8 @@ function lookTile(fid,id,name,sub,on){
     (sub?'<span class="lsub">'+esc(sub)+'</span>':'')+'</span>'+
     '<span class="dstar'+(isFav(fid,id)?' on':'')+'" data-fav="1" aria-hidden="true">'+
     (isFav(fid,id)?'\u2605':'\u2606')+'</span>'+
-    (fid==='browse'?lookVerdictBtns(id)+lookPackBtn(id):'')+'</button>';
+    (fid==='browse'?lookVerdictBtns(id)+lookPackBtn(id):'')+
+    (fid==='card'?lookPackBtn(id):'')+'</button>';
 }
 /* Which directions recommend this one. The whitelists are useful as a reason to
    pick something and harmful as a filter — most compositions and the Google theme
@@ -7739,6 +7799,8 @@ function lookListHTML(){
     var it=browseItems();
     return browseChips()+(it.length
       ? '<div class="lookgrid'+(BR.pack&&BR.packView!=='in'?' packadd':'')+'">'+it.map(function(x){
+          if(x.card) return lookTile('card', x.id, x.card.n,
+            (FORMATS[x.card.fmt]||{k:'?'}).k+' \u00b7 saved card', false);
           return lookTile('browse', x.id, PLATES[x.pl][0],
             THEMES[x.th].k+' \u00b7 '+PALETTES[x.pal].k, browseOn(x));
         }).join('')+'</div>'
@@ -7838,6 +7900,24 @@ function lookDetailHTML(d){
             '<i style="background:'+bpal.tint+'"></i></div>'+
           '<div class="lings">'+lookIngredients(bst).map(function(nm){
             return '<span class="ling">'+esc(nm)+'</span>' }).join('')+'</div>';
+  }else if(fid==='card'){
+    /* A saved card has no archetype to describe: it is whatever it was left as. So
+       the detail pane says what it IS — its trim, its colour, what it is made of —
+       rather than trying to name a composition it may no longer match. Without this
+       branch it fell through to the plate case, which parsed "card:c19-..." as an
+       index and read [0] off undefined. */
+    var sc=cardById(String(id).slice(5));
+    big=lookArtFor(fid,id);
+    title=sc?sc.n:'Saved card';
+    if(sc){
+      var sf=FORMATS[sc.d.fmt|0]||{k:'?'};
+      prose='Saved card at '+sf.k+(sc.d.plateName?', built on '+sc.d.plateName:'')+
+            '. It opens exactly as you left it \u2014 its own colours, its own trim.';
+      extra='<div class="lsw"><i style="background:'+esc(sc.d.bg||'#fff')+'"></i>'+
+            '<i style="background:'+esc(sc.d.brand||'#000')+'"></i></div>'+
+            '<div class="lings">'+lookIngredients(sc.d.stack||[]).map(function(nm){
+              return '<span class="ling">'+esc(nm)+'</span>' }).join('')+'</div>';
+    }
   }else{
     var i=+id.slice(1);
     big=lookArtFor(fid,id);
@@ -7962,6 +8042,12 @@ function lookUse(fid,id){
     S.plate=+q[0]; S.theme=+q[1]; S.pal=+q[2];
     S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null);
   }
+  else if(fid==='card'){
+    var c=cardById(String(id).slice(5));
+    if(!c){ UNDO.pop(); return }
+    applyDesign(JSON.parse(JSON.stringify(c.d))); selectOnly(null);
+    drawAxes(); paint(); lookDraw(); return;
+  }
   else if(fid==='plate'){ S.plate=+id.slice(1);
     S.stack=PLATES[S.plate][1](S.fmt); selectOnly(null) }
   else if(fid==='theme') S.theme=+id.slice(1);
@@ -8057,8 +8143,16 @@ $('lookBody').addEventListener('click',function(e){
   var pkb=e.target.closest('[data-pk]');
   if(pkb){
     e.preventDefault(); e.stopPropagation();
-    var pq=pkb.dataset.pk.split('.');
-    packToggle(packGet(BR.pack), +pq[0], +pq[1], +pq[2]);
+    var pid=pkb.dataset.pk;
+    if(pid.slice(0,5)==='card:'){
+      var cpk=packGet(BR.pack);
+      if(cpk){ var ci=cpk.of.indexOf(pid);
+        if(ci<0) cpk.of.push(pid); else cpk.of.splice(ci,1);
+        cpk.seeded=0; packsSave(); }
+    } else {
+      var pq=pid.split('.');
+      packToggle(packGet(BR.pack), +pq[0], +pq[1], +pq[2]);
+    }
     var keep=this.scrollTop; lookScroll.browse=keep; lookDraw();
     var bd=$('lookBody'); if(bd) bd.scrollTop=keep;
     return;
